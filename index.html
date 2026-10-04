@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Students Parliament Nigeria — Front ID Card Generator</title>
+  <title>Students Parliament Nigeria - Front ID Card Generator</title>
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,7 +22,7 @@
         <img src="image/image-1.png" alt="Students Parliament Logo" class="header-logo">
         <div class="header-titles">
           <h1>Students Parliament Nigeria</h1>
-          <p>Official ID Card Generator — Front Side</p>
+          <p>Official ID Card Generator - Front Side</p>
         </div>
       </div>
       <div>
@@ -55,7 +55,10 @@
             <!-- Full Name -->
             <div class="form-group full-width">
               <label for="inputName" class="form-label">
-                <span>Bearer Full Name</span>
+                <span class="label-with-icon">
+                  <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                  Bearer Full Name
+                </span>
                 <span style="color: #94a3b8; font-weight: normal; font-size: 0.75rem;">UPPERCASE</span>
               </label>
               <input type="text" id="inputName" class="form-input" placeholder="e.g. ADEOLA SEMILORE RODI" value="">
@@ -63,22 +66,40 @@
 
             <!-- School / Branch -->
             <div class="form-group full-width">
-              <label for="inputSchool" class="form-label">School / Chapter / Branch</label>
+              <label for="inputSchool" class="form-label">
+                <span class="label-with-icon">
+                  <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zm0 8.47L4.5 8.18 12 4.09l7.5 4.09L12 11.47zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
+                  School / Chapter / Branch
+                </span>
+              </label>
               <input type="text" id="inputSchool" class="form-input" placeholder="e.g. CSGS. GBERIGBE" value="">
             </div>
 
             <!-- ID Number with Auto-generate -->
             <div class="form-group">
-              <label for="inputId" class="form-label">ID Number</label>
+              <label for="inputId" class="form-label">
+                <span class="label-with-icon">
+                  <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zm2 4v2h12V8H6zm0 4v2h8v-2H6z"/></svg>
+                  ID Number
+                </span>
+              </label>
               <div class="input-with-action">
                 <input type="text" id="inputId" class="form-input" placeholder="e.g. SPA/ID/STU/26/061" value="">
-                <button type="button" id="btnGenId" class="btn-inline-action" title="Generate random ID number">Auto ID</button>
+                <button type="button" id="btnGenId" class="btn-inline-action" title="Generate random ID number">
+                  <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+                  Auto ID
+                </button>
               </div>
             </div>
 
             <!-- Category -->
             <div class="form-group">
-              <label for="inputCategory" class="form-label">Category / Role</label>
+              <label for="inputCategory" class="form-label">
+                <span class="label-with-icon">
+                  <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg>
+                  Category / Role
+                </span>
+              </label>
               <select id="inputCategory" class="form-select">
                 <option value="" disabled selected>Select Category</option>
                 <option value="STUDENT">STUDENT</option>
@@ -91,19 +112,34 @@
 
             <!-- Date Issued -->
             <div class="form-group">
-              <label for="inputDateIssued" class="form-label">Date Issued</label>
+              <label for="inputDateIssued" class="form-label">
+                <span class="label-with-icon">
+                  <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+                  Date Issued
+                </span>
+              </label>
               <input type="text" id="inputDateIssued" class="form-input" placeholder="DD/MM/YYYY" value="">
             </div>
 
             <!-- Valid Until -->
             <div class="form-group">
-              <label for="inputValidUntil" class="form-label">Valid Until</label>
+              <label for="inputValidUntil" class="form-label">
+                <span class="label-with-icon">
+                  <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zm-7-2l5-5-1.41-1.41L12 14.17l-1.59-1.59L9 14l3 3z"/></svg>
+                  Valid Until
+                </span>
+              </label>
               <input type="text" id="inputValidUntil" class="form-input" placeholder="DD/MM/YYYY" value="">
             </div>
 
             <!-- Membership Status -->
             <div class="form-group full-width">
-              <label for="inputStatus" class="form-label">Status</label>
+              <label for="inputStatus" class="form-label">
+                <span class="label-with-icon">
+                  <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+                  Status
+                </span>
+              </label>
               <select id="inputStatus" class="form-select">
                 <option value="ACTIVE" selected>ACTIVE</option>
                 <option value="PENDING">PENDING</option>
@@ -114,7 +150,10 @@
             <!-- Passport Photograph Upload -->
             <div class="form-group full-width">
               <label class="form-label">
-                <span>Passport Photograph</span>
+                <span class="label-with-icon">
+                  <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                  Passport Photograph
+                </span>
                 <span style="color: #64748b; font-size: 0.75rem;">Top-right white box</span>
               </label>
               
@@ -122,7 +161,7 @@
                 <input type="file" id="passportFile" accept="image/*" style="display: none;">
                 <div class="dropzone-inner">
                   <svg class="dropzone-icon" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+                    <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
                   </svg>
                   <p class="dropzone-text">Click or drag & drop passport image</p>
                   <p class="dropzone-hint">JPG, PNG, WEBP (Instantly overlays in passport box)</p>
@@ -223,7 +262,12 @@
 
               <!-- 9. Lower-Right White Space: Dynamic QR Code -->
               <div class="overlay-qr-box" id="qrBox">
-                <div class="qr-empty-hint" id="qrEmptyHint">QR CODE</div>
+                <div class="qr-empty-hint" id="qrEmptyHint">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm13-2h3v2h-3v-2zm-3 2h2v3h-2v-3zm2 3h2v3h-2v-3zm3-1h3v2h-3v-2zm0 3h3v2h-3v-2zm-5 0h2v2h-2v-2z"/>
+                  </svg>
+                  <span>QR CODE</span>
+                </div>
               </div>
 
             </div>

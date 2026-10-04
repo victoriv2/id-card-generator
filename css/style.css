@@ -173,6 +173,17 @@ body {
   align-items: center;
 }
 
+.label-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.label-with-icon svg {
+  color: var(--primary-green);
+  flex-shrink: 0;
+}
+
 .form-input, .form-select {
   padding: 0.7rem 0.9rem;
   border: 1.5px solid #cbd5e1;
@@ -606,10 +617,26 @@ body {
 }
 
 .qr-empty-hint {
-  font-size: 2cqw;
-  font-weight: 700;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
   color: #94a3b8;
   text-align: center;
+}
+
+.qr-empty-hint svg {
+  width: 5.5cqw;
+  max-width: 32px;
+  height: auto;
+  opacity: 0.55;
+}
+
+.qr-empty-hint span {
+  font-size: 2.1cqw;
+  font-weight: 800;
+  letter-spacing: 0.5px;
 }
 
 /* Toast */

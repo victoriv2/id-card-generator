@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const validVal = inputValidUntil.value.trim();
 
     if (!idVal && !nameVal) {
-      qrBox.innerHTML = '<div class="qr-empty-hint">QR CODE</div>';
+      qrBox.innerHTML = '<div class="qr-empty-hint"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm13-2h3v2h-3v-2zm-3 2h2v3h-2v-3zm2 3h2v3h-2v-3zm3-1h3v2h-3v-2zm0 3h3v2h-3v-2zm-5 0h2v2h-2v-2z"/></svg><span>QR CODE</span></div>';
       return;
     }
 
