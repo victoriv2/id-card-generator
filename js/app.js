@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const passportEmptyHint = document.getElementById('passportEmptyHint');
   const photoAdjustBox = document.getElementById('photoAdjustBox');
   const photoScaleRange = document.getElementById('photoScaleRange');
+  const photoPanXRange = document.getElementById('photoPanXRange');
   const photoPanYRange = document.getElementById('photoPanYRange');
   const scaleLabel = document.getElementById('scaleLabel');
 
@@ -43,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const toastNotice = document.getElementById('toastNotice');
 
   let currentScale = 1;
+  let currentPanX = 0;
   let currentPanY = 0;
   let hasPassport = false;
 
@@ -61,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // -------------------------------------------------------------------------
   function applyPhotoTransform() {
     if (!passportImg || !hasPassport) return;
-    passportImg.style.transform = `scale(${currentScale}) translateY(${currentPanY}px)`;
+    passportImg.style.transform = `scale(${currentScale}) translate(${currentPanX}px, ${currentPanY}px)`;
   }
 
   // -------------------------------------------------------------------------
@@ -218,9 +220,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Reset zoom and pan
       currentScale = 1;
+      currentPanX = 0;
       currentPanY = 0;
       if (photoScaleRange) photoScaleRange.value = 100;
       if (scaleLabel) scaleLabel.textContent = '100%';
+      if (photoPanXRange) photoPanXRange.value = 0;
       if (photoPanYRange) photoPanYRange.value = 0;
 
       applyPhotoTransform();
@@ -234,6 +238,13 @@ document.addEventListener('DOMContentLoaded', () => {
     photoScaleRange.addEventListener('input', (e) => {
       currentScale = parseInt(e.target.value, 10) / 100;
       if (scaleLabel) scaleLabel.textContent = `${e.target.value}%`;
+      applyPhotoTransform();
+    });
+  }
+
+  if (photoPanXRange) {
+    photoPanXRange.addEventListener('input', (e) => {
+      currentPanX = parseInt(e.target.value, 10);
       applyPhotoTransform();
     });
   }
@@ -259,6 +270,14 @@ document.addEventListener('DOMContentLoaded', () => {
       inputStatus.selectedIndex = 0;
 
       hasPassport = false;
+      currentScale = 1;
+      currentPanX = 0;
+      currentPanY = 0;
+      if (photoScaleRange) photoScaleRange.value = 100;
+      if (scaleLabel) scaleLabel.textContent = '100%';
+      if (photoPanXRange) photoPanXRange.value = 0;
+      if (photoPanYRange) photoPanYRange.value = 0;
+
       passportImg.src = '';
       passportImg.style.display = 'none';
       if (passportEmptyHint) passportEmptyHint.style.display = 'flex';
