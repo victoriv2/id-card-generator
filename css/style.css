@@ -97,32 +97,29 @@ body {
   color: var(--primary-green-dark);
 }
 
-/* Main Layout */
+/* Main Layout (Top to Bottom Stack) */
 .main-wrapper {
-  max-width: 1440px;
+  max-width: 1200px;
   margin: 2rem auto;
   padding: 0 1.5rem;
 }
 
-.layout-grid {
-  display: grid;
-  grid-template-columns: 460px 1fr;
-  gap: 2.5rem;
-  align-items: start;
+.layout-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  width: 100%;
 }
 
-@media (max-width: 1100px) {
-  .layout-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Form Card */
+/* Form Card on Top */
 .form-panel {
+  max-width: 840px;
+  width: 100%;
+  margin: 0 auto;
   background: var(--surface);
   border-radius: 16px;
-  padding: 1.75rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  padding: 2rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
   border: 1px solid var(--border);
 }
 
@@ -437,14 +434,17 @@ body {
    PREVIEW PANEL & LIVE OVERLAY CARDS (FRONT & BACK)
    ========================================================================== */
 .preview-panel {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1.5rem;
 }
 
 .preview-badge-header {
   background: #ffffff;
-  padding: 0.75rem 1.25rem;
+  padding: 0.85rem 1.4rem;
   border-radius: 12px;
   border: 1px solid var(--border);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -456,7 +456,7 @@ body {
 }
 
 .preview-badge-title {
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   font-weight: 800;
   color: var(--primary-green);
   display: flex;
@@ -476,8 +476,8 @@ body {
 .tab-btn {
   background: none;
   border: none;
-  padding: 0.35rem 0.85rem;
-  font-size: 0.8rem;
+  padding: 0.4rem 0.95rem;
+  font-size: 0.82rem;
   font-weight: 700;
   color: #64748b;
   border-radius: 6px;
@@ -491,21 +491,24 @@ body {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* Cards Preview Grid */
+/* Cards Preview Row */
 .cards-preview-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.5rem;
   justify-content: center;
-  align-items: start;
+  align-items: flex-start;
+  width: 100%;
 }
 
 .card-column {
+  flex: 0 1 380px;
+  max-width: 380px;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.65rem;
-  width: 100%;
+  gap: 0.75rem;
 }
 
 .card-side-tag {
