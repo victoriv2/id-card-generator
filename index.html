@@ -26,13 +26,9 @@
         </div>
       </div>
       <div class="header-actions">
-        <button id="btnLoadDemo" class="btn-header" type="button" title="Load sample student record">
-          <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46A7.93 7.93 0 0020 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74A7.93 7.93 0 004 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
-          Load Sample Data
-        </button>
-        <button id="btnResetForm" class="btn-header" type="button" title="Reset all input fields">
+        <button id="btnResetForm" class="btn-header" type="button" title="Clear all input fields">
           <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-          Clear Form
+          Reset Form
         </button>
       </div>
     </div>
@@ -43,7 +39,7 @@
     <div class="layout-grid">
 
       <!-- ================================================================
-           FORM INPUTS SECTION
+           FORM INPUTS SECTION (BLANK BY DEFAULT)
            ================================================================ -->
       <section class="form-card">
         <h2 class="section-title">
@@ -63,20 +59,20 @@
                 <span>Bearer Full Name</span>
                 <span style="color: #94a3b8; font-weight: normal; font-size: 0.75rem;">UPPERCASE</span>
               </label>
-              <input type="text" id="inputFullName" class="form-input" placeholder="e.g. ADEOLA SEMILORE RODI" value="ADEOLA SEMILORE RODI" required>
+              <input type="text" id="inputFullName" class="form-input" placeholder="e.g. ADEOLA SEMILORE RODI" value="" required>
             </div>
 
             <!-- School / Branch -->
             <div class="form-group full-width">
               <label for="inputSchool" class="form-label">School / Chapter / Branch</label>
-              <input type="text" id="inputSchool" class="form-input" placeholder="e.g. CSGS. GBERIGBE" value="CSGS. GBERIGBE" required>
+              <input type="text" id="inputSchool" class="form-input" placeholder="e.g. CSGS. GBERIGBE" value="" required>
             </div>
 
             <!-- ID Number with Generator -->
             <div class="form-group">
               <label for="inputIdNumber" class="form-label">ID Number</label>
               <div class="input-with-btn">
-                <input type="text" id="inputIdNumber" class="form-input" placeholder="e.g. SPA/ID/STU/26/061" value="SPA/ID/STU/26/061" required>
+                <input type="text" id="inputIdNumber" class="form-input" placeholder="e.g. SPA/ID/STU/26/061" value="" required>
                 <button type="button" id="btnGenId" class="btn-inline" title="Generate random ID">Auto ID</button>
               </div>
             </div>
@@ -85,7 +81,8 @@
             <div class="form-group">
               <label for="inputCategory" class="form-label">Category / Role</label>
               <select id="inputCategory" class="form-select">
-                <option value="STUDENT" selected>STUDENT</option>
+                <option value="" disabled selected>Select Category</option>
+                <option value="STUDENT">STUDENT</option>
                 <option value="EXECUTIVE">EXECUTIVE</option>
                 <option value="MEMBER">MEMBER</option>
                 <option value="OFFICIAL">OFFICIAL</option>
@@ -96,13 +93,13 @@
             <!-- Date Issued -->
             <div class="form-group">
               <label for="inputDateIssued" class="form-label">Date Issued (DD/MM/YYYY)</label>
-              <input type="text" id="inputDateIssued" class="form-input" placeholder="28/09/2026" value="28/09/2026">
+              <input type="text" id="inputDateIssued" class="form-input" placeholder="DD/MM/YYYY" value="">
             </div>
 
             <!-- Valid Until -->
             <div class="form-group">
               <label for="inputValidUntil" class="form-label">Valid Until (DD/MM/YYYY)</label>
-              <input type="text" id="inputValidUntil" class="form-input" placeholder="28/09/2027" value="28/09/2027">
+              <input type="text" id="inputValidUntil" class="form-input" placeholder="DD/MM/YYYY" value="">
             </div>
 
             <!-- Status -->
@@ -119,7 +116,7 @@
             <div class="form-group full-width">
               <label class="form-label">
                 <span>Passport Photograph</span>
-                <span style="color: #64748b; font-size: 0.75rem;">Clear front-facing portrait</span>
+                <span style="color: #64748b; font-size: 0.75rem;">Upload portrait photo</span>
               </label>
               <div class="upload-zone" id="uploadZone">
                 <input type="file" id="passportInput" accept="image/*" style="display: none;">
@@ -128,12 +125,12 @@
                     <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
                   </svg>
                   <p class="upload-title">Click to upload passport or drag & drop</p>
-                  <p class="upload-subtitle">Supports JPG, PNG, WEBP (Auto-cropped to ID card ratio)</p>
+                  <p class="upload-subtitle">Supports JPG, PNG, WEBP</p>
                 </div>
               </div>
 
               <!-- Photo Zoom & Pan Position Sliders -->
-              <div class="photo-controls" id="photoControls">
+              <div class="photo-controls" id="photoControls" style="display: none;">
                 <div class="photo-slider-group">
                   <label for="photoScale">Zoom: <span id="scaleValue">100%</span></label>
                   <input type="range" id="photoScale" min="50" max="250" value="100">
@@ -212,7 +209,7 @@
 
 
       <!-- ================================================================
-           LIVE CARD PREVIEW SECTION
+           LIVE CARD PREVIEW SECTION (BELOW / SIDE)
            ================================================================ -->
       <section class="preview-container">
         
@@ -270,10 +267,10 @@
 
                     <div class="front-passport-column">
                       <div class="passport-photo-box" id="passportBox">
-                        <img id="passportPreviewImg" src="image/sample-passport.jpg" alt="Bearer Passport Photograph">
+                        <img id="passportPreviewImg" src="image/blank-avatar.svg" alt="Bearer Passport Photograph">
                       </div>
-                      <div class="passport-bearer-name" id="cardBearerName">ADEOLA SEMILORE RODI</div>
-                      <div class="passport-bearer-school" id="cardBearerSchool">(CSGS. GBERIGBE)</div>
+                      <div class="passport-bearer-name empty-placeholder" id="cardBearerName">—</div>
+                      <div class="passport-bearer-school empty-placeholder" id="cardBearerSchool">—</div>
                     </div>
                   </div>
 
@@ -287,7 +284,7 @@
                           <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                         </div>
                         <span class="row-label">ID NUMBER</span>
-                        <span class="row-value id-val" id="cardIdNumber">SPA/ID/STU/26/061</span>
+                        <span class="row-value id-val" id="cardIdNumber">—</span>
                       </div>
 
                       <!-- Category -->
@@ -296,7 +293,7 @@
                           <svg fill="currentColor" viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg>
                         </div>
                         <span class="row-label">CATEGORY</span>
-                        <span class="row-value cat-val" id="cardCategory">STUDENT</span>
+                        <span class="row-value cat-val" id="cardCategory">—</span>
                       </div>
 
                       <!-- Date Issued -->
@@ -305,7 +302,7 @@
                           <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
                         </div>
                         <span class="row-label">DATE ISSUED</span>
-                        <span class="row-value date-val" id="cardDateIssued">28/09/2026</span>
+                        <span class="row-value date-val" id="cardDateIssued">—</span>
                       </div>
 
                       <!-- Valid Until -->
@@ -314,7 +311,7 @@
                           <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zm-7-2l5-5-1.41-1.41L12 14.17l-1.59-1.59L9 14l3 3z"/></svg>
                         </div>
                         <span class="row-label">VALID UNTIL</span>
-                        <span class="row-value exp-val" id="cardValidUntil">28/09/2027</span>
+                        <span class="row-value exp-val" id="cardValidUntil">—</span>
                       </div>
 
                       <!-- Status -->
@@ -330,7 +327,7 @@
 
                     </div>
 
-                    <!-- Dynamic QR Code (Encodes Student ID & Credentials) -->
+                    <!-- Dynamic QR Code (Generated when info is entered) -->
                     <div class="front-qr-box" id="frontQrBox" title="Scan to verify ID credentials">
                       <!-- QR Canvas injected via JavaScript -->
                     </div>
