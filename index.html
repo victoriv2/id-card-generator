@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Students Parliament Nigeria - Front ID Card Generator</title>
+  <title>Students Parliament Nigeria - ID Card Generator</title>
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,7 +22,7 @@
         <img src="image/image-1.png" alt="Students Parliament Logo" class="header-logo">
         <div class="header-titles">
           <h1>Students Parliament Nigeria</h1>
-          <p>Official ID Card Generator - Front Side</p>
+          <p>Official ID Card Generator - Front & Back</p>
         </div>
       </div>
       <div>
@@ -157,30 +157,47 @@
                 <span style="color: #64748b; font-size: 0.75rem;">Top-right white box</span>
               </label>
               
+              <!-- Clean, Full, Unclipped Upload Dropzone -->
               <div class="upload-dropzone" id="dropzone">
                 <input type="file" id="passportFile" accept="image/*" style="display: none;">
                 <div class="dropzone-inner">
-                  <svg class="dropzone-icon" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+                  <!-- Complete, Beautiful Vector Upload Icon -->
+                  <svg class="dropzone-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
                   </svg>
                   <p class="dropzone-text">Click or drag & drop passport image</p>
                   <p class="dropzone-hint">JPG, PNG, WEBP (Instantly overlays in passport box)</p>
                 </div>
               </div>
 
-              <!-- Photo Zoom & Pan Position Controls -->
+              <!-- Photo Zoom, Position Controls & Reset Button -->
               <div class="photo-adjust-box" id="photoAdjustBox">
-                <div class="photo-adjust-group">
-                  <label for="photoScaleRange">Zoom: <span id="scaleLabel">100%</span></label>
-                  <input type="range" id="photoScaleRange" min="50" max="250" value="100">
+                <div class="photo-adjust-header">
+                  <span class="photo-adjust-title">
+                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                    Photo Framing Adjustments
+                  </span>
+                  <button type="button" id="btnResetPhoto" class="btn-reset-photo" title="Reset Zoom and Positions to center">
+                    <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+                    Reset Framing
+                  </button>
                 </div>
-                <div class="photo-adjust-group">
-                  <label for="photoPanXRange">Horizontal Position</label>
-                  <input type="range" id="photoPanXRange" min="-100" max="100" value="0">
-                </div>
-                <div class="photo-adjust-group">
-                  <label for="photoPanYRange">Vertical Position</label>
-                  <input type="range" id="photoPanYRange" min="-100" max="100" value="0">
+
+                <div class="photo-sliders-row">
+                  <div class="photo-adjust-group">
+                    <label for="photoScaleRange">Zoom: <span id="scaleLabel">100%</span></label>
+                    <input type="range" id="photoScaleRange" min="50" max="250" value="100">
+                  </div>
+                  <div class="photo-adjust-group">
+                    <label for="photoPanXRange">Horizontal Position</label>
+                    <input type="range" id="photoPanXRange" min="-100" max="100" value="0">
+                  </div>
+                  <div class="photo-adjust-group">
+                    <label for="photoPanYRange">Vertical Position</label>
+                    <input type="range" id="photoPanYRange" min="-100" max="100" value="0">
+                  </div>
                 </div>
               </div>
             </div>
@@ -191,11 +208,19 @@
           <div class="form-actions">
             <button type="button" id="btnDownloadFront" class="btn-primary-action">
               <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-              Download Front Card (PNG)
+              Download Front (PNG)
+            </button>
+            <button type="button" id="btnDownloadBack" class="btn-secondary-action">
+              <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+              Download Back (PNG)
+            </button>
+            <button type="button" id="btnDownloadBothPDF" class="btn-gold-action">
+              <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7h3v1.5zM9 9.5h1v-1H9v1zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm10 5.5h1v-3h-1v3z"/></svg>
+              Download PDF (Both)
             </button>
             <button type="button" id="btnPrintCard" class="btn-secondary-action">
               <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
-              Print Card
+              Print Cards
             </button>
           </div>
         </form>
@@ -203,7 +228,7 @@
 
 
       <!-- ================================================================
-           REAL-TIME PREVIEW OVERLAY PANEL (RIGHT)
+           REAL-TIME PREVIEW PANEL (RIGHT - FRONT & BACK)
            ================================================================ -->
       <section class="preview-panel">
         
@@ -212,71 +237,93 @@
             <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
             </svg>
-            Live Front Preview
+            Live Preview (Front & Back)
           </div>
-          <div class="live-indicator">
-            <span class="live-dot"></span>
-            Real-Time
+
+          <!-- View Toggles: Both, Front, Back -->
+          <div class="view-tabs">
+            <button type="button" class="tab-btn active" id="tabBoth">Both Sides</button>
+            <button type="button" class="tab-btn" id="tabFront">Front</button>
+            <button type="button" class="tab-btn" id="tabBack">Back</button>
           </div>
         </div>
 
-        <div class="card-preview-container">
-          <!-- The Exact Card Stage -->
-          <div class="card-stage" id="cardStage">
-            
-            <!-- Authentic High-Resolution Blank Template Image -->
-            <img src="image/id-card front.png" alt="ID Card Front Template" class="card-bg-template">
+        <!-- Cards Display Wrapper -->
+        <div class="cards-preview-grid" id="cardsGrid">
 
-            <!-- Real-Time Overlays Layer -->
-            <div class="card-overlay-layer">
+          <!-- ============================================================
+               FRONT CARD STAGE
+               ============================================================ -->
+          <div class="card-column" id="colFront">
+            <span class="card-side-tag">Front Side</span>
+            <div class="card-preview-container">
+              <div class="card-stage" id="cardStageFront">
+                <!-- Authentic High-Resolution Blank Front Template -->
+                <img src="image/id-card front.png" alt="ID Card Front" class="card-bg-template">
 
-              <!-- 1. Top-Right White Space: Passport Photo -->
-              <div class="overlay-passport-box" id="passportBox">
-                <div class="passport-empty-hint" id="passportEmptyHint">
-                  <svg fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                  </svg>
-                  <span>Passport</span>
+                <!-- Real-Time Overlays Layer -->
+                <div class="card-overlay-layer">
+                  <!-- 1. Top-Right White Space: Passport Photo -->
+                  <div class="overlay-passport-box" id="passportBox">
+                    <div class="passport-empty-hint" id="passportEmptyHint">
+                      <svg fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                      </svg>
+                      <span>Passport</span>
+                    </div>
+                    <img id="passportImg" src="" alt="Passport" style="display: none;">
+                  </div>
+
+                  <!-- 2. Full Name directly beneath Passport Box -->
+                  <div class="overlay-bearer-name" id="viewName"></div>
+
+                  <!-- 3. School / Branch directly beneath Name -->
+                  <div class="overlay-bearer-school" id="viewSchool"></div>
+
+                  <!-- 4. Left Side: ID NUMBER -->
+                  <div class="overlay-data-val overlay-id-number" id="viewId"></div>
+
+                  <!-- 5. Left Side: CATEGORY -->
+                  <div class="overlay-data-val overlay-category" id="viewCategory"></div>
+
+                  <!-- 6. Left Side: DATE ISSUED -->
+                  <div class="overlay-data-val overlay-date-issued" id="viewDateIssued"></div>
+
+                  <!-- 7. Left Side: VALID UNTIL -->
+                  <div class="overlay-data-val overlay-valid-until" id="viewValidUntil"></div>
+
+                  <!-- 8. Left Side: STATUS BADGE -->
+                  <div class="overlay-status-row" id="viewStatusRow">
+                    <span class="overlay-status-badge" id="viewStatusBadge">ACTIVE</span>
+                  </div>
+
+                  <!-- 9. Lower-Right White Space: Dynamic QR Code -->
+                  <div class="overlay-qr-box" id="qrBox">
+                    <div class="qr-empty-hint" id="qrEmptyHint">
+                      <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm13-2h3v2h-3v-2zm-3 2h2v3h-2v-3zm2 3h2v3h-2v-3zm3-1h3v2h-3v-2zm0 3h3v2h-3v-2zm-5 0h2v2h-2v-2z"/>
+                      </svg>
+                      <span>QR CODE</span>
+                    </div>
+                  </div>
                 </div>
-                <img id="passportImg" src="" alt="Passport" style="display: none;">
               </div>
-
-              <!-- 2. Full Name directly beneath Passport Box -->
-              <div class="overlay-bearer-name" id="viewName"></div>
-
-              <!-- 3. School / Branch directly beneath Name -->
-              <div class="overlay-bearer-school" id="viewSchool"></div>
-
-              <!-- 4. Left Side: ID NUMBER -->
-              <div class="overlay-data-val overlay-id-number" id="viewId"></div>
-
-              <!-- 5. Left Side: CATEGORY -->
-              <div class="overlay-data-val overlay-category" id="viewCategory"></div>
-
-              <!-- 6. Left Side: DATE ISSUED -->
-              <div class="overlay-data-val overlay-date-issued" id="viewDateIssued"></div>
-
-              <!-- 7. Left Side: VALID UNTIL -->
-              <div class="overlay-data-val overlay-valid-until" id="viewValidUntil"></div>
-
-              <!-- 8. Left Side: STATUS BADGE -->
-              <div class="overlay-status-row" id="viewStatusRow">
-                <span class="overlay-status-badge" id="viewStatusBadge">ACTIVE</span>
-              </div>
-
-              <!-- 9. Lower-Right White Space: Dynamic QR Code -->
-              <div class="overlay-qr-box" id="qrBox">
-                <div class="qr-empty-hint" id="qrEmptyHint">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm13-2h3v2h-3v-2zm-3 2h2v3h-2v-3zm2 3h2v3h-2v-3zm3-1h3v2h-3v-2zm0 3h3v2h-3v-2zm-5 0h2v2h-2v-2z"/>
-                  </svg>
-                  <span>QR CODE</span>
-                </div>
-              </div>
-
             </div>
-
           </div>
+
+          <!-- ============================================================
+               BACK CARD STAGE
+               ============================================================ -->
+          <div class="card-column" id="colBack">
+            <span class="card-side-tag">Back Side</span>
+            <div class="card-preview-container">
+              <div class="card-stage" id="cardStageBack">
+                <!-- Authentic High-Resolution Official Back Template -->
+                <img src="image/id-card back.png" alt="ID Card Back" class="card-bg-template">
+              </div>
+            </div>
+          </div>
+
         </div>
 
       </section>
@@ -290,6 +337,7 @@
   <!-- Vendor Libraries -->
   <script src="lib/qrcode.min.js"></script>
   <script src="lib/html2canvas.min.js"></script>
+  <script src="lib/jspdf.umd.min.js"></script>
 
   <!-- Application Logic -->
   <script src="js/app.js"></script>

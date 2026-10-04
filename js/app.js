@@ -1,6 +1,6 @@
 /**
- * Students Parliament Nigeria - Front ID Card Generator
- * Real-time overlay on official blank template (id-card front.png)
+ * Students Parliament Nigeria - ID Card Generator
+ * Real-time Front & Back generation with authentic templates
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -25,8 +25,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const photoPanXRange = document.getElementById('photoPanXRange');
   const photoPanYRange = document.getElementById('photoPanYRange');
   const scaleLabel = document.getElementById('scaleLabel');
+  const btnResetPhoto = document.getElementById('btnResetPhoto');
 
-  // --- Overlay View Elements ---
+  // --- Overlay View Elements (Front) ---
   const viewName = document.getElementById('viewName');
   const viewSchool = document.getElementById('viewSchool');
   const viewId = document.getElementById('viewId');
@@ -35,11 +36,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const viewValidUntil = document.getElementById('viewValidUntil');
   const viewStatusBadge = document.getElementById('viewStatusBadge');
   const qrBox = document.getElementById('qrBox');
-  const qrEmptyHint = document.getElementById('qrEmptyHint');
-  const cardStage = document.getElementById('cardStage');
+  const cardStageFront = document.getElementById('cardStageFront');
+  const cardStageBack = document.getElementById('cardStageBack');
+
+  // --- Columns & View Toggles ---
+  const colFront = document.getElementById('colFront');
+  const colBack = document.getElementById('colBack');
+  const tabBoth = document.getElementById('tabBoth');
+  const tabFront = document.getElementById('tabFront');
+  const tabBack = document.getElementById('tabBack');
 
   // --- Action Buttons ---
   const btnDownloadFront = document.getElementById('btnDownloadFront');
+  const btnDownloadBack = document.getElementById('btnDownloadBack');
+  const btnDownloadBothPDF = document.getElementById('btnDownloadBothPDF');
   const btnPrintCard = document.getElementById('btnPrintCard');
   const toastNotice = document.getElementById('toastNotice');
 
@@ -64,6 +74,27 @@ document.addEventListener('DOMContentLoaded', () => {
   function applyPhotoTransform() {
     if (!passportImg || !hasPassport) return;
     passportImg.style.transform = `scale(${currentScale}) translate(${currentPanX}px, ${currentPanY}px)`;
+  }
+
+  // -------------------------------------------------------------------------
+  // Reset Photo Framing
+  // -------------------------------------------------------------------------
+  function resetPhotoFraming() {
+    currentScale = 1;
+    currentPanX = 0;
+    currentPanY = 0;
+    if (photoScaleRange) photoScaleRange.value = 100;
+    if (scaleLabel) scaleLabel.textContent = '100%';
+    if (photoPanXRange) photoPanXRange.value = 0;
+    if (photoPanYRange) photoPanYRange.value = 0;
+    applyPhotoTransform();
+  }
+
+  if (btnResetPhoto) {
+    btnResetPhoto.addEventListener('click', () => {
+      resetPhotoFraming();
+      notify('Photo framing reset to default');
+    });
   }
 
   // -------------------------------------------------------------------------
@@ -216,18 +247,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (passportEmptyHint) passportEmptyHint.style.display = 'none';
 
       hasPassport = true;
-      if (photoAdjustBox) photoAdjustBox.style.display = 'grid';
+      if (photoAdjustBox) photoAdjustBox.style.display = 'flex';
 
-      // Reset zoom and pan
-      currentScale = 1;
-      currentPanX = 0;
-      currentPanY = 0;
-      if (photoScaleRange) photoScaleRange.value = 100;
-      if (scaleLabel) scaleLabel.textContent = '100%';
-      if (photoPanXRange) photoPanXRange.value = 0;
-      if (photoPanYRange) photoPanYRange.value = 0;
-
-      applyPhotoTransform();
+      resetPhotoFraming();
       notify('Passport photo added to card!');
     };
     reader.readAsDataURL(file);
@@ -257,7 +279,36 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // -------------------------------------------------------------------------
-  // Reset Form
+  // View Tabs: Both Sides, Front, Back
+  // -------------------------------------------------------------------------
+  if (tabBoth && tabFront && tabBack) {
+    tabBoth.addEventListener('click', () => {
+      tabBoth.classList.add('active');
+      tabFront.classList.remove('active');
+      tabBack.classList.remove('active');
+      if (colFront) colFront.style.display = 'flex';
+      if (colBack) colBack.style.display = 'flex';
+    });
+
+    tabFront.addEventListener('click', () => {
+      tabFront.classList.add('active');
+      tabBoth.classList.remove('active');
+      tabBack.classList.remove('active');
+      if (colFront) colFront.style.display = 'flex';
+      if (colBack) colBack.style.display = 'none';
+    });
+
+    tabBack.addEventListener('click', () => {
+      tabBack.classList.add('active');
+      tabBoth.classList.remove('active');
+      tabFront.classList.remove('active');
+      if (colFront) colFront.style.display = 'none';
+      if (colBack) colBack.style.display = 'flex';
+    });
+  }
+
+  // -------------------------------------------------------------------------
+  // Reset Form (Clear to Blank)
   // -------------------------------------------------------------------------
   if (btnResetAll) {
     btnResetAll.addEventListener('click', () => {
@@ -270,13 +321,7 @@ document.addEventListener('DOMContentLoaded', () => {
       inputStatus.selectedIndex = 0;
 
       hasPassport = false;
-      currentScale = 1;
-      currentPanX = 0;
-      currentPanY = 0;
-      if (photoScaleRange) photoScaleRange.value = 100;
-      if (scaleLabel) scaleLabel.textContent = '100%';
-      if (photoPanXRange) photoPanXRange.value = 0;
-      if (photoPanYRange) photoPanYRange.value = 0;
+      resetPhotoFraming();
 
       passportImg.src = '';
       passportImg.style.display = 'none';
@@ -289,39 +334,92 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // -------------------------------------------------------------------------
-  // High-Resolution Card Download (PNG)
+  // High-Resolution Card Export Functions
   // -------------------------------------------------------------------------
-  if (btnDownloadFront && cardStage) {
-    btnDownloadFront.addEventListener('click', async () => {
-      if (typeof html2canvas === 'undefined') {
-        alert('Rendering library is loading. Please wait a moment.');
+  async function exportCardAsImage(element, filename) {
+    if (typeof html2canvas === 'undefined') {
+      alert('Rendering library is loading. Please wait a moment.');
+      return;
+    }
+
+    notify('Rendering high-resolution image...');
+
+    try {
+      const canvas = await html2canvas(element, {
+        scale: 3, // 3x high DPI render for print quality
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: null
+      });
+
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = canvas.toDataURL('image/png', 1.0);
+      link.click();
+      notify('Download complete: ' + filename);
+    } catch (err) {
+      console.error('Download error:', err);
+      alert('Could not render image. Please try again.');
+    }
+  }
+
+  // Download Front (PNG)
+  if (btnDownloadFront && cardStageFront) {
+    btnDownloadFront.addEventListener('click', () => {
+      const id = (inputId.value.trim() || 'student').replace(/[\/\\]/g, '-');
+      exportCardAsImage(cardStageFront, `Front-ID-${id}.png`);
+    });
+  }
+
+  // Download Back (PNG)
+  if (btnDownloadBack && cardStageBack) {
+    btnDownloadBack.addEventListener('click', () => {
+      const id = (inputId.value.trim() || 'student').replace(/[\/\\]/g, '-');
+      exportCardAsImage(cardStageBack, `Back-ID-${id}.png`);
+    });
+  }
+
+  // Download Both as PDF
+  if (btnDownloadBothPDF && cardStageFront && cardStageBack) {
+    btnDownloadBothPDF.addEventListener('click', async () => {
+      if (typeof html2canvas === 'undefined' || !window.jspdf) {
+        alert('PDF Export libraries are initializing. Please wait a moment.');
         return;
       }
 
-      notify('Generating high-resolution card...');
+      notify('Generating high-resolution 2-page PDF...');
 
       try {
-        const canvas = await html2canvas(cardStage, {
-          scale: 3, // 3x high DPI render for print quality
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: null
+        const { jsPDF } = window.jspdf;
+        // Standard CR80 card dimensions (54mm x 85.6mm)
+        const pdf = new jsPDF({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: [54, 85.6]
         });
 
+        // 1. Render Front Side
+        const canvasFront = await html2canvas(cardStageFront, { scale: 3, useCORS: true, backgroundColor: null });
+        const imgFront = canvasFront.toDataURL('image/jpeg', 0.98);
+        pdf.addImage(imgFront, 'JPEG', 0, 0, 54, 85.6);
+
+        // 2. Render Back Side
+        pdf.addPage([54, 85.6], 'portrait');
+        const canvasBack = await html2canvas(cardStageBack, { scale: 3, useCORS: true, backgroundColor: null });
+        const imgBack = canvasBack.toDataURL('image/jpeg', 0.98);
+        pdf.addImage(imgBack, 'JPEG', 0, 0, 54, 85.6);
+
         const id = (inputId.value.trim() || 'student').replace(/[\/\\]/g, '-');
-        const link = document.createElement('a');
-        link.download = `Front-ID-${id}.png`;
-        link.href = canvas.toDataURL('image/png', 1.0);
-        link.click();
-        notify('Download ready!');
+        pdf.save(`ID-Card-${id}.pdf`);
+        notify('PDF Download complete!');
       } catch (err) {
-        console.error('Download error:', err);
-        alert('Could not render image. Please try again.');
+        console.error('PDF export error:', err);
+        alert('Could not export PDF. Please try again.');
       }
     });
   }
 
-  // Print Card
+  // Print Cards
   if (btnPrintCard) {
     btnPrintCard.addEventListener('click', () => {
       window.print();
