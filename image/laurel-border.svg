@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 800" fill="none">
+  <g stroke="#b89343" stroke-width="1.2" opacity="0.22" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 50 10 Q 40 200 50 400 T 50 790" fill="none" />
+    <!-- Leaf pairs along the stem -->
+    <path d="M 50 40 C 30 25 15 45 48 50" fill="#c59b27" fill-opacity="0.12"/>
+    <path d="M 50 40 C 70 25 85 45 52 50" fill="#c59b27" fill-opacity="0.12"/>
+    <path d="M 48 90 C 25 75 10 95 46 100" fill="#c59b27" fill-opacity="0.12"/>
+    <path d="M 52 90 C 75 75 90 95 54 100" fill="#c59b27" fill-opacity="0.12"/>
+    <path d="M 47 140 C 20 125 8 145 45 150" fill="#c59b27" fill-opacity="0.12"/>
+    <path d="M 53 140 C 80 125 92 145 55 150" fill="#c59b27" fill-opacity="0.12"/>
+    <path d="M 46 190 C 18 175 6 195 44 200" fill="#c59b27" fill-opacity="0.12"/>
+    <path d="M 54 190 C 82 175 94 195 56 200" fill="#c59b27" fill-opacity="0.12"/>
+    <path d="M 47 240 C 20 225 8 245 45 250" fill="#c59b27" fill-opacity="0.12"/>
+    <path d="M 53 240 C 80 225 92 245 55 250" fill="#c59b27" fill-opacity="0.12"/>
+    <path d="M 48 290 C 22 275 10 295 46 300" fill="#c59b27" fill-opacity="0.12"/>
+    <path d="M 52 290 C 78 275 90 295 54 300" fill="#c59b27" fill-opacity="0.12"/>
+    <path d="M 49 340 C 24 325 12 345 47 350" fill="#c59b27" fill-opacity="0.12"/>
+    <path d="M 51 340 C 76 325 88 345 53 350" fill="#c59b27" fill-opacity="0.12"/>
+    <path d="M 50 390 C 25 375 15 395 48 400" fill="#c59b27" fill-opacity="0.12"/>
+    <path d="M 50 390 C 75 375 85 395 52 400" fill="#c59b27" fill-opacity="0.12"/>
+    <path d="M 50 440 C 25 425 15 445 48 450" fill="#c59b27" fill-opacity="0.12"/>
+    <path d="M 50 440 C 75 425 85 445 52 450" fill="#c59b27" fill-opacity="0.12"/>
+    <path d="M 49 490 C 24 475 12 495 47 500" fill="#c59b27" fill-opacity="0.12"/>
+    <path d="M 51 490 C 76 475 88 495 53 500" fill="#c59b27" fill-opacity="0.12"/>
+    <path d="M 48 540 C 22 525 10 545 46 550" fill="#c59b27" fill-opacity="0.12"/>
+    <path d="M 52 540 C 78 525 90 545 54 550" fill="#c59b27" fill-opacity="0.12"/>
+    <path d="M 47 590 C 20 575 8 595 45 600" fill="#c59b27" fill-opacity="0.12"/>
+    <path d="M 53 590 C 80 575 92 595 55 600" fill="#c59b27" fill-opacity="0.12"/>
+    <path d="M 48 640 C 22 625 10 645 46 650" fill="#c59b27" fill-opacity="0.12"/>
+    <path d="M 52 640 C 78 625 90 645 54 650" fill="#c59b27" fill-opacity="0.12"/>
+    <path d="M 49 690 C 25 675 14 695 47 700" fill="#c59b27" fill-opacity="0.12"/>
+    <path d="M 51 690 C 75 675 86 695 53 700" fill="#c59b27" fill-opacity="0.12"/>
+    <path d="M 50 740 C 28 725 18 745 48 750" fill="#c59b27" fill-opacity="0.12"/>
+    <path d="M 50 740 C 72 725 82 745 52 750" fill="#c59b27" fill-opacity="0.12"/>
+  </g>
+</svg>

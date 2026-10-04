@@ -1,0 +1,1206 @@
+/* ==========================================================================
+   STUDENTS PARLIAMENT NIGERIA - ID CARD GENERATOR
+   ========================================================================== */
+
+:root {
+  --primary-green: #0a3d24;
+  --primary-green-dark: #072e1b;
+  --primary-green-light: #135836;
+  --gold-accent: #cda434;
+  --gold-dark: #a67c1e;
+  --gold-light: #f3df9b;
+  --gold-border: #d4af37;
+  --card-bg: #fffdf9;
+  --text-dark: #111827;
+  --text-muted: #4b5563;
+  --accent-red: #c5221f;
+  --accent-blue: #1d4ed8;
+  --accent-amber: #d97706;
+  --bg-gradient: linear-gradient(135deg, #092c1a 0%, #0d4429 50%, #155737 100%);
+  --surface: #ffffff;
+  --surface-alt: #f8fafc;
+  --border: #e2e8f0;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-card: 0 16px 36px rgba(0, 0, 0, 0.22);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #f1f5f9;
+  color: var(--text-dark);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --------------------------------------------------------------------------
+   App Header & Banner
+   -------------------------------------------------------------------------- */
+.app-header {
+  background: var(--bg-gradient);
+  color: #ffffff;
+  padding: 1.25rem 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  border-bottom: 3px solid var(--gold-accent);
+}
+
+.header-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header-logo {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid var(--gold-accent);
+  background: #fff;
+  padding: 2px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.header-titles h1 {
+  font-family: 'Cinzel', serif;
+  font-size: 1.4rem;
+  letter-spacing: 0.5px;
+  color: #ffffff;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.header-titles p {
+  color: var(--gold-light);
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.btn-header {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(205, 164, 52, 0.5);
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.btn-header:hover {
+  background: var(--gold-accent);
+  color: var(--primary-green-dark);
+  border-color: var(--gold-accent);
+}
+
+/* --------------------------------------------------------------------------
+   Main Container
+   -------------------------------------------------------------------------- */
+.main-wrapper {
+  max-width: 1400px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+  width: 100%;
+  flex: 1;
+}
+
+.layout-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 1080px) {
+  .layout-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Form Section
+   -------------------------------------------------------------------------- */
+.form-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1.75rem;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--primary-green);
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #eef2f6;
+}
+
+.section-title svg {
+  color: var(--gold-accent);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.2rem;
+}
+
+@media (max-width: 640px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.form-input, .form-select {
+  padding: 0.65rem 0.85rem;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  background: #fff;
+  color: #1e293b;
+}
+
+.form-input:focus, .form-select:focus {
+  outline: none;
+  border-color: var(--primary-green);
+  box-shadow: 0 0 0 3px rgba(10, 61, 36, 0.15);
+}
+
+.input-with-btn {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.input-with-btn .form-input {
+  flex: 1;
+}
+
+.btn-inline {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 0 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--primary-green);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+
+.btn-inline:hover {
+  background: #e2e8f0;
+}
+
+/* --------------------------------------------------------------------------
+   Passport Upload Zone & Photo Controls
+   -------------------------------------------------------------------------- */
+.upload-zone {
+  border: 2px dashed #94a3b8;
+  border-radius: 12px;
+  padding: 1.25rem;
+  text-align: center;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.upload-zone:hover, .upload-zone.dragover {
+  border-color: var(--primary-green);
+  background: #f0fdf4;
+}
+
+.upload-zone-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.upload-icon {
+  width: 42px;
+  height: 42px;
+  color: var(--primary-green);
+}
+
+.upload-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #1e293b;
+}
+
+.upload-subtitle {
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+.photo-controls {
+  margin-top: 0.75rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  background: #f1f5f9;
+  padding: 0.75rem;
+  border-radius: 8px;
+}
+
+.photo-slider-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.photo-slider-group label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.photo-slider-group input[type="range"] {
+  width: 100%;
+  accent-color: var(--primary-green);
+}
+
+/* --------------------------------------------------------------------------
+   Collapsible Details
+   -------------------------------------------------------------------------- */
+.accordion-toggle {
+  width: 100%;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary-green);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 0;
+  cursor: pointer;
+  border-top: 1px solid var(--border);
+  margin-top: 1.25rem;
+}
+
+.accordion-content {
+  display: none;
+  padding-top: 0.5rem;
+}
+
+.accordion-content.open {
+  display: block;
+}
+
+/* --------------------------------------------------------------------------
+   Action Buttons Bar
+   -------------------------------------------------------------------------- */
+.action-buttons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+}
+
+.btn-primary {
+  background: var(--primary-green);
+  color: #fff;
+  border: none;
+  padding: 0.75rem 1.4rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 4px rgba(10, 61, 36, 0.3);
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: var(--primary-green-dark);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: #ffffff;
+  color: var(--primary-green);
+  border: 1.5px solid var(--primary-green);
+  padding: 0.75rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: #f0fdf4;
+}
+
+.btn-gold {
+  background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
+  color: #ffffff;
+  border: none;
+  padding: 0.75rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 4px rgba(184, 134, 11, 0.3);
+  transition: all 0.2s ease;
+}
+
+.btn-gold:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+/* --------------------------------------------------------------------------
+   Preview Section
+   -------------------------------------------------------------------------- */
+.preview-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: sticky;
+  top: 1.5rem;
+}
+
+.preview-toolbar {
+  background: #ffffff;
+  padding: 0.85rem 1.25rem;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.preview-toolbar-title {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--primary-green);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.view-mode-toggles {
+  display: flex;
+  background: #f1f5f9;
+  border-radius: 8px;
+  padding: 3px;
+  border: 1px solid #cbd5e1;
+}
+
+.mode-btn {
+  background: none;
+  border: none;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #475569;
+  transition: all 0.2s;
+}
+
+.mode-btn.active {
+  background: #ffffff;
+  color: var(--primary-green);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* --------------------------------------------------------------------------
+   ID Cards Canvas / Display Wrapper
+   -------------------------------------------------------------------------- */
+.cards-display-area {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  perspective: 1200px;
+}
+
+/* Single Flip View Wrapper */
+.cards-display-area.flip-mode {
+  display: block;
+  width: 360px;
+  height: 570px;
+  margin: 0 auto;
+}
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.flip-card-inner.flipped {
+  transform: rotateY(180deg);
+}
+
+.cards-display-area.flip-mode .id-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  margin: 0;
+}
+
+.cards-display-area.flip-mode .id-card.back {
+  transform: rotateY(180deg);
+}
+
+/* --------------------------------------------------------------------------
+   THE ID CARD (Front & Back)
+   Standard CR80 aspect ratio (approx 54mm x 85.6mm)
+   Screen size: 360px x 570px
+   -------------------------------------------------------------------------- */
+.id-card-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.card-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #475569;
+  text-transform: uppercase;
+}
+
+.id-card {
+  width: 360px;
+  height: 570px;
+  background-color: var(--card-bg);
+  border-radius: 18px;
+  box-shadow: var(--shadow-card);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Background Watermark & Laurel Wreaths */
+.id-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    url('../image/laurel-border.svg'),
+    url('../image/laurel-border.svg');
+  background-position: left 2px center, right 2px center;
+  background-repeat: no-repeat;
+  background-size: 26px 85%;
+  pointer-events: none;
+  opacity: 0.65;
+  z-index: 1;
+}
+
+.id-card::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 250px;
+  height: 250px;
+  background-image: url('../image/image-1.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  opacity: 0.045;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Card Content Layer */
+.card-inner {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 0 0 12px 0;
+}
+
+/* --------------------------------------------------------------------------
+   Front Card Header
+   -------------------------------------------------------------------------- */
+.front-header-banner {
+  width: 100%;
+  height: 48px;
+  position: relative;
+  background: #0b3d23;
+  clip-path: ellipse(75% 100% at 50% 0%);
+  display: flex;
+  justify-content: flex-end;
+  padding: 6px 14px;
+}
+
+.front-header-banner::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #c59b27, #f6e08c, #c59b27);
+}
+
+.nigeria-flag-badge {
+  position: absolute;
+  top: 8px;
+  right: 14px;
+  width: 32px;
+  height: 22px;
+  border: 1px solid #ffffff;
+  border-radius: 3px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  z-index: 5;
+}
+
+.nigeria-flag-badge img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.front-title-area {
+  text-align: center;
+  margin-top: -6px;
+  padding: 0 10px;
+}
+
+.front-main-title {
+  font-family: 'Cinzel', serif;
+  font-size: 14.5px;
+  font-weight: 900;
+  color: #0d3d25;
+  letter-spacing: 0.4px;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.front-subtitle-decor {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 3px;
+}
+
+.decor-line {
+  height: 2px;
+  width: 32px;
+  background: #b58826;
+  border-radius: 2px;
+}
+
+.front-subtitle {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-style: italic;
+  font-size: 11px;
+  font-weight: 600;
+  color: #a3781f;
+  letter-spacing: 0.3px;
+}
+
+/* --------------------------------------------------------------------------
+   Front Card Upper Body (Emblem & Passport)
+   -------------------------------------------------------------------------- */
+.front-upper-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 14px 4px 14px;
+  gap: 8px;
+}
+
+.front-seal-logo {
+  width: 140px;
+  height: 140px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: -4px;
+}
+
+.front-seal-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.15));
+}
+
+.front-passport-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 125px;
+  text-align: center;
+}
+
+.passport-photo-box {
+  width: 108px;
+  height: 118px;
+  border: 1.8px solid #c99e30;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #e2e8f0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+  position: relative;
+}
+
+.passport-photo-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.passport-bearer-name {
+  color: #1e40af;
+  font-weight: 800;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  margin-top: 5px;
+  line-height: 1.15;
+  width: 130px;
+  word-wrap: break-word;
+}
+
+.passport-bearer-school {
+  color: #111827;
+  font-weight: 800;
+  font-size: 9.5px;
+  text-transform: uppercase;
+  margin-top: 2px;
+  line-height: 1.1;
+  width: 130px;
+  word-wrap: break-word;
+}
+
+/* --------------------------------------------------------------------------
+   Front Card Details & QR Section
+   -------------------------------------------------------------------------- */
+.front-data-section {
+  display: flex;
+  padding: 4px 14px 2px 14px;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.data-rows-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.data-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2.5px 0;
+  border-bottom: 1px solid rgba(205, 164, 52, 0.35);
+}
+
+.row-icon-badge {
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: #0b3d23;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.row-icon-badge svg {
+  width: 11px;
+  height: 11px;
+}
+
+.row-label {
+  font-size: 9px;
+  font-weight: 800;
+  color: #0b3d23;
+  letter-spacing: 0.2px;
+  min-width: 62px;
+  text-transform: uppercase;
+}
+
+.row-value {
+  font-size: 9.8px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  margin-left: auto;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.row-value.id-val {
+  color: #dc2626;
+  font-size: 10px;
+}
+
+.row-value.cat-val {
+  color: #d97706;
+}
+
+.row-value.date-val {
+  color: #065f46;
+}
+
+.row-value.exp-val {
+  color: #dc2626;
+}
+
+.status-badge {
+  background: #0b512c;
+  color: #ffffff;
+  font-size: 8.5px;
+  font-weight: 800;
+  padding: 2px 9px;
+  border-radius: 3px;
+  letter-spacing: 0.5px;
+  display: inline-block;
+}
+
+.status-badge.pending {
+  background: #d97706;
+}
+
+.status-badge.expired {
+  background: #dc2626;
+}
+
+.front-qr-box {
+  width: 84px;
+  height: 84px;
+  background: #ffffff;
+  padding: 3px;
+  border-radius: 4px;
+  border: 1px solid #d4af37;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.front-qr-box canvas, .front-qr-box img {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+/* --------------------------------------------------------------------------
+   Front Card Footer
+   -------------------------------------------------------------------------- */
+.front-card-footer {
+  margin-top: auto;
+  position: relative;
+}
+
+.foundation-banner {
+  padding: 0 14px 6px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.foundation-banner img {
+  height: 38px;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.front-bottom-banner {
+  width: 100%;
+  height: 22px;
+  background: #0b3d23;
+  clip-path: ellipse(80% 100% at 50% 100%);
+  position: relative;
+}
+
+.front-bottom-banner::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #c59b27, #f6e08c, #c59b27);
+}
+
+/* ==========================================================================
+   BACK OF THE ID CARD
+   ========================================================================== */
+
+.back-top-banner {
+  width: 100%;
+  height: 44px;
+  background: #0b3d23;
+  clip-path: ellipse(75% 100% at 50% 0%);
+  position: relative;
+}
+
+.back-top-banner::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #c59b27, #f6e08c, #c59b27);
+}
+
+.back-upper-section {
+  display: flex;
+  align-items: center;
+  padding: 4px 14px;
+  gap: 8px;
+}
+
+.back-flag-col {
+  width: 75px;
+  flex-shrink: 0;
+}
+
+.back-flag-col img {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.back-disclaimer-text {
+  flex: 1;
+  font-size: 8.8px;
+  font-weight: 600;
+  color: #1f2937;
+  line-height: 1.35;
+  text-align: center;
+  padding-left: 2px;
+}
+
+.back-center-seal-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-top: 2px;
+}
+
+.back-seal-logo {
+  width: 110px;
+  height: 110px;
+}
+
+.back-seal-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.15));
+}
+
+.back-org-title {
+  font-family: 'Cinzel', serif;
+  font-size: 13.5px;
+  font-weight: 900;
+  color: #0b3d23;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+
+.back-star-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 2px 0;
+  color: #c59b27;
+  font-size: 11px;
+}
+
+.back-star-divider .star-line {
+  height: 1px;
+  width: 38px;
+  background: #c59b27;
+}
+
+.back-police-notice {
+  font-size: 8.8px;
+  color: #374151;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+/* Contact Us Gold Box */
+.back-contact-box {
+  margin: 0 16px;
+  border: 1.5px solid #c99e30;
+  border-radius: 8px;
+  background: #fffcf8;
+  padding: 6px 12px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(201, 158, 48, 0.15);
+}
+
+.contact-box-title {
+  font-size: 10px;
+  font-weight: 800;
+  color: #854d0e;
+  margin-bottom: 3px;
+}
+
+.contact-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 9.2px;
+  font-weight: 700;
+  color: #1e3a8a;
+  line-height: 1.35;
+}
+
+.contact-row svg {
+  width: 10px;
+  height: 10px;
+  color: #1e3a8a;
+}
+
+/* Signature Block */
+.back-signature-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 6px;
+}
+
+.signature-img-wrap {
+  height: 30px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.signature-img-wrap img {
+  height: 28px;
+  max-width: 120px;
+  object-fit: contain;
+}
+
+.signature-divider {
+  width: 140px;
+  height: 1px;
+  background: #c59b27;
+  margin: 2px 0 3px 0;
+}
+
+.signatory-name {
+  font-size: 8.8px;
+  font-weight: 800;
+  color: #111827;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.signatory-title {
+  font-size: 7.2px;
+  font-weight: 700;
+  color: #4b5563;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+}
+
+/* Barcode */
+.back-barcode-section {
+  margin-top: auto;
+  display: flex;
+  justify-content: center;
+  padding: 4px 14px 2px 14px;
+}
+
+.barcode-wrapper {
+  background: #ffffff;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid #d4af37;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.barcode-wrapper svg {
+  height: 32px;
+  max-width: 200px;
+  display: block;
+}
+
+.back-bottom-banner {
+  width: 100%;
+  height: 22px;
+  background: #0b3d23;
+  clip-path: ellipse(80% 100% at 50% 100%);
+  position: relative;
+}
+
+.back-bottom-banner::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #c59b27, #f6e08c, #c59b27);
+}
+
+/* --------------------------------------------------------------------------
+   Toast Notification
+   -------------------------------------------------------------------------- */
+.toast-msg {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: #0b3d23;
+  color: #fff;
+  padding: 0.85rem 1.4rem;
+  border-radius: 8px;
+  box-shadow: var(--shadow-xl);
+  border-left: 4px solid var(--gold-accent);
+  font-size: 0.9rem;
+  font-weight: 600;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 9999;
+}
+
+.toast-msg.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* --------------------------------------------------------------------------
+   Print Styles
+   -------------------------------------------------------------------------- */
+@media print {
+  body {
+    background: #ffffff !important;
+  }
+
+  .app-header, .form-card, .preview-toolbar, .action-buttons, .card-label, .toast-msg {
+    display: none !important;
+  }
+
+  .main-wrapper {
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .layout-grid {
+    display: block !important;
+  }
+
+  .cards-display-area {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 20mm !important;
+    justify-content: center !important;
+    page-break-inside: avoid;
+  }
+
+  .id-card {
+    box-shadow: none !important;
+    border: 1px solid #cbd5e1 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
