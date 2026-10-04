@@ -3,30 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Students Parliament Nigeria — ID Card Generator</title>
+  <title>Students Parliament Nigeria — Front ID Card Generator</title>
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@1,600;1,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   
   <!-- Styles -->
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-  <!-- Top Application Header -->
+  <!-- Application Header -->
   <header class="app-header">
     <div class="header-inner">
       <div class="header-brand">
-        <img src="image/image-1.png" alt="Students Parliament Nigeria Logo" class="header-logo">
+        <img src="image/image-1.png" alt="Students Parliament Logo" class="header-logo">
         <div class="header-titles">
           <h1>Students Parliament Nigeria</h1>
-          <p>Official Identification Card Generator & Verification System</p>
+          <p>Official ID Card Generator — Front Side</p>
         </div>
       </div>
-      <div class="header-actions">
-        <button id="btnResetForm" class="btn-header" type="button" title="Clear all input fields">
+      <div>
+        <button type="button" id="btnResetAll" class="btn-header-reset" title="Clear all input fields">
           <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
           Reset Form
         </button>
@@ -34,46 +34,45 @@
     </div>
   </header>
 
-  <!-- Main Content Grid -->
+  <!-- Main Content Layout -->
   <main class="main-wrapper">
     <div class="layout-grid">
 
       <!-- ================================================================
-           FORM INPUTS SECTION (BLANK BY DEFAULT)
+           FORM INPUTS PANEL (LEFT)
            ================================================================ -->
-      <section class="form-card">
-        <h2 class="section-title">
+      <section class="form-panel">
+        <h2 class="panel-title">
           <svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
             <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
           </svg>
-          Bearer & Card Information
+          Card Information
         </h2>
 
-        <form id="idCardForm" autocomplete="off" onsubmit="return false;">
-
+        <form id="cardForm" autocomplete="off" onsubmit="return false;">
           <div class="form-grid">
 
             <!-- Full Name -->
             <div class="form-group full-width">
-              <label for="inputFullName" class="form-label">
+              <label for="inputName" class="form-label">
                 <span>Bearer Full Name</span>
                 <span style="color: #94a3b8; font-weight: normal; font-size: 0.75rem;">UPPERCASE</span>
               </label>
-              <input type="text" id="inputFullName" class="form-input" placeholder="e.g. ADEOLA SEMILORE RODI" value="" required>
+              <input type="text" id="inputName" class="form-input" placeholder="e.g. ADEOLA SEMILORE RODI" value="">
             </div>
 
             <!-- School / Branch -->
             <div class="form-group full-width">
               <label for="inputSchool" class="form-label">School / Chapter / Branch</label>
-              <input type="text" id="inputSchool" class="form-input" placeholder="e.g. CSGS. GBERIGBE" value="" required>
+              <input type="text" id="inputSchool" class="form-input" placeholder="e.g. CSGS. GBERIGBE" value="">
             </div>
 
-            <!-- ID Number with Generator -->
+            <!-- ID Number with Auto-generate -->
             <div class="form-group">
-              <label for="inputIdNumber" class="form-label">ID Number</label>
-              <div class="input-with-btn">
-                <input type="text" id="inputIdNumber" class="form-input" placeholder="e.g. SPA/ID/STU/26/061" value="" required>
-                <button type="button" id="btnGenId" class="btn-inline" title="Generate random ID">Auto ID</button>
+              <label for="inputId" class="form-label">ID Number</label>
+              <div class="input-with-action">
+                <input type="text" id="inputId" class="form-input" placeholder="e.g. SPA/ID/STU/26/061" value="">
+                <button type="button" id="btnGenId" class="btn-inline-action" title="Generate random ID number">Auto ID</button>
               </div>
             </div>
 
@@ -92,335 +91,144 @@
 
             <!-- Date Issued -->
             <div class="form-group">
-              <label for="inputDateIssued" class="form-label">Date Issued (DD/MM/YYYY)</label>
+              <label for="inputDateIssued" class="form-label">Date Issued</label>
               <input type="text" id="inputDateIssued" class="form-input" placeholder="DD/MM/YYYY" value="">
             </div>
 
             <!-- Valid Until -->
             <div class="form-group">
-              <label for="inputValidUntil" class="form-label">Valid Until (DD/MM/YYYY)</label>
+              <label for="inputValidUntil" class="form-label">Valid Until</label>
               <input type="text" id="inputValidUntil" class="form-input" placeholder="DD/MM/YYYY" value="">
             </div>
 
-            <!-- Status -->
+            <!-- Membership Status -->
             <div class="form-group full-width">
-              <label for="inputStatus" class="form-label">Membership Status</label>
+              <label for="inputStatus" class="form-label">Status</label>
               <select id="inputStatus" class="form-select">
-                <option value="ACTIVE" selected>ACTIVE (Valid Badge)</option>
-                <option value="PENDING">PENDING (Reviewing)</option>
-                <option value="EXPIRED">EXPIRED (Renewal Required)</option>
+                <option value="ACTIVE" selected>ACTIVE</option>
+                <option value="PENDING">PENDING</option>
+                <option value="EXPIRED">EXPIRED</option>
               </select>
             </div>
 
-            <!-- Passport Photo Upload Zone -->
+            <!-- Passport Photograph Upload -->
             <div class="form-group full-width">
               <label class="form-label">
                 <span>Passport Photograph</span>
-                <span style="color: #64748b; font-size: 0.75rem;">Upload portrait photo</span>
+                <span style="color: #64748b; font-size: 0.75rem;">Top-right white box</span>
               </label>
-              <div class="upload-zone" id="uploadZone">
-                <input type="file" id="passportInput" accept="image/*" style="display: none;">
-                <div class="upload-zone-content">
-                  <svg class="upload-icon" fill="currentColor" viewBox="0 0 24 24">
+              
+              <div class="upload-dropzone" id="dropzone">
+                <input type="file" id="passportFile" accept="image/*" style="display: none;">
+                <div class="dropzone-inner">
+                  <svg class="dropzone-icon" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
                   </svg>
-                  <p class="upload-title">Click to upload passport or drag & drop</p>
-                  <p class="upload-subtitle">Supports JPG, PNG, WEBP</p>
+                  <p class="dropzone-text">Click or drag & drop passport image</p>
+                  <p class="dropzone-hint">JPG, PNG, WEBP (Instantly overlays in passport box)</p>
                 </div>
               </div>
 
-              <!-- Photo Zoom & Pan Position Sliders -->
-              <div class="photo-controls" id="photoControls" style="display: none;">
-                <div class="photo-slider-group">
-                  <label for="photoScale">Zoom: <span id="scaleValue">100%</span></label>
-                  <input type="range" id="photoScale" min="50" max="250" value="100">
+              <!-- Photo Zoom & Pan Position Controls -->
+              <div class="photo-adjust-box" id="photoAdjustBox">
+                <div class="photo-adjust-group">
+                  <label for="photoScaleRange">Zoom: <span id="scaleLabel">100%</span></label>
+                  <input type="range" id="photoScaleRange" min="50" max="250" value="100">
                 </div>
-                <div class="photo-slider-group">
-                  <label for="photoOffsetY">Vertical Position</label>
-                  <input type="range" id="photoOffsetY" min="-100" max="100" value="0">
+                <div class="photo-adjust-group">
+                  <label for="photoPanYRange">Vertical Position</label>
+                  <input type="range" id="photoPanYRange" min="-100" max="100" value="0">
                 </div>
               </div>
             </div>
 
-          </div>
-
-          <!-- Collapsible Organization & Back Card Settings -->
-          <button type="button" class="accordion-toggle" id="btnToggleSettings">
-            <span>Official Back Card Settings & Signatures</span>
-            <svg id="accordionIcon" width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
-          </button>
-
-          <div class="accordion-content" id="accordionContent">
-            <div class="form-grid" style="margin-top: 0.8rem;">
-              <div class="form-group full-width">
-                <label for="inputDisclaimer" class="form-label">Disclaimer Text</label>
-                <textarea id="inputDisclaimer" class="form-input" rows="2" style="resize: vertical;">This is to certify that the bearer whose&#10;Name and Passport appearing overleaf&#10;is a member of</textarea>
-              </div>
-
-              <div class="form-group">
-                <label for="inputPhone" class="form-label">Contact Phone</label>
-                <input type="text" id="inputPhone" class="form-input" value="+2348088882028">
-              </div>
-
-              <div class="form-group">
-                <label for="inputEmail" class="form-label">Contact Email</label>
-                <input type="email" id="inputEmail" class="form-input" value="info@studentparliament.africa">
-              </div>
-
-              <div class="form-group">
-                <label for="inputSignatoryName" class="form-label">Signatory Name</label>
-                <input type="text" id="inputSignatoryName" class="form-input" value="PRINCE ITUEN UMANAH">
-              </div>
-
-              <div class="form-group">
-                <label for="inputSignatoryTitle" class="form-label">Signatory Title</label>
-                <input type="text" id="inputSignatoryTitle" class="form-input" value="PRESIDENT, STUDENTS PARLIAMENT AFRICA">
-              </div>
-
-              <div class="form-group full-width">
-                <label for="inputPoliceNotice" class="form-label">Police Caution Note</label>
-                <input type="text" id="inputPoliceNotice" class="form-input" value="If found kindly report to the nearest Police station">
-              </div>
-            </div>
           </div>
 
           <!-- Bottom Action Buttons -->
-          <div class="action-buttons">
-            <button type="button" id="btnDownloadFront" class="btn-primary">
-              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-              Download Front (PNG)
+          <div class="form-actions">
+            <button type="button" id="btnDownloadFront" class="btn-primary-action">
+              <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+              Download Front Card (PNG)
             </button>
-            <button type="button" id="btnDownloadBack" class="btn-secondary">
-              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-              Download Back (PNG)
-            </button>
-            <button type="button" id="btnDownloadPDF" class="btn-gold">
-              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7h3v1.5zM9 9.5h1v-1H9v1zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm10 5.5h1v-3h-1v3z"/></svg>
-              Download PDF (Both)
-            </button>
-            <button type="button" id="btnPrintCard" class="btn-secondary">
-              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
+            <button type="button" id="btnPrintCard" class="btn-secondary-action">
+              <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
               Print Card
             </button>
           </div>
-
         </form>
       </section>
 
 
       <!-- ================================================================
-           LIVE CARD PREVIEW SECTION (BELOW / SIDE)
+           REAL-TIME PREVIEW OVERLAY PANEL (RIGHT)
            ================================================================ -->
-      <section class="preview-container">
+      <section class="preview-panel">
         
-        <!-- Preview Toolbar -->
-        <div class="preview-toolbar">
-          <div class="preview-toolbar-title">
-            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+        <div class="preview-badge-header">
+          <div class="preview-badge-title">
+            <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
             </svg>
-            Live Card Preview (CR80 Standard)
+            Live Front Preview
           </div>
-
-          <div class="view-mode-toggles">
-            <button type="button" class="mode-btn active" id="btnModeSide">Side-by-Side</button>
-            <button type="button" class="mode-btn" id="btnModeFlip">3D Flip Card</button>
+          <div class="live-indicator">
+            <span class="live-dot"></span>
+            Real-Time
           </div>
         </div>
 
-        <!-- The Display Area -->
-        <div class="cards-display-area" id="cardsDisplayArea">
-          
-          <div class="flip-card-inner" id="flipCardInner">
+        <div class="card-preview-container">
+          <!-- The Exact Card Stage -->
+          <div class="card-stage" id="cardStage">
+            
+            <!-- Authentic High-Resolution Blank Template Image -->
+            <img src="image/id-card front.png" alt="ID Card Front Template" class="card-bg-template">
 
-            <!-- ==========================================================
-                 FRONT OF THE CARD
-                 ========================================================== -->
-            <div class="id-card-wrapper" id="cardFrontWrapper">
-              <span class="card-label">Front Side</span>
-              <div class="id-card front" id="cardFront">
-                
-                <div class="card-inner">
-                  <!-- Top Green Arch Header Banner -->
-                  <div class="front-header-banner">
-                    <!-- Nigerian Flag Badge -->
-                    <div class="nigeria-flag-badge">
-                      <img src="image/nigeria-flag.svg" alt="Nigeria Flag">
-                    </div>
-                  </div>
+            <!-- Real-Time Overlays Layer -->
+            <div class="card-overlay-layer">
 
-                  <!-- Card Organization Titles -->
-                  <div class="front-title-area">
-                    <h2 class="front-main-title">Students Parliament Nigeria</h2>
-                    <div class="front-subtitle-decor">
-                      <div class="decor-line"></div>
-                      <span class="front-subtitle">Nurturing Future Leaders</span>
-                      <div class="decor-line"></div>
-                    </div>
-                  </div>
-
-                  <!-- Upper Section: Official Circular Seal & Passport Photo -->
-                  <div class="front-upper-body">
-                    <div class="front-seal-logo">
-                      <img src="image/image-1.png" alt="Students Parliament Seal">
-                    </div>
-
-                    <div class="front-passport-column">
-                      <div class="passport-photo-box" id="passportBox">
-                        <img id="passportPreviewImg" src="image/blank-avatar.svg" alt="Bearer Passport Photograph">
-                      </div>
-                      <div class="passport-bearer-name empty-placeholder" id="cardBearerName">—</div>
-                      <div class="passport-bearer-school empty-placeholder" id="cardBearerSchool">—</div>
-                    </div>
-                  </div>
-
-                  <!-- Middle/Data Section: 5 Info Rows + Dynamic QR Code -->
-                  <div class="front-data-section">
-                    <div class="data-rows-container">
-
-                      <!-- ID Number -->
-                      <div class="data-row">
-                        <div class="row-icon-badge" title="ID Number">
-                          <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                        </div>
-                        <span class="row-label">ID NUMBER</span>
-                        <span class="row-value id-val" id="cardIdNumber">—</span>
-                      </div>
-
-                      <!-- Category -->
-                      <div class="data-row">
-                        <div class="row-icon-badge" title="Category">
-                          <svg fill="currentColor" viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg>
-                        </div>
-                        <span class="row-label">CATEGORY</span>
-                        <span class="row-value cat-val" id="cardCategory">—</span>
-                      </div>
-
-                      <!-- Date Issued -->
-                      <div class="data-row">
-                        <div class="row-icon-badge" title="Date Issued">
-                          <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
-                        </div>
-                        <span class="row-label">DATE ISSUED</span>
-                        <span class="row-value date-val" id="cardDateIssued">—</span>
-                      </div>
-
-                      <!-- Valid Until -->
-                      <div class="data-row">
-                        <div class="row-icon-badge" title="Valid Until">
-                          <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zm-7-2l5-5-1.41-1.41L12 14.17l-1.59-1.59L9 14l3 3z"/></svg>
-                        </div>
-                        <span class="row-label">VALID UNTIL</span>
-                        <span class="row-value exp-val" id="cardValidUntil">—</span>
-                      </div>
-
-                      <!-- Status -->
-                      <div class="data-row" style="border-bottom: none;">
-                        <div class="row-icon-badge" title="Status">
-                          <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
-                        </div>
-                        <span class="row-label">STATUS</span>
-                        <span class="row-value" style="margin-left: auto;">
-                          <span class="status-badge" id="cardStatusBadge">ACTIVE</span>
-                        </span>
-                      </div>
-
-                    </div>
-
-                    <!-- Dynamic QR Code (Generated when info is entered) -->
-                    <div class="front-qr-box" id="frontQrBox" title="Scan to verify ID credentials">
-                      <!-- QR Canvas injected via JavaScript -->
-                    </div>
-                  </div>
-
-                  <!-- Front Footer: Foundation Banner & Curved Bottom Banner -->
-                  <div class="front-card-footer">
-                    <div class="foundation-banner">
-                      <img src="image/image-2.png" alt="Prince Umanah Future Leaders Development Foundation">
-                    </div>
-                    <div class="front-bottom-banner"></div>
-                  </div>
-
+              <!-- 1. Top-Right White Space: Passport Photo -->
+              <div class="overlay-passport-box" id="passportBox">
+                <div class="passport-empty-hint" id="passportEmptyHint">
+                  <svg fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                  </svg>
+                  <span>Passport</span>
                 </div>
+                <img id="passportImg" src="" alt="Passport" style="display: none;">
               </div>
-            </div>
 
-            <!-- ==========================================================
-                 BACK OF THE CARD
-                 ========================================================== -->
-            <div class="id-card-wrapper" id="cardBackWrapper">
-              <span class="card-label">Back Side</span>
-              <div class="id-card back" id="cardBack">
-                
-                <div class="card-inner">
-                  <!-- Back Top Banner Arch -->
-                  <div class="back-top-banner"></div>
+              <!-- 2. Full Name directly beneath Passport Box -->
+              <div class="overlay-bearer-name" id="viewName"></div>
 
-                  <!-- Back Upper: 3D Waving Flag & Disclaimer Text -->
-                  <div class="back-upper-section">
-                    <div class="back-flag-col">
-                      <img src="image/image-3.png" alt="Students Parliament Waving Flag">
-                    </div>
-                    <div class="back-disclaimer-text" id="cardDisclaimer">
-                      This is to certify that the bearer whose<br>
-                      Name and Passport appearing overleaf<br>
-                      is a member of
-                    </div>
-                  </div>
+              <!-- 3. School / Branch directly beneath Name -->
+              <div class="overlay-bearer-school" id="viewSchool"></div>
 
-                  <!-- Center Seal, African Parliament Title & Star Divider -->
-                  <div class="back-center-seal-area">
-                    <div class="back-seal-logo">
-                      <img src="image/image-1.png" alt="Students Parliament Africa Seal">
-                    </div>
-                    <h3 class="back-org-title">STUDENTS PARLIAMENT AFRICA</h3>
-                    <div class="back-star-divider">
-                      <div class="star-line"></div>
-                      <span>★</span>
-                      <div class="star-line"></div>
-                    </div>
-                    <p class="back-police-notice" id="cardPoliceNotice">If found kindly report to the nearest Police station</p>
-                  </div>
+              <!-- 4. Left Side: ID NUMBER -->
+              <div class="overlay-data-val overlay-id-number" id="viewId"></div>
 
-                  <!-- Gold Bordered Contact Us Box -->
-                  <div class="back-contact-box">
-                    <div class="contact-box-title">Contact us.</div>
-                    <div class="contact-row">
-                      <svg fill="currentColor" viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
-                      <span id="cardPhone">+2348088882028</span>
-                    </div>
-                    <div class="contact-row">
-                      <svg fill="currentColor" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
-                      <span id="cardEmail">info@studentparliament.africa</span>
-                    </div>
-                  </div>
+              <!-- 5. Left Side: CATEGORY -->
+              <div class="overlay-data-val overlay-category" id="viewCategory"></div>
 
-                  <!-- Presidential Signature Block -->
-                  <div class="back-signature-section">
-                    <div class="signature-img-wrap">
-                      <img id="signatureImg" src="image/signature.png" alt="Presidential Signature">
-                    </div>
-                    <div class="signature-divider"></div>
-                    <div class="signatory-name" id="cardSignatoryName">PRINCE ITUEN UMANAH</div>
-                    <div class="signatory-title" id="cardSignatoryTitle">PRESIDENT, STUDENTS PARLIAMENT AFRICA</div>
-                  </div>
+              <!-- 6. Left Side: DATE ISSUED -->
+              <div class="overlay-data-val overlay-date-issued" id="viewDateIssued"></div>
 
-                  <!-- Dynamic Barcode Section -->
-                  <div class="back-barcode-section">
-                    <div class="barcode-wrapper">
-                      <svg id="barcodeCanvas"></svg>
-                    </div>
-                  </div>
+              <!-- 7. Left Side: VALID UNTIL -->
+              <div class="overlay-data-val overlay-valid-until" id="viewValidUntil"></div>
 
-                  <!-- Back Bottom Banner Arch -->
-                  <div class="back-bottom-banner"></div>
-
-                </div>
+              <!-- 8. Left Side: STATUS BADGE -->
+              <div class="overlay-status-row" id="viewStatusRow">
+                <span class="overlay-status-badge" id="viewStatusBadge">ACTIVE</span>
               </div>
+
+              <!-- 9. Lower-Right White Space: Dynamic QR Code -->
+              <div class="overlay-qr-box" id="qrBox">
+                <div class="qr-empty-hint" id="qrEmptyHint">QR CODE</div>
+              </div>
+
             </div>
 
           </div>
-
         </div>
 
       </section>
@@ -428,14 +236,12 @@
     </div>
   </main>
 
-  <!-- Toast Notification element -->
-  <div class="toast-msg" id="toast">ID Card Updated</div>
+  <!-- Notification Toast -->
+  <div class="toast-notice" id="toastNotice">Card Updated</div>
 
   <!-- Vendor Libraries -->
   <script src="lib/qrcode.min.js"></script>
-  <script src="lib/JsBarcode.all.min.js"></script>
   <script src="lib/html2canvas.min.js"></script>
-  <script src="lib/jspdf.umd.min.js"></script>
 
   <!-- Application Logic -->
   <script src="js/app.js"></script>

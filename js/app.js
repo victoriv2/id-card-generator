@@ -1,472 +1,314 @@
 /**
- * Students Parliament Nigeria - ID Card Generator Logic
- * Blank Slate Mode: No ready-made or prefilled data.
+ * Students Parliament Nigeria - Front ID Card Generator
+ * Real-time overlay on official blank template (id-card front.png)
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  // --- Form Elements ---
-  const inputFullName = document.getElementById('inputFullName');
+  // --- Input Elements ---
+  const inputName = document.getElementById('inputName');
   const inputSchool = document.getElementById('inputSchool');
-  const inputIdNumber = document.getElementById('inputIdNumber');
+  const inputId = document.getElementById('inputId');
   const inputCategory = document.getElementById('inputCategory');
   const inputDateIssued = document.getElementById('inputDateIssued');
   const inputValidUntil = document.getElementById('inputValidUntil');
   const inputStatus = document.getElementById('inputStatus');
   const btnGenId = document.getElementById('btnGenId');
+  const btnResetAll = document.getElementById('btnResetAll');
 
-  // Photo Controls
-  const uploadZone = document.getElementById('uploadZone');
-  const passportInput = document.getElementById('passportInput');
-  const photoControls = document.getElementById('photoControls');
-  const photoScale = document.getElementById('photoScale');
-  const photoOffsetY = document.getElementById('photoOffsetY');
-  const scaleValue = document.getElementById('scaleValue');
-  const passportPreviewImg = document.getElementById('passportPreviewImg');
+  // --- Photo Upload & Controls ---
+  const dropzone = document.getElementById('dropzone');
+  const passportFile = document.getElementById('passportFile');
+  const passportImg = document.getElementById('passportImg');
+  const passportEmptyHint = document.getElementById('passportEmptyHint');
+  const photoAdjustBox = document.getElementById('photoAdjustBox');
+  const photoScaleRange = document.getElementById('photoScaleRange');
+  const photoPanYRange = document.getElementById('photoPanYRange');
+  const scaleLabel = document.getElementById('scaleLabel');
 
-  // Back Settings Inputs
-  const inputDisclaimer = document.getElementById('inputDisclaimer');
-  const inputPhone = document.getElementById('inputPhone');
-  const inputEmail = document.getElementById('inputEmail');
-  const inputSignatoryName = document.getElementById('inputSignatoryName');
-  const inputSignatoryTitle = document.getElementById('inputSignatoryTitle');
-  const inputPoliceNotice = document.getElementById('inputPoliceNotice');
-  const btnToggleSettings = document.getElementById('btnToggleSettings');
-  const accordionContent = document.getElementById('accordionContent');
-  const accordionIcon = document.getElementById('accordionIcon');
-
-  // --- Card Preview Elements (Front) ---
-  const cardBearerName = document.getElementById('cardBearerName');
-  const cardBearerSchool = document.getElementById('cardBearerSchool');
-  const cardIdNumber = document.getElementById('cardIdNumber');
-  const cardCategory = document.getElementById('cardCategory');
-  const cardDateIssued = document.getElementById('cardDateIssued');
-  const cardValidUntil = document.getElementById('cardValidUntil');
-  const cardStatusBadge = document.getElementById('cardStatusBadge');
-  const frontQrBox = document.getElementById('frontQrBox');
-  const cardFront = document.getElementById('cardFront');
-
-  // --- Card Preview Elements (Back) ---
-  const cardDisclaimer = document.getElementById('cardDisclaimer');
-  const cardPoliceNotice = document.getElementById('cardPoliceNotice');
-  const cardPhone = document.getElementById('cardPhone');
-  const cardEmail = document.getElementById('cardEmail');
-  const cardSignatoryName = document.getElementById('cardSignatoryName');
-  const cardSignatoryTitle = document.getElementById('cardSignatoryTitle');
-  const barcodeCanvas = document.getElementById('barcodeCanvas');
-  const cardBack = document.getElementById('cardBack');
+  // --- Overlay View Elements ---
+  const viewName = document.getElementById('viewName');
+  const viewSchool = document.getElementById('viewSchool');
+  const viewId = document.getElementById('viewId');
+  const viewCategory = document.getElementById('viewCategory');
+  const viewDateIssued = document.getElementById('viewDateIssued');
+  const viewValidUntil = document.getElementById('viewValidUntil');
+  const viewStatusBadge = document.getElementById('viewStatusBadge');
+  const qrBox = document.getElementById('qrBox');
+  const qrEmptyHint = document.getElementById('qrEmptyHint');
+  const cardStage = document.getElementById('cardStage');
 
   // --- Action Buttons ---
-  const btnResetForm = document.getElementById('btnResetForm');
   const btnDownloadFront = document.getElementById('btnDownloadFront');
-  const btnDownloadBack = document.getElementById('btnDownloadBack');
-  const btnDownloadPDF = document.getElementById('btnDownloadPDF');
   const btnPrintCard = document.getElementById('btnPrintCard');
-
-  // --- View Mode Controls ---
-  const btnModeSide = document.getElementById('btnModeSide');
-  const btnModeFlip = document.getElementById('btnModeFlip');
-  const cardsDisplayArea = document.getElementById('cardsDisplayArea');
-  const flipCardInner = document.getElementById('flipCardInner');
-  const toast = document.getElementById('toast');
+  const toastNotice = document.getElementById('toastNotice');
 
   let currentScale = 1;
-  let currentOffsetY = 0;
-  let hasUploadedPhoto = false;
+  let currentPanY = 0;
+  let hasPassport = false;
 
   // -------------------------------------------------------------------------
   // Toast Helper
   // -------------------------------------------------------------------------
-  function showToast(message) {
-    if (!toast) return;
-    toast.textContent = message;
-    toast.classList.add('show');
-    setTimeout(() => {
-      toast.classList.remove('show');
-    }, 2800);
+  function notify(text) {
+    if (!toastNotice) return;
+    toastNotice.textContent = text;
+    toastNotice.classList.add('show');
+    setTimeout(() => toastNotice.classList.remove('show'), 2600);
   }
 
   // -------------------------------------------------------------------------
-  // Photo Transform Helper
+  // Photo Transform (Zoom & Pan)
   // -------------------------------------------------------------------------
-  function updatePhotoTransform() {
-    if (!passportPreviewImg || !hasUploadedPhoto) return;
-    passportPreviewImg.style.transform = `scale(${currentScale}) translateY(${currentOffsetY}px)`;
+  function applyPhotoTransform() {
+    if (!passportImg || !hasPassport) return;
+    passportImg.style.transform = `scale(${currentScale}) translateY(${currentPanY}px)`;
   }
 
   // -------------------------------------------------------------------------
-  // QR Code Generation
+  // Dynamic QR Code Generation (Lower-Right White Box)
   // -------------------------------------------------------------------------
-  function updateQRCode() {
-    if (!frontQrBox) return;
-    frontQrBox.innerHTML = '';
+  function renderQrCode() {
+    if (!qrBox) return;
 
-    const id = inputIdNumber.value.trim();
-    const name = inputFullName.value.trim();
-    const valid = inputValidUntil.value.trim();
-    
-    // Only generate QR code if ID or Name is provided
-    if (!id && !name) {
-      frontQrBox.innerHTML = '<span style="font-size: 8px; color: #94a3b8; text-align: center; display: block; padding-top: 26px;">QR CODE</span>';
+    const idVal = inputId.value.trim();
+    const nameVal = inputName.value.trim();
+    const validVal = inputValidUntil.value.trim();
+
+    if (!idVal && !nameVal) {
+      qrBox.innerHTML = '<div class="qr-empty-hint">QR CODE</div>';
       return;
     }
 
-    const qrData = `STUDENTS PARLIAMENT NIGERIA\nID: ${id || 'N/A'}\nName: ${name || 'N/A'}\nStatus: ${inputStatus.value}\nValid: ${valid || 'N/A'}`;
+    qrBox.innerHTML = '';
+    const qrText = `STUDENTS PARLIAMENT NIGERIA\nID: ${idVal || 'N/A'}\nName: ${nameVal || 'N/A'}\nCategory: ${inputCategory.value || 'N/A'}\nStatus: ${inputStatus.value}\nValid: ${validVal || 'N/A'}`;
 
     try {
       if (typeof QRCode !== 'undefined') {
-        new QRCode(frontQrBox, {
-          text: qrData,
-          width: 80,
-          height: 80,
+        new QRCode(qrBox, {
+          text: qrText,
+          width: 120,
+          height: 120,
           colorDark: '#000000',
           colorLight: '#ffffff',
           correctLevel: QRCode.CorrectLevel.M
         });
       }
-    } catch (e) {
-      console.warn('QR Code generation fallback:', e);
+    } catch (err) {
+      console.warn('QR Code error:', err);
     }
   }
 
   // -------------------------------------------------------------------------
-  // Barcode Generation
+  // Real-Time Overlay Sync
   // -------------------------------------------------------------------------
-  function updateBarcode() {
-    if (!barcodeCanvas || typeof JsBarcode === 'undefined') return;
-    const rawId = inputIdNumber.value.trim();
-    
-    if (!rawId) {
-      // Empty placeholder barcode
-      barcodeCanvas.innerHTML = '';
-      return;
+  function syncOverlay() {
+    // 1. Full Name
+    const name = inputName.value.trim();
+    viewName.textContent = name;
+
+    // 2. School / Branch (formatted as (NAME))
+    const school = inputSchool.value.trim();
+    if (school) {
+      const cleanSchool = school.replace(/^\(|\)$/g, '');
+      viewSchool.textContent = `(${cleanSchool})`;
+    } else {
+      viewSchool.textContent = '';
     }
 
-    try {
-      JsBarcode(barcodeCanvas, rawId, {
-        format: 'CODE128',
-        width: 1.4,
-        height: 30,
-        displayValue: false,
-        margin: 2,
-        lineColor: '#111827'
-      });
-    } catch (e) {
-      console.warn('Barcode generation fallback:', e);
-    }
-  }
+    // 3. ID Number
+    viewId.textContent = inputId.value.trim();
 
-  // -------------------------------------------------------------------------
-  // Live Sync Input to Preview
-  // -------------------------------------------------------------------------
-  function syncPreview() {
-    // Front card bindings
-    const nameVal = inputFullName.value.trim();
-    cardBearerName.textContent = nameVal || '—';
-    cardBearerName.style.opacity = nameVal ? '1' : '0.4';
+    // 4. Category
+    viewCategory.textContent = inputCategory.value || '';
 
-    const schoolVal = inputSchool.value.trim();
-    cardBearerSchool.textContent = schoolVal ? `(${schoolVal.replace(/^\(|\)$/g, '')})` : '—';
-    cardBearerSchool.style.opacity = schoolVal ? '1' : '0.4';
+    // 5. Date Issued
+    viewDateIssued.textContent = inputDateIssued.value.trim();
 
-    const idVal = inputIdNumber.value.trim();
-    cardIdNumber.textContent = idVal || '—';
+    // 6. Valid Until
+    viewValidUntil.textContent = inputValidUntil.value.trim();
 
-    const catVal = inputCategory.value;
-    cardCategory.textContent = catVal || '—';
-
-    const issuedVal = inputDateIssued.value.trim();
-    cardDateIssued.textContent = issuedVal || '—';
-
-    const validVal = inputValidUntil.value.trim();
-    cardValidUntil.textContent = validVal || '—';
-
-    // Status styling
+    // 7. Status Badge
     const status = inputStatus.value;
-    cardStatusBadge.textContent = status;
-    cardStatusBadge.className = 'status-badge';
-    if (status === 'PENDING') cardStatusBadge.classList.add('pending');
-    if (status === 'EXPIRED') cardStatusBadge.classList.add('expired');
+    viewStatusBadge.textContent = status;
+    viewStatusBadge.className = 'overlay-status-badge';
+    if (status === 'PENDING') viewStatusBadge.classList.add('pending');
+    if (status === 'EXPIRED') viewStatusBadge.classList.add('expired');
 
-    // Back card bindings
-    if (cardDisclaimer) {
-      const formattedDisclaimer = (inputDisclaimer.value || '').replace(/\n/g, '<br>');
-      cardDisclaimer.innerHTML = formattedDisclaimer;
-    }
-    if (cardPoliceNotice) cardPoliceNotice.textContent = inputPoliceNotice.value.trim();
-    if (cardPhone) cardPhone.textContent = inputPhone.value.trim();
-    if (cardEmail) cardEmail.textContent = inputEmail.value.trim();
-    if (cardSignatoryName) cardSignatoryName.textContent = inputSignatoryName.value.trim();
-    if (cardSignatoryTitle) cardSignatoryTitle.textContent = inputSignatoryTitle.value.trim();
-
-    // Re-generate Barcode & QR Code
-    updateBarcode();
-    updateQRCode();
+    // 8. QR Code
+    renderQrCode();
   }
 
-  // Attach live event listeners to all input fields
-  const allInputs = [
-    inputFullName, inputSchool, inputIdNumber, inputCategory,
-    inputDateIssued, inputValidUntil, inputStatus, inputDisclaimer,
-    inputPhone, inputEmail, inputSignatoryName, inputSignatoryTitle,
-    inputPoliceNotice
+  // Attach live input listeners for real-time reactivity
+  const liveInputs = [
+    inputName, inputSchool, inputId, inputCategory,
+    inputDateIssued, inputValidUntil, inputStatus
   ];
 
-  allInputs.forEach(input => {
-    if (input) {
-      input.addEventListener('input', syncPreview);
-      input.addEventListener('change', syncPreview);
+  liveInputs.forEach(elem => {
+    if (elem) {
+      elem.addEventListener('input', syncOverlay);
+      elem.addEventListener('change', syncOverlay);
     }
   });
 
   // -------------------------------------------------------------------------
-  // Auto ID Generator
+  // Auto ID Generator Button
   // -------------------------------------------------------------------------
   if (btnGenId) {
     btnGenId.addEventListener('click', () => {
-      const randomNum = String(Math.floor(Math.random() * 900) + 100);
+      const random3 = String(Math.floor(Math.random() * 900) + 100);
       const catCode = (inputCategory.value || 'STU').substring(0, 3).toUpperCase();
-      const yearCode = new Date().getFullYear().toString().slice(-2);
-      inputIdNumber.value = `SPA/ID/${catCode}/${yearCode}/${randomNum}`;
-      syncPreview();
-      showToast('Generated ID: ' + inputIdNumber.value);
+      const yr = new Date().getFullYear().toString().slice(-2);
+      inputId.value = `SPA/ID/${catCode}/${yr}/${random3}`;
+      syncOverlay();
+      notify('Generated: ' + inputId.value);
     });
   }
 
   // -------------------------------------------------------------------------
-  // Passport Image Upload Handler & Drag-Drop
+  // Passport Photo Upload Handler & Drag-and-Drop
   // -------------------------------------------------------------------------
-  if (uploadZone && passportInput) {
-    uploadZone.addEventListener('click', () => passportInput.click());
+  if (dropzone && passportFile) {
+    dropzone.addEventListener('click', () => passportFile.click());
 
-    ['dragenter', 'dragover'].forEach(eventName => {
-      uploadZone.addEventListener(eventName, (e) => {
+    ['dragenter', 'dragover'].forEach(name => {
+      dropzone.addEventListener(name, (e) => {
         e.preventDefault();
         e.stopPropagation();
-        uploadZone.classList.add('dragover');
+        dropzone.classList.add('dragover');
       });
     });
 
-    ['dragleave', 'drop'].forEach(eventName => {
-      uploadZone.addEventListener(eventName, (e) => {
+    ['dragleave', 'drop'].forEach(name => {
+      dropzone.addEventListener(name, (e) => {
         e.preventDefault();
         e.stopPropagation();
-        uploadZone.classList.remove('dragover');
+        dropzone.classList.remove('dragover');
       });
     });
 
-    uploadZone.addEventListener('drop', (e) => {
-      const dt = e.dataTransfer;
-      const files = dt.files;
+    dropzone.addEventListener('drop', (e) => {
+      const files = e.dataTransfer.files;
       if (files && files.length > 0) {
-        handleImageFile(files[0]);
+        processUploadedImage(files[0]);
       }
     });
 
-    passportInput.addEventListener('change', (e) => {
+    passportFile.addEventListener('change', (e) => {
       if (e.target.files && e.target.files.length > 0) {
-        handleImageFile(e.target.files[0]);
+        processUploadedImage(e.target.files[0]);
       }
     });
   }
 
-  function handleImageFile(file) {
+  function processUploadedImage(file) {
     if (!file.type.startsWith('image/')) {
-      alert('Please upload a valid image file (JPG, PNG, WEBP).');
+      alert('Please upload an image file (JPG, PNG, WEBP).');
       return;
     }
 
     const reader = new FileReader();
     reader.onload = (e) => {
-      if (passportPreviewImg) {
-        passportPreviewImg.src = e.target.result;
-        hasUploadedPhoto = true;
-        // Show controls
-        if (photoControls) photoControls.style.display = 'grid';
-        // Reset scale and offset
-        currentScale = 1;
-        currentOffsetY = 0;
-        if (photoScale) photoScale.value = 100;
-        if (scaleValue) scaleValue.textContent = '100%';
-        if (photoOffsetY) photoOffsetY.value = 0;
-        updatePhotoTransform();
-        showToast('Passport photograph uploaded!');
-      }
+      passportImg.src = e.target.result;
+      passportImg.style.display = 'block';
+      if (passportEmptyHint) passportEmptyHint.style.display = 'none';
+
+      hasPassport = true;
+      if (photoAdjustBox) photoAdjustBox.style.display = 'grid';
+
+      // Reset zoom and pan
+      currentScale = 1;
+      currentPanY = 0;
+      if (photoScaleRange) photoScaleRange.value = 100;
+      if (scaleLabel) scaleLabel.textContent = '100%';
+      if (photoPanYRange) photoPanYRange.value = 0;
+
+      applyPhotoTransform();
+      notify('Passport photo added to card!');
     };
     reader.readAsDataURL(file);
   }
 
-  // Sliders for Photo Position
-  if (photoScale) {
-    photoScale.addEventListener('input', (e) => {
+  // Zoom & Pan Sliders
+  if (photoScaleRange) {
+    photoScaleRange.addEventListener('input', (e) => {
       currentScale = parseInt(e.target.value, 10) / 100;
-      if (scaleValue) scaleValue.textContent = `${e.target.value}%`;
-      updatePhotoTransform();
+      if (scaleLabel) scaleLabel.textContent = `${e.target.value}%`;
+      applyPhotoTransform();
     });
   }
 
-  if (photoOffsetY) {
-    photoOffsetY.addEventListener('input', (e) => {
-      currentOffsetY = parseInt(e.target.value, 10);
-      updatePhotoTransform();
-    });
-  }
-
-  // -------------------------------------------------------------------------
-  // Accordion Toggle for Back Settings
-  // -------------------------------------------------------------------------
-  if (btnToggleSettings && accordionContent) {
-    btnToggleSettings.addEventListener('click', () => {
-      const isOpen = accordionContent.classList.contains('open');
-      if (isOpen) {
-        accordionContent.classList.remove('open');
-        accordionIcon.style.transform = 'rotate(0deg)';
-      } else {
-        accordionContent.classList.add('open');
-        accordionIcon.style.transform = 'rotate(180deg)';
-      }
+  if (photoPanYRange) {
+    photoPanYRange.addEventListener('input', (e) => {
+      currentPanY = parseInt(e.target.value, 10);
+      applyPhotoTransform();
     });
   }
 
   // -------------------------------------------------------------------------
-  // View Modes: Side-by-Side vs 3D Flip
+  // Reset Form
   // -------------------------------------------------------------------------
-  if (btnModeSide && btnModeFlip && cardsDisplayArea) {
-    btnModeSide.addEventListener('click', () => {
-      btnModeSide.classList.add('active');
-      btnModeFlip.classList.remove('active');
-      cardsDisplayArea.classList.remove('flip-mode');
-      if (flipCardInner) flipCardInner.classList.remove('flipped');
-    });
-
-    btnModeFlip.addEventListener('click', () => {
-      btnModeFlip.classList.add('active');
-      btnModeSide.classList.remove('active');
-      cardsDisplayArea.classList.add('flip-mode');
-    });
-
-    if (flipCardInner) {
-      flipCardInner.addEventListener('click', () => {
-        if (cardsDisplayArea.classList.contains('flip-mode')) {
-          flipCardInner.classList.toggle('flipped');
-        }
-      });
-    }
-  }
-
-  // -------------------------------------------------------------------------
-  // Reset Form (Clear to Blank)
-  // -------------------------------------------------------------------------
-  if (btnResetForm) {
-    btnResetForm.addEventListener('click', () => {
-      inputFullName.value = '';
+  if (btnResetAll) {
+    btnResetAll.addEventListener('click', () => {
+      inputName.value = '';
       inputSchool.value = '';
-      inputIdNumber.value = '';
+      inputId.value = '';
       inputCategory.selectedIndex = 0;
       inputDateIssued.value = '';
       inputValidUntil.value = '';
       inputStatus.selectedIndex = 0;
 
-      hasUploadedPhoto = false;
-      passportPreviewImg.src = 'image/blank-avatar.svg';
-      passportPreviewImg.style.transform = 'none';
-      if (photoControls) photoControls.style.display = 'none';
+      hasPassport = false;
+      passportImg.src = '';
+      passportImg.style.display = 'none';
+      if (passportEmptyHint) passportEmptyHint.style.display = 'flex';
+      if (photoAdjustBox) photoAdjustBox.style.display = 'none';
 
-      syncPreview();
-      showToast('All fields cleared to blank.');
+      syncOverlay();
+      notify('All inputs cleared.');
     });
   }
 
   // -------------------------------------------------------------------------
-  // High-Resolution Card Export Functions
+  // High-Resolution Card Download (PNG)
   // -------------------------------------------------------------------------
-  async function downloadCardAsImage(cardElement, filename) {
-    if (typeof html2canvas === 'undefined') {
-      alert('Export library is still loading, please wait a moment.');
-      return;
-    }
-
-    showToast('Rendering high-resolution card...');
-
-    try {
-      const canvas = await html2canvas(cardElement, {
-        scale: 3, // 3x high DPI render for crisp print quality
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#fffdf9'
-      });
-
-      const link = document.createElement('a');
-      link.download = filename;
-      link.href = canvas.toDataURL('image/png', 1.0);
-      link.click();
-      showToast('Download complete: ' + filename);
-    } catch (err) {
-      console.error('Error rendering card:', err);
-      alert('Unable to generate image. Please try again.');
-    }
-  }
-
-  if (btnDownloadFront && cardFront) {
-    btnDownloadFront.addEventListener('click', () => {
-      const id = (inputIdNumber.value.trim() || 'blank').replace(/[\/\\]/g, '-');
-      downloadCardAsImage(cardFront, `ID-Front-${id}.png`);
-    });
-  }
-
-  if (btnDownloadBack && cardBack) {
-    btnDownloadBack.addEventListener('click', () => {
-      const id = (inputIdNumber.value.trim() || 'blank').replace(/[\/\\]/g, '-');
-      downloadCardAsImage(cardBack, `ID-Back-${id}.png`);
-    });
-  }
-
-  // Export Both Front & Back as PDF
-  if (btnDownloadPDF) {
-    btnDownloadPDF.addEventListener('click', async () => {
-      if (typeof html2canvas === 'undefined' || !window.jspdf) {
-        alert('Export libraries are initializing. Please wait a moment.');
+  if (btnDownloadFront && cardStage) {
+    btnDownloadFront.addEventListener('click', async () => {
+      if (typeof html2canvas === 'undefined') {
+        alert('Rendering library is loading. Please wait a moment.');
         return;
       }
 
-      showToast('Generating high-res PDF...');
+      notify('Generating high-resolution card...');
 
       try {
-        const { jsPDF } = window.jspdf;
-        // Standard CR80 ID Card dimensions: 54mm x 85.6mm (portrait)
-        const pdf = new jsPDF({
-          orientation: 'portrait',
-          unit: 'mm',
-          format: [54, 85.6]
+        const canvas = await html2canvas(cardStage, {
+          scale: 3, // 3x high DPI render for print quality
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: null
         });
 
-        // Render Front
-        const canvasFront = await html2canvas(cardFront, { scale: 3, useCORS: true, backgroundColor: '#fffdf9' });
-        const imgFrontData = canvasFront.toDataURL('image/jpeg', 0.98);
-        pdf.addImage(imgFrontData, 'JPEG', 0, 0, 54, 85.6);
-
-        // Add Back page
-        pdf.addPage([54, 85.6], 'portrait');
-        const canvasBack = await html2canvas(cardBack, { scale: 3, useCORS: true, backgroundColor: '#fffdf9' });
-        const imgBackData = canvasBack.toDataURL('image/jpeg', 0.98);
-        pdf.addImage(imgBackData, 'JPEG', 0, 0, 54, 85.6);
-
-        const id = (inputIdNumber.value.trim() || 'blank').replace(/[\/\\]/g, '-');
-        pdf.save(`ID-Card-${id}.pdf`);
-        showToast('PDF Downloaded successfully!');
+        const id = (inputId.value.trim() || 'student').replace(/[\/\\]/g, '-');
+        const link = document.createElement('a');
+        link.download = `Front-ID-${id}.png`;
+        link.href = canvas.toDataURL('image/png', 1.0);
+        link.click();
+        notify('Download ready!');
       } catch (err) {
-        console.error('PDF export error:', err);
-        alert('Could not export PDF. Please try again.');
+        console.error('Download error:', err);
+        alert('Could not render image. Please try again.');
       }
     });
   }
 
-  // Print Action
+  // Print Card
   if (btnPrintCard) {
     btnPrintCard.addEventListener('click', () => {
       window.print();
     });
   }
 
-  // Initialize display with blank state
-  syncPreview();
+  // Initial blank sync
+  syncOverlay();
 });
