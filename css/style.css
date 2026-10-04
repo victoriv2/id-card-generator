@@ -140,25 +140,22 @@ body {
 }
 
 .form-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  display: flex;
+  flex-direction: column;
   gap: 1.1rem;
-}
-
-@media (max-width: 500px) {
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
+  width: 100%;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
+  width: 100%;
+  min-width: 0;
 }
 
 .form-group.full-width {
-  grid-column: 1 / -1;
+  width: 100%;
 }
 
 .form-label {
@@ -168,6 +165,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
 }
 
 .label-with-icon {
@@ -182,12 +180,15 @@ body {
 }
 
 .form-input, .form-select {
-  padding: 0.65rem 0.85rem;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 0.7rem 0.9rem;
   border: 1.5px solid #cbd5e1;
   border-radius: 8px;
   font-size: 0.9rem;
   font-family: inherit;
-  transition: all 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
   background: #ffffff;
   color: #1e293b;
 }
@@ -201,17 +202,20 @@ body {
 .input-with-action {
   display: flex;
   gap: 0.5rem;
+  width: 100%;
+  min-width: 0;
 }
 
 .input-with-action .form-input {
-  flex: 1;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .btn-inline-action {
   background: #f1f5f9;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
-  padding: 0 0.85rem;
+  padding: 0 0.95rem;
   font-size: 0.82rem;
   font-weight: 700;
   color: var(--primary-green);
@@ -220,7 +224,8 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  transition: all 0.2s;
+  flex-shrink: 0;
+  transition: background-color 0.2s, color 0.2s;
 }
 
 .btn-inline-action:hover {
@@ -228,15 +233,17 @@ body {
   color: var(--primary-green-dark);
 }
 
-/* Upload Dropzone - Fully Unclipped */
+/* Upload Dropzone - Fully Unclipped & Contained */
 .upload-dropzone {
+  width: 100%;
+  box-sizing: border-box;
   border: 2px dashed #94a3b8;
   border-radius: 12px;
   padding: 1.5rem 1rem;
   text-align: center;
   background: #f8fafc;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .upload-dropzone:hover, .upload-dropzone.dragover {
@@ -250,6 +257,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.65rem;
+  width: 100%;
 }
 
 .dropzone-icon {
@@ -257,11 +265,6 @@ body {
   height: 44px;
   color: var(--primary-green);
   flex-shrink: 0;
-  transition: transform 0.2s ease;
-}
-
-.upload-dropzone:hover .dropzone-icon {
-  transform: translateY(-2px);
 }
 
 .dropzone-text {
@@ -356,52 +359,49 @@ body {
   cursor: pointer;
 }
 
-/* Action Buttons */
+/* Action Buttons - List Arrangement (Not Grid) */
 .form-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  width: 100%;
   margin-top: 1.5rem;
   padding-top: 1.25rem;
   border-top: 1px solid var(--border);
+}
+
+.btn-primary-action,
+.btn-secondary-action,
+.btn-gold-action {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: background-color 0.2s ease, border-color 0.2s ease, filter 0.2s ease, color 0.2s ease;
 }
 
 .btn-primary-action {
   background: var(--primary-green);
   color: #ffffff;
   border: none;
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  font-size: 0.88rem;
-  font-weight: 700;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
-  box-shadow: 0 2px 4px rgba(11, 61, 35, 0.3);
-  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(11, 61, 35, 0.2);
 }
 
 .btn-primary-action:hover {
   background: var(--primary-green-dark);
-  transform: translateY(-1px);
 }
 
 .btn-secondary-action {
   background: #ffffff;
   color: var(--primary-green);
   border: 1.5px solid var(--primary-green);
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  font-size: 0.88rem;
-  font-weight: 700;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
-  transition: all 0.2s;
 }
 
 .btn-secondary-action:hover {
@@ -412,22 +412,11 @@ body {
   background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
   color: #ffffff;
   border: none;
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  font-size: 0.88rem;
-  font-weight: 700;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
-  box-shadow: 0 2px 4px rgba(184, 134, 11, 0.3);
-  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(184, 134, 11, 0.2);
 }
 
 .btn-gold-action:hover {
   filter: brightness(1.08);
-  transform: translateY(-1px);
 }
 
 /* ==========================================================================
