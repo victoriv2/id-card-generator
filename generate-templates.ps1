@@ -29,8 +29,8 @@ function Create-OptimizedBase64($srcPath, $outWidth, $quality) {
     $ms.Dispose()
     $targetBmp.Dispose()
 
-    Write-Output "Resized $srcPath to ${outWidth}x${outHeight} (Q=$quality): $($bytes.Length) bytes ($([math]::Round($bytes.Length/1KB, 1)) KB)"
-    return "data:image/jpeg;base64," + [Convert]::ToBase64String($bytes)
+    Write-Host "Resized $srcPath to ${outWidth}x${outHeight} (Q=$quality): $($bytes.Length) bytes ($([math]::Round($bytes.Length/1KB, 1)) KB)"
+    return ("data:image/jpeg;base64," + [Convert]::ToBase64String($bytes))
 }
 
 $frontPath = (Resolve-Path "image/id-card-1.png").Path
@@ -42,4 +42,4 @@ $backB64 = Create-OptimizedBase64 $backPath 1400 97
 
 $jsContent = "window.CARD_TEMPLATES = { front: '$frontB64', back: '$backB64' };"
 [System.IO.File]::WriteAllText((Join-Path $PSScriptRoot "js/templates-data.js"), $jsContent, [System.Text.Encoding]::UTF8)
-Write-Output "js/templates-data.js updated successfully!"
+Write-Host "js/templates-data.js updated successfully!"
