@@ -9,8 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const inputSchool = document.getElementById('inputSchool');
   const inputId = document.getElementById('inputId');
   const inputCategory = document.getElementById('inputCategory');
+  const inputState = document.getElementById('inputState');
   const inputDateIssued = document.getElementById('inputDateIssued');
-  const inputValidUntil = document.getElementById('inputValidUntil');
   const inputStatus = document.getElementById('inputStatus');
   const btnResetAll = document.getElementById('btnResetAll');
 
@@ -19,7 +19,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const selectedCategoryText = document.getElementById('selectedCategoryText');
   const categoryModal = document.getElementById('categoryModal');
   const btnCloseCategoryModal = document.getElementById('btnCloseCategoryModal');
-  const simpleModalOptions = document.querySelectorAll('.simple-modal-option');
+  const simpleModalOptions = document.querySelectorAll('.simple-modal-option[data-cat]');
+
+  // --- State Simple Modal Elements (with Search) ---
+  const stateTrigger = document.getElementById('stateTrigger');
+  const selectedStateText = document.getElementById('selectedStateText');
+  const stateModal = document.getElementById('stateModal');
+  const btnCloseStateModal = document.getElementById('btnCloseStateModal');
+  const stateSearchInput = document.getElementById('stateSearchInput');
+  const btnStateSearchClear = document.getElementById('btnStateSearchClear');
+  const stateOptionsList = document.getElementById('stateOptionsList');
+  const stateEmptyState = document.getElementById('stateEmptyState');
+  const stateModalOptions = document.querySelectorAll('.state-modal-option');
 
   // --- Photo Upload & Controls ---
   const dropzone = document.getElementById('dropzone');
@@ -39,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const viewId = document.getElementById('viewId');
   const viewCategory = document.getElementById('viewCategory');
   const viewDateIssued = document.getElementById('viewDateIssued');
-  const viewValidUntil = document.getElementById('viewValidUntil');
+  const viewState = document.getElementById('viewState');
   const viewStatusBadge = document.getElementById('viewStatusBadge');
   const qrBox = document.getElementById('qrBox');
   const cardStageFront = document.getElementById('cardStageFront');
@@ -82,9 +93,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const year = now.getFullYear();
     const dateIssued = `${day}/${month}/${year}`;
-    const validUntil = `${day}/${month}/${year + 1}`;
     const year2Digits = String(year).slice(-2);
-    return { dateIssued, validUntil, year2Digits };
+    return { dateIssued, year2Digits };
   }
 
   function getCardSequenceNumber() {
@@ -100,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function updateAutoCredentials() {
-    const { dateIssued, validUntil, year2Digits } = getSystemDates();
+    const { dateIssued, year2Digits } = getSystemDates();
     const cat = inputCategory ? inputCategory.value : 'STUDENT';
     const catCode = CATEGORY_CODES[cat] || 'STU';
     const seq = String(getCardSequenceNumber()).padStart(3, '0');
@@ -110,9 +120,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (inputDateIssued) {
       inputDateIssued.value = dateIssued;
-    }
-    if (inputValidUntil) {
-      inputValidUntil.value = validUntil;
     }
   }
 
@@ -161,8 +168,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const idVal = inputId ? inputId.value.trim() : '';
     const nameVal = inputName ? inputName.value.trim() : '';
     const catVal = inputCategory ? inputCategory.value : '';
+    const stateVal = inputState ? inputState.value.trim() : 'LAGOS';
     const statusVal = inputStatus ? inputStatus.value : 'ACTIVE';
-    const validVal = inputValidUntil ? inputValidUntil.value.trim() : '';
 
     if (!idVal && !nameVal) {
       qrBox.innerHTML = '<div class="qr-empty-hint"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm13-2h3v2h-3v-2zm-3 2h2v3h-2v-3zm2 3h2v3h-2v-3zm3-1h3v2h-3v-2zm0 3h3v2h-3v-2zm-5 0h2v2h-2v-2z"/></svg><span>QR CODE</span></div>';
@@ -170,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     qrBox.innerHTML = '';
-    const qrText = `STUDENTS PARLIAMENT NIGERIA\nID: ${idVal}\nName: ${nameVal || 'N/A'}\nCategory: ${catVal}\nStatus: ${statusVal}\nValid: ${validVal}`;
+    const qrText = `STUDENTS PARLIAMENT NIGERIA\nID: ${idVal}\nName: ${nameVal || 'N/A'}\nCategory: ${catVal}\nState: ${stateVal}\nStatus: ${statusVal}`;
 
     try {
       if (typeof QRCode !== 'undefined') {
@@ -192,9 +199,21 @@ document.addEventListener('DOMContentLoaded', () => {
   // Real-Time Overlay Sync
   // -------------------------------------------------------------------------
   function syncOverlay() {
-    // 1. Full Name
+    // 1. Full Name (with responsive scaling for multi-line names)
     const name = inputName ? inputName.value.trim() : '';
-    if (viewName) viewName.textContent = name;
+    if (viewName) {
+      viewName.textContent = name;
+      if (name.length > 30) {
+        viewName.style.fontSize = '1.85cqw';
+        viewName.style.lineHeight = '1.05';
+      } else if (name.length > 20) {
+        viewName.style.fontSize = '2.15cqw';
+        viewName.style.lineHeight = '1.08';
+      } else {
+        viewName.style.fontSize = '2.5cqw';
+        viewName.style.lineHeight = '1.1';
+      }
+    }
 
     // 2. School / Branch (formatted as (NAME))
     const school = inputSchool ? inputSchool.value.trim() : '';
@@ -222,9 +241,9 @@ document.addEventListener('DOMContentLoaded', () => {
       viewDateIssued.textContent = inputDateIssued.value;
     }
 
-    // 6. Valid Until
-    if (viewValidUntil && inputValidUntil) {
-      viewValidUntil.textContent = inputValidUntil.value;
+    // 6. State
+    if (viewState && inputState) {
+      viewState.textContent = inputState.value;
     }
 
     // 7. Status Badge
@@ -288,11 +307,123 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // --- Simple State Modal Logic (Searchable) ---
+  function openStateModal() {
+    if (!stateModal) return;
+    stateModal.style.display = 'flex';
+    if (stateSearchInput) {
+      stateSearchInput.value = '';
+      setTimeout(() => stateSearchInput.focus(), 60);
+    }
+    if (btnStateSearchClear) btnStateSearchClear.style.display = 'none';
+    if (stateEmptyState) stateEmptyState.style.display = 'none';
+    if (stateModalOptions) {
+      stateModalOptions.forEach(opt => opt.style.display = '');
+    }
+    const currentActive = stateOptionsList ? stateOptionsList.querySelector('.active') : null;
+    if (currentActive) {
+      currentActive.scrollIntoView({ block: 'nearest' });
+    }
+  }
+
+  function closeStateModal() {
+    if (!stateModal) return;
+    stateModal.style.display = 'none';
+  }
+
+  if (stateTrigger) {
+    stateTrigger.addEventListener('click', openStateModal);
+    stateTrigger.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openStateModal();
+      }
+    });
+  }
+
+  if (btnCloseStateModal) {
+    btnCloseStateModal.addEventListener('click', closeStateModal);
+  }
+
+  if (stateModal) {
+    stateModal.addEventListener('click', (e) => {
+      if (e.target === stateModal) {
+        closeStateModal();
+      }
+    });
+  }
+
+  // Global Escape key to dismiss active modal
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && categoryModal && categoryModal.style.display === 'flex') {
-      closeCategoryModal();
+    if (e.key === 'Escape') {
+      if (categoryModal && categoryModal.style.display === 'flex') {
+        closeCategoryModal();
+      }
+      if (stateModal && stateModal.style.display === 'flex') {
+        closeStateModal();
+      }
     }
   });
+
+  // State Search Filter
+  if (stateSearchInput) {
+    stateSearchInput.addEventListener('input', () => {
+      const query = stateSearchInput.value.trim().toUpperCase();
+      if (btnStateSearchClear) {
+        btnStateSearchClear.style.display = query.length > 0 ? 'flex' : 'none';
+      }
+
+      let matchCount = 0;
+      if (stateModalOptions) {
+        stateModalOptions.forEach(opt => {
+          const text = opt.textContent.toUpperCase();
+          if (text.includes(query)) {
+            opt.style.display = '';
+            matchCount++;
+          } else {
+            opt.style.display = 'none';
+          }
+        });
+      }
+
+      if (stateEmptyState) {
+        stateEmptyState.style.display = matchCount === 0 ? 'block' : 'none';
+      }
+    });
+  }
+
+  // Clear search input
+  if (btnStateSearchClear) {
+    btnStateSearchClear.addEventListener('click', () => {
+      if (stateSearchInput) {
+        stateSearchInput.value = '';
+        stateSearchInput.focus();
+      }
+      btnStateSearchClear.style.display = 'none';
+      if (stateEmptyState) stateEmptyState.style.display = 'none';
+      if (stateModalOptions) {
+        stateModalOptions.forEach(opt => opt.style.display = '');
+      }
+    });
+  }
+
+  // State Option Selection
+  if (stateModalOptions && stateModalOptions.length > 0) {
+    stateModalOptions.forEach(opt => {
+      opt.addEventListener('click', () => {
+        const st = opt.getAttribute('data-state');
+        if (inputState) inputState.value = st;
+        if (selectedStateText) selectedStateText.textContent = st;
+
+        stateModalOptions.forEach(o => o.classList.remove('active'));
+        opt.classList.add('active');
+
+        closeStateModal();
+        syncOverlay();
+        notify(`State selected: ${st}`);
+      });
+    });
+  }
 
   if (simpleModalOptions && simpleModalOptions.length > 0) {
     simpleModalOptions.forEach(opt => {
@@ -437,6 +568,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (simpleModalOptions && simpleModalOptions.length > 0) {
         simpleModalOptions.forEach(o => {
           o.classList.toggle('active', o.getAttribute('data-cat') === 'STUDENT');
+        });
+      }
+      if (inputState) inputState.value = 'LAGOS';
+      if (selectedStateText) selectedStateText.textContent = 'LAGOS';
+      if (stateModalOptions && stateModalOptions.length > 0) {
+        stateModalOptions.forEach(o => {
+          o.classList.toggle('active', o.getAttribute('data-state') === 'LAGOS');
         });
       }
       if (inputStatus) inputStatus.value = 'ACTIVE';

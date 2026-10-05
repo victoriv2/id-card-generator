@@ -102,6 +102,21 @@
               <input type="hidden" id="inputCategory" value="STUDENT">
             </div>
 
+            <!-- State / Chapter State (Click to Open Simple Modal with Search) -->
+            <div class="form-group full-width">
+              <label for="stateTrigger" class="form-label">
+                <span class="label-with-icon">
+                  <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                  State / Chapter State
+                </span>
+              </label>
+              <div class="select-modal-trigger" id="stateTrigger" role="button" tabindex="0">
+                <span id="selectedStateText">LAGOS</span>
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+              </div>
+              <input type="hidden" id="inputState" value="LAGOS">
+            </div>
+
             <!-- Date Issued (Auto-Generated) -->
             <div class="form-group">
               <label for="inputDateIssued" class="form-label">
@@ -114,20 +129,8 @@
               <input type="text" id="inputDateIssued" class="form-input" readonly value="" style="background: #f8fafc; font-weight: 700; color: #065f46; cursor: default;">
             </div>
 
-            <!-- Valid Until (Auto-Generated 1 Year) -->
-            <div class="form-group">
-              <label for="inputValidUntil" class="form-label">
-                <span class="label-with-icon">
-                  <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zm-7-2l5-5-1.41-1.41L12 14.17l-1.59-1.59L9 14l3 3z"/></svg>
-                  Valid Until
-                </span>
-                <span style="color: #10b981; font-size: 0.75rem; font-weight: 700;">1 YEAR</span>
-              </label>
-              <input type="text" id="inputValidUntil" class="form-input" readonly value="" style="background: #f8fafc; font-weight: 700; color: #b91c1c; cursor: default;">
-            </div>
-
             <!-- Membership Status -->
-            <div class="form-group full-width">
+            <div class="form-group">
               <label for="inputStatus" class="form-label">
                 <span class="label-with-icon">
                   <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
@@ -268,11 +271,11 @@
                     <img id="passportImg" src="" alt="Passport" style="display: none;">
                   </div>
 
-                  <!-- 2. Full Name directly beneath Passport Box -->
-                  <div class="overlay-bearer-name" id="viewName"></div>
-
-                  <!-- 3. School / Branch directly beneath Name -->
-                  <div class="overlay-bearer-school" id="viewSchool"></div>
+                  <!-- 2 & 3. Full Name and School inside non-overlapping flex block directly beneath Passport Box -->
+                  <div class="overlay-bearer-block">
+                    <div class="overlay-bearer-name" id="viewName"></div>
+                    <div class="overlay-bearer-school" id="viewSchool"></div>
+                  </div>
 
                   <!-- 4. Left Side: ID NUMBER -->
                   <div class="overlay-data-val overlay-id-number" id="viewId"></div>
@@ -283,8 +286,8 @@
                   <!-- 6. Left Side: DATE ISSUED -->
                   <div class="overlay-data-val overlay-date-issued" id="viewDateIssued"></div>
 
-                  <!-- 7. Left Side: VALID UNTIL -->
-                  <div class="overlay-data-val overlay-valid-until" id="viewValidUntil"></div>
+                  <!-- 7. Left Side: STATE (Replaces Valid Until) -->
+                  <div class="overlay-data-val overlay-state" id="viewState">LAGOS</div>
 
                   <!-- 8. Left Side: STATUS BADGE -->
                   <div class="overlay-status-row" id="viewStatusRow">
@@ -342,6 +345,71 @@
         <button type="button" class="simple-modal-option" data-cat="EXECUTIVE">EXECUTIVE</button>
         <button type="button" class="simple-modal-option" data-cat="PARENT">PARENT</button>
         <button type="button" class="simple-modal-option" data-cat="OFFICIAL">OFFICIAL</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================
+       SIMPLE STATE MODAL WITH SEARCH INPUT (36 States + FCT)
+       ================================================================ -->
+  <div class="modal-backdrop" id="stateModal" style="display: none;">
+    <div class="modal-dialog-simple modal-dialog-searchable">
+      <div class="modal-header-simple">
+        <span>Select State</span>
+        <button type="button" class="btn-modal-close" id="btnCloseStateModal" title="Close">
+          <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
+      <div class="modal-search-wrapper">
+        <svg class="modal-search-icon" width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+        </svg>
+        <input type="text" id="stateSearchInput" class="modal-search-input" placeholder="Search state..." autocomplete="off">
+        <button type="button" class="search-clear-btn" id="btnStateSearchClear" style="display: none;" title="Clear search">
+          <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
+      <div class="simple-modal-list state-scroll-list" id="stateOptionsList">
+        <button type="button" class="simple-modal-option state-modal-option" data-state="ABIA">ABIA</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="ADAMAWA">ADAMAWA</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="AKWA IBOM">AKWA IBOM</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="ANAMBRA">ANAMBRA</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="BAUCHI">BAUCHI</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="BAYELSA">BAYELSA</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="BENUE">BENUE</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="BORNO">BORNO</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="CROSS RIVER">CROSS RIVER</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="DELTA">DELTA</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="EBONYI">EBONYI</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="EDO">EDO</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="EKITI">EKITI</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="ENUGU">ENUGU</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="FCT - ABUJA">FCT - ABUJA</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="GOMBE">GOMBE</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="IMO">IMO</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="JIGAWA">JIGAWA</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="KADUNA">KADUNA</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="KANO">KANO</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="KATSINA">KATSINA</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="KEBBI">KEBBI</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="KOGI">KOGI</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="KWARA">KWARA</button>
+        <button type="button" class="simple-modal-option state-modal-option active" data-state="LAGOS">LAGOS</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="NASARAWA">NASARAWA</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="NIGER">NIGER</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="OGUN">OGUN</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="ONDO">ONDO</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="OSUN">OSUN</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="OYO">OYO</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="PLATEAU">PLATEAU</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="RIVERS">RIVERS</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="SOKOTO">SOKOTO</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="TARABA">TARABA</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="YOBE">YOBE</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="ZAMFARA">ZAMFARA</button>
+      </div>
+      <div class="modal-empty-state" id="stateEmptyState" style="display: none;">
+        No state found matching search
       </div>
     </div>
   </div>
