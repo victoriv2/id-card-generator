@@ -204,37 +204,46 @@ document.addEventListener('DOMContentLoaded', () => {
   // Auto-Fitting Typography for Bearer Name and School
   // -------------------------------------------------------------------------
   function autoFitBearerText() {
-    if (!viewName || !viewSchool) return;
+    const bearerBlock = document.getElementById('bearerBlock');
+    if (!bearerBlock || !viewName || !viewSchool) return;
 
-    // Reset default prominent bold sizes
-    let nameSize = 2.7;
+    // Start with bold, prominent default sizes
+    let nameSize = 2.75;
     let schoolSize = 2.2;
 
     viewName.style.fontSize = `${nameSize}cqw`;
-    viewName.style.lineHeight = '1.15';
+    viewName.style.lineHeight = '1.12';
     viewSchool.style.fontSize = `${schoolSize}cqw`;
-    viewSchool.style.lineHeight = '1.15';
+    viewSchool.style.lineHeight = '1.12';
 
-    // Auto-fit Name if text overflows allocated width
-    const nameMaxW = viewName.clientWidth || 0;
-    if (nameMaxW > 0) {
-      let attempts = 0;
-      while (viewName.scrollWidth > nameMaxW && nameSize > 1.3 && attempts < 25) {
-        nameSize -= 0.06;
+    // Measure allocated bounds
+    const maxH = bearerBlock.clientHeight;
+    const maxW = bearerBlock.clientWidth;
+    if (!maxH || !maxW) return;
+
+    // Only shrink if there is actual physical overflow of container height or width
+    let attempts = 0;
+    while (attempts < 25) {
+      const currentH = (viewName.offsetHeight || 0) + (viewSchool.offsetHeight || 0) + 2;
+      const currentW = Math.max(viewName.scrollWidth || 0, viewSchool.scrollWidth || 0);
+
+      if (currentH <= maxH && currentW <= maxW) {
+        break; // Fits inside boundary!
+      }
+
+      if (nameSize > 1.6) {
+        nameSize -= 0.08;
         viewName.style.fontSize = `${nameSize.toFixed(2)}cqw`;
-        attempts++;
       }
-    }
-
-    // Auto-fit School if text overflows allocated width
-    const schoolMaxW = viewSchool.clientWidth || 0;
-    if (schoolMaxW > 0) {
-      let attempts = 0;
-      while (viewSchool.scrollWidth > schoolMaxW && schoolSize > 1.1 && attempts < 25) {
-        schoolSize -= 0.05;
+      if (schoolSize > 1.3) {
+        schoolSize -= 0.06;
         viewSchool.style.fontSize = `${schoolSize.toFixed(2)}cqw`;
-        attempts++;
       }
+
+      if (nameSize <= 1.6 && schoolSize <= 1.3) {
+        break;
+      }
+      attempts++;
     }
   }
 
