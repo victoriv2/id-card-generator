@@ -313,13 +313,10 @@ document.addEventListener('DOMContentLoaded', () => {
       viewState.textContent = (inputState && inputState.value) ? inputState.value : '';
     }
 
-    // 7. Status Badge
-    if (viewStatusBadge && inputStatus) {
-      const status = inputStatus.value;
-      viewStatusBadge.textContent = status;
+    // 7. Status Badge (Always ACTIVE)
+    if (viewStatusBadge) {
+      viewStatusBadge.textContent = 'ACTIVE';
       viewStatusBadge.className = 'overlay-status-badge';
-      if (status === 'PENDING') viewStatusBadge.classList.add('pending');
-      if (status === 'EXPIRED') viewStatusBadge.classList.add('expired');
     }
 
     // 8. Dynamic QR Code
