@@ -519,11 +519,11 @@ body {
   container-type: inline-size;
 }
 
-/* The actual Card Stage (Aspect ratio: 6597 x 10476) */
+/* The actual Card Stage (Aspect ratio: 6598 x 10477) */
 .card-stage {
   position: relative;
   width: 100%;
-  aspect-ratio: 6597 / 10476;
+  aspect-ratio: 6598 / 10477;
   border-radius: 18px;
   overflow: hidden;
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.22);
@@ -544,7 +544,7 @@ body {
 }
 
 /* ==========================================================================
-   FRONT OVERLAY REAL-TIME COORDINATES
+   FRONT OVERLAY REAL-TIME COORDINATES (Calibrated to id-card-1.png)
    ========================================================================== */
 .card-overlay-layer {
   position: absolute;
@@ -559,11 +559,11 @@ body {
 /* 1. Upper White Box: Passport Photograph */
 .overlay-passport-box {
   position: absolute;
-  left: 62.03%;
-  top: 29.01%;
-  width: 31.30%;
-  height: 22.88%;
-  border-radius: 6px;
+  left: 61.85%;
+  top: 28.94%;
+  width: 31.83%;
+  height: 23.68%;
+  border-radius: 4px;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -605,13 +605,13 @@ body {
 /* 2. Full Name directly beneath Passport Box */
 .overlay-bearer-name {
   position: absolute;
-  left: 55%;
-  width: 45%;
-  top: 52.8%;
+  left: 56%;
+  width: 43.5%;
+  top: 53.4%;
   text-align: center;
-  color: var(--blue-accent);
+  color: #0b3d23;
   font-weight: 900;
-  font-size: 2.9cqw;
+  font-size: 2.8cqw;
   text-transform: uppercase;
   line-height: 1.15;
   letter-spacing: 0.2px;
@@ -621,13 +621,13 @@ body {
 /* 3. School / Branch directly beneath Name */
 .overlay-bearer-school {
   position: absolute;
-  left: 55%;
-  width: 45%;
-  top: 58.8%;
+  left: 56%;
+  width: 43.5%;
+  top: 57.5%;
   text-align: center;
-  color: #111827;
-  font-weight: 900;
-  font-size: 2.5cqw;
+  color: #1e293b;
+  font-weight: 800;
+  font-size: 2.3cqw;
   text-transform: uppercase;
   line-height: 1.15;
   min-height: 2.8cqw;
@@ -636,45 +636,45 @@ body {
 /* 4. Left 5 Data Rows */
 .overlay-data-val {
   position: absolute;
-  left: 36%;
-  width: 23%;
+  left: 33.5%;
+  width: 25.5%;
   text-align: right;
   font-weight: 900;
-  font-size: 2.7cqw;
+  font-size: 2.65cqw;
   letter-spacing: 0.2px;
   white-space: nowrap;
 }
 
 /* ID NUMBER */
 .overlay-id-number {
-  top: 62.8%;
+  top: 63.3%;
   color: var(--red-accent);
 }
 
 /* CATEGORY */
 .overlay-category {
-  top: 67.9%;
+  top: 68.4%;
   color: var(--amber-accent);
 }
 
 /* DATE ISSUED */
 .overlay-date-issued {
-  top: 73.0%;
+  top: 73.5%;
   color: #065f46;
 }
 
 /* VALID UNTIL */
 .overlay-valid-until {
-  top: 78.1%;
+  top: 78.6%;
   color: var(--red-accent);
 }
 
 /* STATUS BADGE */
 .overlay-status-row {
   position: absolute;
-  left: 36%;
-  width: 23%;
-  top: 83.0%;
+  left: 33.5%;
+  width: 25.5%;
+  top: 83.6%;
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -685,7 +685,7 @@ body {
   color: #ffffff;
   font-size: 2.2cqw;
   font-weight: 900;
-  padding: 0.4cqw 2cqw;
+  padding: 0.35cqw 1.8cqw;
   border-radius: 4px;
   letter-spacing: 0.5px;
   text-transform: uppercase;
@@ -702,17 +702,17 @@ body {
 /* 5. Lower White Box: Dynamic QR Code */
 .overlay-qr-box {
   position: absolute;
-  left: 67.03%;
-  top: 72.93%;
-  width: 27.89%;
-  height: 16.67%;
-  border-radius: 2px;
+  left: 61.85%;
+  top: 61.71%;
+  width: 31.83%;
+  height: 20.04%;
+  border-radius: 4px;
   overflow: hidden;
   background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1.5%;
+  padding: 2%;
 }
 
 .overlay-qr-box canvas, .overlay-qr-box img {

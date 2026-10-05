@@ -1,13 +1,13 @@
 # Students Parliament Nigeria - ID Card Generator (Front & Back)
 
-Real-time ID card generator built with vanilla HTML5, CSS3, and JavaScript, using authentic high-resolution parliamentary card templates (`image/id-card front.png` and `image/id-card back.png`).
+Real-time ID card generator built with vanilla HTML5, CSS3, and JavaScript, using authentic high-resolution parliamentary card templates (`image/id-card-1.png` and `image/id-card back.png`).
 
 ---
 
 ## Features
 
 * **Authentic Template Backgrounds**:
-  * Front: Direct real-time overlay on `image/id-card front.png`.
+  * Front: Direct real-time overlay on `image/id-card-1.png`.
   * Back: Official complete template `image/id-card back.png` with official signature and barcode.
 * **Dual Live Preview**:
   * Side-by-side viewing of both Front and Back.
