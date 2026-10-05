@@ -986,29 +986,33 @@ document.addEventListener('DOMContentLoaded', () => {
   const exportButtonsGroup = document.getElementById('exportButtonsGroup');
   const paywallVerifiedRef = document.getElementById('paywallVerifiedRef');
   const paywallVerifiedAmount = document.getElementById('paywallVerifiedAmount');
+  const downloadsLockBanner = document.getElementById('downloadsLockBanner');
 
   function updatePaywallState() {
     const id = getSanitizedId();
     const isPaid = window.CloudDB ? CloudDB.isCardPaid(id) : false;
     const price = window.CloudDB ? CloudDB.getPrice() : 1500;
+    const formattedPrice = new Intl.NumberFormat('en-NG').format(price);
 
-    if (paywallAmountDisplay) paywallAmountDisplay.textContent = price.toLocaleString();
-    if (btnPayAmountDisplay) btnPayAmountDisplay.textContent = `₦${price.toLocaleString()}`;
+    if (paywallAmountDisplay) paywallAmountDisplay.textContent = formattedPrice;
+    if (btnPayAmountDisplay) btnPayAmountDisplay.textContent = `₦${formattedPrice}`;
 
     if (isPaid) {
       if (paywallBox) paywallBox.style.display = 'none';
+      if (downloadsLockBanner) downloadsLockBanner.style.display = 'none';
       if (paywallVerifiedBox) {
         paywallVerifiedBox.style.display = 'block';
         const cards = window.CloudDB ? CloudDB.getLocalCards() : [];
         const card = cards.find(c => c.id === id);
         if (card) {
           if (paywallVerifiedRef) paywallVerifiedRef.textContent = card.paymentRef || 'VERIFIED';
-          if (paywallVerifiedAmount) paywallVerifiedAmount.textContent = `₦${(card.amountPaid || price).toLocaleString()}`;
+          if (paywallVerifiedAmount) paywallVerifiedAmount.textContent = `₦${new Intl.NumberFormat('en-NG').format(card.amountPaid || price)}`;
         }
       }
       if (exportButtonsGroup) exportButtonsGroup.classList.remove('downloads-locked');
     } else {
       if (paywallBox) paywallBox.style.display = 'block';
+      if (downloadsLockBanner) downloadsLockBanner.style.display = 'flex';
       if (paywallVerifiedBox) paywallVerifiedBox.style.display = 'none';
       if (exportButtonsGroup) exportButtonsGroup.classList.add('downloads-locked');
     }

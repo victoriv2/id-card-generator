@@ -13,6 +13,7 @@
   <!-- Styles -->
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/modal-alert.css">
+  <link rel="stylesheet" href="css/paywall.css">
 
   <!-- Embedded High-Definition Card Templates (Base64 for zero-taint offline exports) -->
   <script src="js/templates-data.js"></script>
@@ -256,6 +257,11 @@
 
             <!-- Export Buttons (Guarded by Paywall) -->
             <div class="export-buttons-group downloads-locked" id="exportButtonsGroup">
+              <div class="downloads-lock-banner" id="downloadsLockBanner">
+                <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                <span>Downloads Locked &bull; Complete Payment Above to Unlock</span>
+              </div>
+
               <!-- PNG Downloads -->
               <div class="export-row-split">
                 <button type="button" id="btnDownloadFrontPNG" class="btn-primary-action">
