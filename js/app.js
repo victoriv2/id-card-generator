@@ -14,6 +14,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const inputStatus = document.getElementById('inputStatus');
   const btnResetAll = document.getElementById('btnResetAll');
 
+  // --- Category Simple Modal Elements ---
+  const categoryTrigger = document.getElementById('categoryTrigger');
+  const selectedCategoryText = document.getElementById('selectedCategoryText');
+  const categoryModal = document.getElementById('categoryModal');
+  const btnCloseCategoryModal = document.getElementById('btnCloseCategoryModal');
+  const simpleModalOptions = document.querySelectorAll('.simple-modal-option');
+
   // --- Photo Upload & Controls ---
   const dropzone = document.getElementById('dropzone');
   const passportFile = document.getElementById('passportFile');
@@ -247,6 +254,64 @@ document.addEventListener('DOMContentLoaded', () => {
       notify(`Category updated to ${inputCategory.value}`);
     });
   }
+
+  // --- Simple Category Modal Logic ---
+  function openCategoryModal() {
+    if (!categoryModal) return;
+    categoryModal.style.display = 'flex';
+  }
+
+  function closeCategoryModal() {
+    if (!categoryModal) return;
+    categoryModal.style.display = 'none';
+  }
+
+  if (categoryTrigger) {
+    categoryTrigger.addEventListener('click', openCategoryModal);
+    categoryTrigger.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openCategoryModal();
+      }
+    });
+  }
+
+  if (btnCloseCategoryModal) {
+    btnCloseCategoryModal.addEventListener('click', closeCategoryModal);
+  }
+
+  if (categoryModal) {
+    categoryModal.addEventListener('click', (e) => {
+      if (e.target === categoryModal) {
+        closeCategoryModal();
+      }
+    });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && categoryModal && categoryModal.style.display === 'flex') {
+      closeCategoryModal();
+    }
+  });
+
+  if (simpleModalOptions && simpleModalOptions.length > 0) {
+    simpleModalOptions.forEach(opt => {
+      opt.addEventListener('click', () => {
+        const cat = opt.getAttribute('data-cat');
+        if (inputCategory) inputCategory.value = cat;
+        if (selectedCategoryText) selectedCategoryText.textContent = cat;
+
+        simpleModalOptions.forEach(o => o.classList.remove('active'));
+        opt.classList.add('active');
+
+        closeCategoryModal();
+        updateAutoCredentials();
+        syncOverlay();
+        notify(`Category selected: ${cat}`);
+      });
+    });
+  }
+
   if (inputStatus) {
     inputStatus.addEventListener('change', syncOverlay);
   }
@@ -368,6 +433,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (inputName) inputName.value = '';
       if (inputSchool) inputSchool.value = '';
       if (inputCategory) inputCategory.value = 'STUDENT';
+      if (selectedCategoryText) selectedCategoryText.textContent = 'STUDENT';
+      if (simpleModalOptions && simpleModalOptions.length > 0) {
+        simpleModalOptions.forEach(o => {
+          o.classList.toggle('active', o.getAttribute('data-cat') === 'STUDENT');
+        });
+      }
       if (inputStatus) inputStatus.value = 'ACTIVE';
 
       hasPassport = false;
