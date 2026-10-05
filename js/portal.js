@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (emptyState) {
         emptyState.style.display = 'block';
         if (q) {
-          emptyState.querySelector('p').textContent = `No cards found matching "${query}". Try searching by ID number or name.`;
+          emptyState.querySelector('p').textContent = `No cards found matching "${query}". Try searching by Full Name or ID Number.`;
         } else {
           emptyState.querySelector('p').textContent = 'No ID cards have been generated yet. Click "Generate New ID Card" to issue your first card.';
         }
