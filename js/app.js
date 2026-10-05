@@ -681,21 +681,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // -------------------------------------------------------------------------
   // Pre-load card background images as base64 data URLs
-  // This fixes html2canvas failing on file:// protocol (cross-origin taint error)
+  // This fixes html2canvas export on file:// protocol (cross-origin taint)
+  // Uses multiple fallback methods since file:// has different restrictions
+  // per browser (Chrome blocks XHR/fetch, Firefox allows them, etc.)
   // -------------------------------------------------------------------------
-  function imgSrcToDataURL(src) {
-    return new Promise((resolve) => {
-      if (!src || src.startsWith('data:')) return resolve(src || null);
 
-      // Use XHR to load the image as a blob, then FileReader to base64 encode it
-      // This works on file:// protocol where CORS canvas approach fails
+  /**
+   * Method 1: Draw the ALREADY LOADED DOM <img> element to a canvas.
+   * Works if browser treats same-directory file:// images as same-origin.
+   */
+  function tryCanvasMethod(imgElement) {
+    try {
+      if (!imgElement || !imgElement.complete || imgElement.naturalWidth === 0) return null;
+      const c = document.createElement('canvas');
+      c.width = imgElement.naturalWidth;
+      c.height = imgElement.naturalHeight;
+      c.getContext('2d').drawImage(imgElement, 0, 0);
+      const result = c.toDataURL('image/png');
+      if (result && result !== 'data:,') return result;
+    } catch (e) {
+      console.warn('[ID Card] Canvas method failed:', e.message);
+    }
+    return null;
+  }
+
+  /**
+   * Method 2: XHR blob → FileReader → data URL.
+   * Works in Firefox on file://. Blocked in Chrome/Edge.
+   */
+  function tryXhrMethod(src) {
+    return new Promise((resolve) => {
       try {
         const xhr = new XMLHttpRequest();
         xhr.open('GET', src, true);
         xhr.responseType = 'blob';
-
         xhr.onload = () => {
-          if (xhr.status === 200 || xhr.status === 0) {
+          if ((xhr.status === 200 || xhr.status === 0) && xhr.response && xhr.response.size > 0) {
             const reader = new FileReader();
             reader.onloadend = () => resolve(reader.result);
             reader.onerror = () => resolve(null);
@@ -704,7 +725,6 @@ document.addEventListener('DOMContentLoaded', () => {
             resolve(null);
           }
         };
-
         xhr.onerror = () => resolve(null);
         xhr.send();
       } catch (e) {
@@ -713,24 +733,85 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  /**
+   * Method 3: fetch → blob → FileReader → data URL.
+   * Alternative to XHR; may work in different browser configurations.
+   */
+  function tryFetchMethod(src) {
+    if (typeof fetch === 'undefined') return Promise.resolve(null);
+    return fetch(src)
+      .then(r => r.blob())
+      .then(blob => new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = () => resolve(null);
+        reader.readAsDataURL(blob);
+      }))
+      .catch(() => null);
+  }
+
+  /**
+   * Try all methods to convert an <img> element's source to a base64 data URL.
+   */
+  async function convertImageToBase64(imgElement) {
+    if (!imgElement) return null;
+    const src = imgElement.src;
+    if (!src || src.startsWith('data:') || src.startsWith('blob:')) return src || null;
+
+    // Method 1: Canvas from already-loaded DOM element (fastest, no network)
+    const canvasResult = tryCanvasMethod(imgElement);
+    if (canvasResult) {
+      console.log('[ID Card] Image converted via canvas method');
+      return canvasResult;
+    }
+
+    // Method 2: XHR blob
+    const xhrResult = await tryXhrMethod(src);
+    if (xhrResult) {
+      console.log('[ID Card] Image converted via XHR method');
+      return xhrResult;
+    }
+
+    // Method 3: Fetch blob
+    const fetchResult = await tryFetchMethod(src);
+    if (fetchResult) {
+      console.log('[ID Card] Image converted via fetch method');
+      return fetchResult;
+    }
+
+    console.warn('[ID Card] All image conversion methods failed for:', src);
+    return null;
+  }
+
   async function preloadCardImages() {
     const frontBg = cardStageFront ? cardStageFront.querySelector('.card-bg-template') : null;
     const backBg = cardStageBack ? cardStageBack.querySelector('.card-bg-template') : null;
 
+    // Wait for images to be fully loaded by the browser before conversion
+    await Promise.all([
+      frontBg && !frontBg.complete ? new Promise(r => { frontBg.onload = r; frontBg.onerror = r; }) : Promise.resolve(),
+      backBg && !backBg.complete ? new Promise(r => { backBg.onload = r; backBg.onerror = r; }) : Promise.resolve()
+    ]);
+
     const [frontDataUrl, backDataUrl] = await Promise.all([
-      frontBg ? imgSrcToDataURL(frontBg.src) : Promise.resolve(null),
-      backBg ? imgSrcToDataURL(backBg.src) : Promise.resolve(null)
+      convertImageToBase64(frontBg),
+      convertImageToBase64(backBg)
     ]);
 
     if (frontDataUrl && frontBg) frontBg.src = frontDataUrl;
     if (backDataUrl && backBg) backBg.src = backDataUrl;
+
+    return !!(frontDataUrl && backDataUrl);
   }
 
-  // Kick off pre-load (store promise so exports can await it if user clicks quickly)
-  const cardImagesReady = preloadCardImages().catch(() => {});
+  // Kick off pre-load (store promise so exports can await it)
+  const cardImagesReady = preloadCardImages().catch((e) => {
+    console.warn('[ID Card] Preload error:', e);
+    return false;
+  });
 
   // -------------------------------------------------------------------------
-  // High-Resolution Card Export Helper Functions
+  // High-Resolution Card Export Functions (PNG, JPEG, PDF, Print)
   // -------------------------------------------------------------------------
   function getSanitizedId() {
     return (inputId && inputId.value.trim() ? inputId.value.trim() : 'card').replace(/[\/\\]/g, '-');
@@ -755,43 +836,40 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.appendChild(link);
     link.click();
     setTimeout(() => {
-      if (link.parentNode) {
-        link.parentNode.removeChild(link);
-      }
-    }, 250);
+      if (link.parentNode) link.parentNode.removeChild(link);
+    }, 300);
   }
 
   async function renderStageToCanvas(stageElement, scale, isJpeg) {
-    if (!stageElement) {
-      throw new Error('Target card element not found');
-    }
+    if (!stageElement) throw new Error('Target card element not found');
 
-    // If the stage's column is hidden (due to tab view "Front" or "Back"),
-    // temporarily unhide it offscreen so html2canvas can measure and render it
+    // If the stage's column is hidden (tab view), temporarily unhide offscreen
     const col = stageElement.closest('.card-column');
     const wasHidden = col && (window.getComputedStyle(col).display === 'none');
-    const prevStyle = col ? {
-      display: col.style.display,
-      position: col.style.position,
-      left: col.style.left,
-      top: col.style.top,
-      visibility: col.style.visibility,
-      opacity: col.style.opacity
-    } : null;
+    const savedStyles = {};
 
     if (wasHidden) {
-      col.style.display = 'flex';
-      col.style.position = 'fixed';
-      col.style.left = '-9999px';
-      col.style.top = '0px';
-      col.style.visibility = 'visible';
-      col.style.opacity = '1';
+      ['display', 'position', 'left', 'top', 'visibility', 'opacity'].forEach(prop => {
+        savedStyles[prop] = col.style[prop];
+      });
+      Object.assign(col.style, {
+        display: 'flex',
+        position: 'fixed',
+        left: '-9999px',
+        top: '0px',
+        visibility: 'visible',
+        opacity: '1'
+      });
+      // Force layout recalculation
+      col.offsetHeight;
     }
 
     try {
       const canvas = await html2canvas(stageElement, {
         scale: scale,
-        useCORS: true,
+        // DO NOT use useCORS — it sets crossOrigin="anonymous" on images,
+        // which prevents them from loading on file:// protocol entirely
+        useCORS: false,
         allowTaint: true,
         logging: false,
         backgroundColor: isJpeg ? '#ffffff' : null
@@ -799,12 +877,9 @@ document.addEventListener('DOMContentLoaded', () => {
       return canvas;
     } finally {
       if (wasHidden && col) {
-        col.style.display = prevStyle.display;
-        col.style.position = prevStyle.position;
-        col.style.left = prevStyle.left;
-        col.style.top = prevStyle.top;
-        col.style.visibility = prevStyle.visibility;
-        col.style.opacity = prevStyle.opacity;
+        Object.keys(savedStyles).forEach(prop => {
+          col.style[prop] = savedStyles[prop];
+        });
       }
     }
   }
@@ -819,17 +894,40 @@ document.addEventListener('DOMContentLoaded', () => {
     notify(`Rendering ${format.toUpperCase()} (${label})...`);
 
     try {
-      // Ensure card background images are fully converted to base64 first
+      // Wait for background images to be converted to base64
       await cardImagesReady;
+
       const canvas = await renderStageToCanvas(element, scale, format === 'jpeg');
+
+      // Try to export the canvas to a data URL
       const mimeType = format === 'jpeg' ? 'image/jpeg' : 'image/png';
-      const dataUrl = canvas.toDataURL(mimeType, jpegQuality);
+      let dataUrl;
+      try {
+        dataUrl = canvas.toDataURL(mimeType, jpegQuality);
+      } catch (taintErr) {
+        // Canvas is tainted — images could not be pre-converted to base64.
+        // This happens on Chrome/Edge when opening from file:// protocol.
+        console.error('[ID Card] Canvas tainted:', taintErr);
+        alert(
+          'Download blocked by browser security (file:// protocol).\n\n' +
+          'To enable downloads, open this page via a local web server:\n' +
+          '1. Open a terminal/command prompt in this folder\n' +
+          '2. Run: python -m http.server 8080\n' +
+          '3. Open: http://localhost:8080\n\n' +
+          'Or use the VS Code "Live Server" extension.'
+        );
+        return;
+      }
+
+      if (!dataUrl || dataUrl === 'data:,') {
+        throw new Error('Canvas produced empty image data');
+      }
 
       triggerDownload(dataUrl, filename);
       notify(`Download complete: ${filename}`);
     } catch (err) {
-      console.error('Download error:', err);
-      alert('Could not render image. Please try again.');
+      console.error('[ID Card] Download error:', err);
+      alert('Could not render image: ' + (err.message || String(err)));
     }
   }
 
@@ -843,10 +941,9 @@ document.addEventListener('DOMContentLoaded', () => {
     notify(`Generating PDF (${label})...`);
 
     try {
-      // Ensure card background images are fully converted to base64 first
       await cardImagesReady;
+
       const { jsPDF } = window.jspdf;
-      // Standard CR80 card dimensions (54mm x 85.6mm)
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
@@ -855,7 +952,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // 1. Render Front Side
       const canvasFront = await renderStageToCanvas(cardStageFront, scale, true);
-      const imgFront = canvasFront.toDataURL('image/jpeg', jpegQuality);
+      let imgFront;
+      try {
+        imgFront = canvasFront.toDataURL('image/jpeg', jpegQuality);
+      } catch (e) {
+        alert(
+          'PDF export blocked by browser security (file:// protocol).\n\n' +
+          'Please open this page via a local web server.\n' +
+          'Run: python -m http.server 8080\n' +
+          'Then open: http://localhost:8080'
+        );
+        return;
+      }
       pdf.addImage(imgFront, 'JPEG', 0, 0, 54, 85.6);
 
       // 2. Render Back Side
@@ -869,8 +977,8 @@ document.addEventListener('DOMContentLoaded', () => {
       pdf.save(filename);
       notify(`PDF Download complete: ${filename}`);
     } catch (err) {
-      console.error('PDF export error:', err);
-      alert('Could not export PDF. Please try again.');
+      console.error('[ID Card] PDF export error:', err);
+      alert('Could not export PDF: ' + (err.message || String(err)));
     }
   }
 
