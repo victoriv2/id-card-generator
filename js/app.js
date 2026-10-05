@@ -680,135 +680,23 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // -------------------------------------------------------------------------
-  // Pre-load card background images as base64 data URLs
-  // This fixes html2canvas export on file:// protocol (cross-origin taint)
-  // Uses multiple fallback methods since file:// has different restrictions
-  // per browser (Chrome blocks XHR/fetch, Firefox allows them, etc.)
+  // Base64 Pre-Encoded Card Templates Initialization
+  // (Ensures 100% offline, zero-taint canvas download on file:// and web servers)
   // -------------------------------------------------------------------------
+  const cardBgFront = document.getElementById('cardBgFront') || (cardStageFront ? cardStageFront.querySelector('.card-bg-template') : null);
+  const cardBgBack = document.getElementById('cardBgBack') || (cardStageBack ? cardStageBack.querySelector('.card-bg-template') : null);
 
-  /**
-   * Method 1: Draw the ALREADY LOADED DOM <img> element to a canvas.
-   * Works if browser treats same-directory file:// images as same-origin.
-   */
-  function tryCanvasMethod(imgElement) {
-    try {
-      if (!imgElement || !imgElement.complete || imgElement.naturalWidth === 0) return null;
-      const c = document.createElement('canvas');
-      c.width = imgElement.naturalWidth;
-      c.height = imgElement.naturalHeight;
-      c.getContext('2d').drawImage(imgElement, 0, 0);
-      const result = c.toDataURL('image/png');
-      if (result && result !== 'data:,') return result;
-    } catch (e) {
-      console.warn('[ID Card] Canvas method failed:', e.message);
-    }
-    return null;
-  }
-
-  /**
-   * Method 2: XHR blob → FileReader → data URL.
-   * Works in Firefox on file://. Blocked in Chrome/Edge.
-   */
-  function tryXhrMethod(src) {
-    return new Promise((resolve) => {
-      try {
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', src, true);
-        xhr.responseType = 'blob';
-        xhr.onload = () => {
-          if ((xhr.status === 200 || xhr.status === 0) && xhr.response && xhr.response.size > 0) {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result);
-            reader.onerror = () => resolve(null);
-            reader.readAsDataURL(xhr.response);
-          } else {
-            resolve(null);
-          }
-        };
-        xhr.onerror = () => resolve(null);
-        xhr.send();
-      } catch (e) {
-        resolve(null);
+  function ensureTemplatesLoaded() {
+    if (window.CARD_TEMPLATES) {
+      if (cardBgFront && window.CARD_TEMPLATES.front && (!cardBgFront.src || !cardBgFront.src.startsWith('data:'))) {
+        cardBgFront.src = window.CARD_TEMPLATES.front;
       }
-    });
-  }
-
-  /**
-   * Method 3: fetch → blob → FileReader → data URL.
-   * Alternative to XHR; may work in different browser configurations.
-   */
-  function tryFetchMethod(src) {
-    if (typeof fetch === 'undefined') return Promise.resolve(null);
-    return fetch(src)
-      .then(r => r.blob())
-      .then(blob => new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.onerror = () => resolve(null);
-        reader.readAsDataURL(blob);
-      }))
-      .catch(() => null);
-  }
-
-  /**
-   * Try all methods to convert an <img> element's source to a base64 data URL.
-   */
-  async function convertImageToBase64(imgElement) {
-    if (!imgElement) return null;
-    const src = imgElement.src;
-    if (!src || src.startsWith('data:') || src.startsWith('blob:')) return src || null;
-
-    // Method 1: Canvas from already-loaded DOM element (fastest, no network)
-    const canvasResult = tryCanvasMethod(imgElement);
-    if (canvasResult) {
-      console.log('[ID Card] Image converted via canvas method');
-      return canvasResult;
+      if (cardBgBack && window.CARD_TEMPLATES.back && (!cardBgBack.src || !cardBgBack.src.startsWith('data:'))) {
+        cardBgBack.src = window.CARD_TEMPLATES.back;
+      }
     }
-
-    // Method 2: XHR blob
-    const xhrResult = await tryXhrMethod(src);
-    if (xhrResult) {
-      console.log('[ID Card] Image converted via XHR method');
-      return xhrResult;
-    }
-
-    // Method 3: Fetch blob
-    const fetchResult = await tryFetchMethod(src);
-    if (fetchResult) {
-      console.log('[ID Card] Image converted via fetch method');
-      return fetchResult;
-    }
-
-    console.warn('[ID Card] All image conversion methods failed for:', src);
-    return null;
   }
-
-  async function preloadCardImages() {
-    const frontBg = cardStageFront ? cardStageFront.querySelector('.card-bg-template') : null;
-    const backBg = cardStageBack ? cardStageBack.querySelector('.card-bg-template') : null;
-
-    // Wait for images to be fully loaded by the browser before conversion
-    await Promise.all([
-      frontBg && !frontBg.complete ? new Promise(r => { frontBg.onload = r; frontBg.onerror = r; }) : Promise.resolve(),
-      backBg && !backBg.complete ? new Promise(r => { backBg.onload = r; backBg.onerror = r; }) : Promise.resolve()
-    ]);
-
-    const [frontDataUrl, backDataUrl] = await Promise.all([
-      convertImageToBase64(frontBg),
-      convertImageToBase64(backBg)
-    ]);
-
-    if (frontDataUrl && frontBg) frontBg.src = frontDataUrl;
-    if (backDataUrl && backBg) backBg.src = backDataUrl;
-
-    return !!(frontDataUrl && backDataUrl);
-  }
-
-  // Kick off pre-load (store promise so exports can await it)
-  const cardImagesReady = preloadCardImages().catch((e) => {
-    console.warn('[ID Card] Preload error:', e);
-    return false;
-  });
+  ensureTemplatesLoaded();
 
   // -------------------------------------------------------------------------
   // High-Resolution Card Export Functions (PNG, JPEG, PDF, Print)
@@ -843,6 +731,8 @@ document.addEventListener('DOMContentLoaded', () => {
   async function renderStageToCanvas(stageElement, scale, isJpeg) {
     if (!stageElement) throw new Error('Target card element not found');
 
+    ensureTemplatesLoaded();
+
     // If the stage's column is hidden (tab view), temporarily unhide offscreen
     const col = stageElement.closest('.card-column');
     const wasHidden = col && (window.getComputedStyle(col).display === 'none');
@@ -867,10 +757,8 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const canvas = await html2canvas(stageElement, {
         scale: scale,
-        // DO NOT use useCORS — it sets crossOrigin="anonymous" on images,
-        // which prevents them from loading on file:// protocol entirely
-        useCORS: false,
-        allowTaint: true,
+        useCORS: true,
+        allowTaint: false,
         logging: false,
         backgroundColor: isJpeg ? '#ffffff' : null
       });
@@ -894,33 +782,12 @@ document.addEventListener('DOMContentLoaded', () => {
     notify(`Rendering ${format.toUpperCase()} (${label})...`);
 
     try {
-      // Wait for background images to be converted to base64
-      await cardImagesReady;
-
       const canvas = await renderStageToCanvas(element, scale, format === 'jpeg');
-
-      // Try to export the canvas to a data URL
       const mimeType = format === 'jpeg' ? 'image/jpeg' : 'image/png';
-      let dataUrl;
-      try {
-        dataUrl = canvas.toDataURL(mimeType, jpegQuality);
-      } catch (taintErr) {
-        // Canvas is tainted — images could not be pre-converted to base64.
-        // This happens on Chrome/Edge when opening from file:// protocol.
-        console.error('[ID Card] Canvas tainted:', taintErr);
-        alert(
-          'Download blocked by browser security (file:// protocol).\n\n' +
-          'To enable downloads, open this page via a local web server:\n' +
-          '1. Open a terminal/command prompt in this folder\n' +
-          '2. Run: python -m http.server 8080\n' +
-          '3. Open: http://localhost:8080\n\n' +
-          'Or use the VS Code "Live Server" extension.'
-        );
-        return;
-      }
+      const dataUrl = canvas.toDataURL(mimeType, jpegQuality);
 
       if (!dataUrl || dataUrl === 'data:,') {
-        throw new Error('Canvas produced empty image data');
+        throw new Error('Canvas export produced empty data');
       }
 
       triggerDownload(dataUrl, filename);
@@ -941,8 +808,6 @@ document.addEventListener('DOMContentLoaded', () => {
     notify(`Generating PDF (${label})...`);
 
     try {
-      await cardImagesReady;
-
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF({
         orientation: 'portrait',
@@ -952,18 +817,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // 1. Render Front Side
       const canvasFront = await renderStageToCanvas(cardStageFront, scale, true);
-      let imgFront;
-      try {
-        imgFront = canvasFront.toDataURL('image/jpeg', jpegQuality);
-      } catch (e) {
-        alert(
-          'PDF export blocked by browser security (file:// protocol).\n\n' +
-          'Please open this page via a local web server.\n' +
-          'Run: python -m http.server 8080\n' +
-          'Then open: http://localhost:8080'
-        );
-        return;
-      }
+      const imgFront = canvasFront.toDataURL('image/jpeg', jpegQuality);
       pdf.addImage(imgFront, 'JPEG', 0, 0, 54, 85.6);
 
       // 2. Render Back Side
