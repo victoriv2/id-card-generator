@@ -64,8 +64,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const tabBack = document.getElementById('tabBack');
 
   // --- Action Buttons ---
-  const btnDownloadFront = document.getElementById('btnDownloadFront');
-  const btnDownloadBack = document.getElementById('btnDownloadBack');
+  const btnDownloadFrontPNG = document.getElementById('btnDownloadFrontPNG');
+  const btnDownloadBackPNG = document.getElementById('btnDownloadBackPNG');
+  const btnDownloadFrontJPEG = document.getElementById('btnDownloadFrontJPEG');
+  const btnDownloadBackJPEG = document.getElementById('btnDownloadBackJPEG');
   const btnDownloadBothPDF = document.getElementById('btnDownloadBothPDF');
   const btnPrintCard = document.getElementById('btnPrintCard');
   const toastNotice = document.getElementById('toastNotice');
@@ -404,6 +406,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (stateModal && stateModal.style.display === 'flex') {
         closeStateModal();
       }
+      if (typeof closeQualityModal === 'function') {
+        closeQualityModal();
+      }
     }
   });
 
@@ -649,29 +654,132 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // -------------------------------------------------------------------------
-  // High-Resolution Card Export Functions
+  // Quality Selection State & Simple Modal
   // -------------------------------------------------------------------------
-  async function exportCardAsImage(element, filename) {
+  let selectedQuality = 'standard';
+  let pendingExportAction = null;
+
+  const qualityModal = document.getElementById('qualityModal');
+  const btnCloseQualityModal = document.getElementById('btnCloseQualityModal');
+  const qualityModalOptions = document.querySelectorAll('.quality-modal-option');
+  const qualityPills = document.querySelectorAll('.quality-pill-btn');
+
+  function setQuality(quality) {
+    if (!quality) return;
+    selectedQuality = quality.toLowerCase();
+
+    // Update inline bar pills
+    qualityPills.forEach(pill => {
+      if (pill.dataset.quality === selectedQuality) {
+        pill.classList.add('active');
+      } else {
+        pill.classList.remove('active');
+      }
+    });
+
+    // Update modal options
+    qualityModalOptions.forEach(opt => {
+      if (opt.dataset.quality === selectedQuality) {
+        opt.classList.add('active');
+      } else {
+        opt.classList.remove('active');
+      }
+    });
+  }
+
+  // Handle inline quality bar pill clicks
+  qualityPills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      setQuality(pill.dataset.quality);
+      notify(`Quality set to ${selectedQuality.toUpperCase()}`);
+    });
+  });
+
+  function openQualityModal(actionCallback) {
+    pendingExportAction = actionCallback;
+    if (!qualityModal) {
+      if (pendingExportAction) pendingExportAction(selectedQuality);
+      return;
+    }
+    setQuality(selectedQuality);
+    qualityModal.style.display = 'flex';
+  }
+
+  function closeQualityModal() {
+    if (!qualityModal) return;
+    qualityModal.style.display = 'none';
+    pendingExportAction = null;
+  }
+
+  if (btnCloseQualityModal) {
+    btnCloseQualityModal.addEventListener('click', closeQualityModal);
+  }
+
+  if (qualityModal) {
+    qualityModal.addEventListener('click', (e) => {
+      if (e.target === qualityModal) {
+        closeQualityModal();
+      }
+    });
+  }
+
+  qualityModalOptions.forEach(opt => {
+    opt.addEventListener('click', () => {
+      const q = opt.dataset.quality || 'standard';
+      setQuality(q);
+      const action = pendingExportAction;
+      closeQualityModal();
+      if (typeof action === 'function') {
+        action(q);
+      }
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // High-Resolution Card Export Functions (PNG, JPEG, PDF, Print)
+  // -------------------------------------------------------------------------
+  function getSanitizedId() {
+    return (inputId && inputId.value.trim() ? inputId.value.trim() : 'card').replace(/[\/\\]/g, '-');
+  }
+
+  function getQualityParams(quality) {
+    switch (quality) {
+      case 'low':
+        return { scale: 1.5, jpegQuality: 0.70 };
+      case 'high':
+        return { scale: 3.5, jpegQuality: 0.98 };
+      case 'standard':
+      default:
+        return { scale: 2.3, jpegQuality: 0.88 };
+    }
+  }
+
+  async function exportCardAsImage(element, filename, format = 'png', quality = 'standard') {
     if (typeof html2canvas === 'undefined') {
       alert('Rendering library is loading. Please wait a moment.');
       return;
     }
 
-    notify('Rendering high-resolution image...');
+    notify(`Rendering ${format.toUpperCase()} (${quality.toUpperCase()})...`);
+
+    const { scale, jpegQuality } = getQualityParams(quality);
 
     try {
       const canvas = await html2canvas(element, {
-        scale: 3, // 3x high DPI render for print quality
+        scale: scale,
         useCORS: true,
         allowTaint: true,
-        backgroundColor: null
+        backgroundColor: format === 'jpeg' ? '#ffffff' : null
       });
+
+      const mimeType = format === 'jpeg' ? 'image/jpeg' : 'image/png';
+      const dataUrl = canvas.toDataURL(mimeType, jpegQuality);
 
       const link = document.createElement('a');
       link.download = filename;
-      link.href = canvas.toDataURL('image/png', 1.0);
+      link.href = dataUrl;
       link.click();
-      notify('Download complete: ' + filename);
+      notify(`Download complete: ${filename}`);
 
       // Advance sequence counter for next generation (001 -> 002)
       advanceCardSequence();
@@ -683,71 +791,112 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Download Front (PNG)
-  if (btnDownloadFront && cardStageFront) {
-    btnDownloadFront.addEventListener('click', () => {
-      const id = (inputId ? inputId.value.trim() : 'card').replace(/[\/\\]/g, '-');
-      exportCardAsImage(cardStageFront, `Front-${id}.png`);
+  async function exportCardAsPdf(quality = 'standard') {
+    if (typeof html2canvas === 'undefined' || !window.jspdf) {
+      alert('PDF Export libraries are initializing. Please wait a moment.');
+      return;
+    }
+
+    notify(`Generating PDF (${quality.toUpperCase()})...`);
+
+    const { scale, jpegQuality } = getQualityParams(quality);
+
+    try {
+      const { jsPDF } = window.jspdf;
+      // Standard CR80 card dimensions (54mm x 85.6mm)
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: [54, 85.6]
+      });
+
+      // 1. Render Front Side
+      const canvasFront = await html2canvas(cardStageFront, {
+        scale: scale,
+        useCORS: true,
+        backgroundColor: '#ffffff'
+      });
+      const imgFront = canvasFront.toDataURL('image/jpeg', jpegQuality);
+      pdf.addImage(imgFront, 'JPEG', 0, 0, 54, 85.6);
+
+      // 2. Render Back Side
+      pdf.addPage([54, 85.6], 'portrait');
+      const canvasBack = await html2canvas(cardStageBack, {
+        scale: scale,
+        useCORS: true,
+        backgroundColor: '#ffffff'
+      });
+      const imgBack = canvasBack.toDataURL('image/jpeg', jpegQuality);
+      pdf.addImage(imgBack, 'JPEG', 0, 0, 54, 85.6);
+
+      const id = getSanitizedId();
+      pdf.save(`ID-Card-${id}-${quality}.pdf`);
+      notify('PDF Download complete!');
+
+      // Advance sequence counter for next generation (001 -> 002)
+      advanceCardSequence();
+      updateAutoCredentials();
+      syncOverlay();
+    } catch (err) {
+      console.error('PDF export error:', err);
+      alert('Could not export PDF. Please try again.');
+    }
+  }
+
+  // --- Attach Export Triggers with Quality Modal Prompt ---
+
+  // 1. Front (PNG)
+  if (btnDownloadFrontPNG && cardStageFront) {
+    btnDownloadFrontPNG.addEventListener('click', () => {
+      openQualityModal((quality) => {
+        exportCardAsImage(cardStageFront, `Front-${getSanitizedId()}-${quality}.png`, 'png', quality);
+      });
     });
   }
 
-  // Download Back (PNG)
-  if (btnDownloadBack && cardStageBack) {
-    btnDownloadBack.addEventListener('click', () => {
-      const id = (inputId ? inputId.value.trim() : 'card').replace(/[\/\\]/g, '-');
-      exportCardAsImage(cardStageBack, `Back-${id}.png`);
+  // 2. Back (PNG)
+  if (btnDownloadBackPNG && cardStageBack) {
+    btnDownloadBackPNG.addEventListener('click', () => {
+      openQualityModal((quality) => {
+        exportCardAsImage(cardStageBack, `Back-${getSanitizedId()}-${quality}.png`, 'png', quality);
+      });
     });
   }
 
-  // Download Both as PDF
+  // 3. Front (JPEG)
+  if (btnDownloadFrontJPEG && cardStageFront) {
+    btnDownloadFrontJPEG.addEventListener('click', () => {
+      openQualityModal((quality) => {
+        exportCardAsImage(cardStageFront, `Front-${getSanitizedId()}-${quality}.jpg`, 'jpeg', quality);
+      });
+    });
+  }
+
+  // 4. Back (JPEG)
+  if (btnDownloadBackJPEG && cardStageBack) {
+    btnDownloadBackJPEG.addEventListener('click', () => {
+      openQualityModal((quality) => {
+        exportCardAsImage(cardStageBack, `Back-${getSanitizedId()}-${quality}.jpg`, 'jpeg', quality);
+      });
+    });
+  }
+
+  // 5. Download Both as PDF
   if (btnDownloadBothPDF && cardStageFront && cardStageBack) {
-    btnDownloadBothPDF.addEventListener('click', async () => {
-      if (typeof html2canvas === 'undefined' || !window.jspdf) {
-        alert('PDF Export libraries are initializing. Please wait a moment.');
-        return;
-      }
-
-      notify('Generating high-resolution 2-page PDF...');
-
-      try {
-        const { jsPDF } = window.jspdf;
-        // Standard CR80 card dimensions (54mm x 85.6mm)
-        const pdf = new jsPDF({
-          orientation: 'portrait',
-          unit: 'mm',
-          format: [54, 85.6]
-        });
-
-        // 1. Render Front Side
-        const canvasFront = await html2canvas(cardStageFront, { scale: 3, useCORS: true, backgroundColor: null });
-        const imgFront = canvasFront.toDataURL('image/jpeg', 0.98);
-        pdf.addImage(imgFront, 'JPEG', 0, 0, 54, 85.6);
-
-        // 2. Render Back Side
-        pdf.addPage([54, 85.6], 'portrait');
-        const canvasBack = await html2canvas(cardStageBack, { scale: 3, useCORS: true, backgroundColor: null });
-        const imgBack = canvasBack.toDataURL('image/jpeg', 0.98);
-        pdf.addImage(imgBack, 'JPEG', 0, 0, 54, 85.6);
-
-        const id = (inputId ? inputId.value.trim() : 'card').replace(/[\/\\]/g, '-');
-        pdf.save(`ID-Card-${id}.pdf`);
-        notify('PDF Download complete!');
-
-        // Advance sequence counter for next generation (001 -> 002)
-        advanceCardSequence();
-        updateAutoCredentials();
-        syncOverlay();
-      } catch (err) {
-        console.error('PDF export error:', err);
-        alert('Could not export PDF. Please try again.');
-      }
+    btnDownloadBothPDF.addEventListener('click', () => {
+      openQualityModal((quality) => {
+        exportCardAsPdf(quality);
+      });
     });
   }
 
-  // Print Cards
+  // 6. Print Cards
   if (btnPrintCard) {
     btnPrintCard.addEventListener('click', () => {
-      window.print();
+      openQualityModal((quality) => {
+        notify(`Opening print dialog (${quality.toUpperCase()})...`);
+        setTimeout(() => window.print(), 200);
+      });
     });
   }
 
