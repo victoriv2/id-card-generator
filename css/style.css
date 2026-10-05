@@ -100,9 +100,9 @@ body {
 
 .btn-header-reset {
   background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(205, 164, 52, 0.6);
+  border: 1.5px solid var(--gold-accent, #cda434);
   color: #fff;
-  padding: 0.5rem 0.9rem;
+  padding: 0.5rem 0.95rem;
   border-radius: 8px;
   font-size: 0.84rem;
   font-weight: 600;
@@ -111,17 +111,21 @@ body {
   align-items: center;
   gap: 0.45rem;
   text-decoration: none;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   white-space: nowrap;
 }
 
 .btn-header-reset:hover {
   background: var(--gold-accent);
   color: var(--primary-green-dark);
+  border-color: var(--gold-accent);
 }
 
 .btn-header-action {
-  padding: 0.55rem 1rem;
+  background: rgba(205, 164, 52, 0.16);
+  border: 1.5px solid var(--gold-accent, #cda434);
+  color: #ffffff;
+  padding: 0.55rem 1.15rem;
   text-decoration: none;
   font-size: 0.88rem;
   font-weight: 700;
@@ -130,6 +134,15 @@ body {
   gap: 0.45rem;
   white-space: nowrap;
   border-radius: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.btn-header-action:hover {
+  background: var(--gold-accent, #cda434);
+  color: var(--primary-green-dark, #072a18);
+  border-color: var(--gold-accent, #cda434);
+  box-shadow: 0 4px 12px rgba(205, 164, 52, 0.35);
 }
 
 /* Header Responsiveness */
