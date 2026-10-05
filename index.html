@@ -75,18 +75,6 @@
               <input type="text" id="inputSchool" class="form-input" placeholder="e.g. CSGS. GBERIGBE" value="">
             </div>
 
-            <!-- ID Number (Auto-Generated) -->
-            <div class="form-group full-width">
-              <label for="inputId" class="form-label">
-                <span class="label-with-icon">
-                  <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zm2 4v2h12V8H6zm0 4v2h8v-2H6z"/></svg>
-                  ID Number
-                </span>
-                <span style="color: #10b981; font-size: 0.75rem; font-weight: 700;">AUTO</span>
-              </label>
-              <input type="text" id="inputId" class="form-input" readonly value="SPA/ID/STU/26/001" style="background: #f8fafc; font-weight: 700; color: #b91c1c; cursor: default;">
-            </div>
-
             <!-- Category / Role (Click to Open Simple Modal) -->
             <div class="form-group full-width">
               <label for="categoryTrigger" class="form-label">
@@ -117,6 +105,18 @@
               <input type="hidden" id="inputState" value="LAGOS">
             </div>
 
+            <!-- ID Number (Auto-Generated - Positioned Below State) -->
+            <div class="form-group full-width">
+              <label for="inputId" class="form-label">
+                <span class="label-with-icon">
+                  <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zm2 4v2h12V8H6zm0 4v2h8v-2H6z"/></svg>
+                  ID Number
+                </span>
+                <span style="color: #10b981; font-size: 0.75rem; font-weight: 700;">AUTO</span>
+              </label>
+              <input type="text" id="inputId" class="form-input" readonly value="SPA/ID/STU/26/001" style="background: #f8fafc; font-weight: 700; color: #b91c1c; cursor: default;">
+            </div>
+
             <!-- Date Issued (Auto-Generated) -->
             <div class="form-group">
               <label for="inputDateIssued" class="form-label">
@@ -140,7 +140,6 @@
               <select id="inputStatus" class="form-select">
                 <option value="ACTIVE" selected>ACTIVE</option>
                 <option value="PENDING">PENDING</option>
-                <option value="EXPIRED">EXPIRED</option>
               </select>
             </div>
 
