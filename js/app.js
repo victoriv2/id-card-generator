@@ -201,50 +201,75 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // -------------------------------------------------------------------------
+  // Auto-Fitting Typography for Bearer Name and School
+  // -------------------------------------------------------------------------
+  function autoFitBearerText() {
+    const bearerBlock = document.getElementById('bearerBlock');
+    if (!bearerBlock || !viewName || !viewSchool) return;
+
+    // Start with bold, prominent default sizes
+    let nameSize = 2.75;
+    let schoolSize = 2.2;
+
+    viewName.style.fontSize = `${nameSize}cqw`;
+    viewName.style.lineHeight = '1.12';
+    viewSchool.style.fontSize = `${schoolSize}cqw`;
+    viewSchool.style.lineHeight = '1.12';
+
+    // Measure allocated bounds
+    const maxH = bearerBlock.clientHeight;
+    const maxW = bearerBlock.clientWidth;
+    if (!maxH || !maxW) return;
+
+    // Only shrink if there is actual physical overflow of container height or width
+    let attempts = 0;
+    while (attempts < 25) {
+      const currentH = (viewName.offsetHeight || 0) + (viewSchool.offsetHeight || 0) + 2;
+      const currentW = Math.max(viewName.scrollWidth || 0, viewSchool.scrollWidth || 0);
+
+      if (currentH <= maxH && currentW <= maxW) {
+        break; // Fits inside boundary!
+      }
+
+      if (nameSize > 1.6) {
+        nameSize -= 0.08;
+        viewName.style.fontSize = `${nameSize.toFixed(2)}cqw`;
+      }
+      if (schoolSize > 1.3) {
+        schoolSize -= 0.06;
+        viewSchool.style.fontSize = `${schoolSize.toFixed(2)}cqw`;
+      }
+
+      if (nameSize <= 1.6 && schoolSize <= 1.3) {
+        break;
+      }
+      attempts++;
+    }
+  }
+
+  // -------------------------------------------------------------------------
   // Real-Time Overlay Sync
   // -------------------------------------------------------------------------
   function syncOverlay() {
-    // 1. Full Name (with smart dynamic scaling for long or multi-line names)
+    // 1. Full Name
     const name = inputName ? inputName.value.trim() : '';
     if (viewName) {
       viewName.textContent = name;
-      const len = name.length;
-      if (len > 34) {
-        viewName.style.fontSize = '1.65cqw';
-        viewName.style.lineHeight = '1.04';
-      } else if (len > 24) {
-        viewName.style.fontSize = '1.9cqw';
-        viewName.style.lineHeight = '1.06';
-      } else if (len > 15) {
-        viewName.style.fontSize = '2.15cqw';
-        viewName.style.lineHeight = '1.08';
-      } else {
-        viewName.style.fontSize = '2.4cqw';
-        viewName.style.lineHeight = '1.1';
-      }
     }
 
-    // 2. School / Branch (formatted as (NAME) with smart scaling)
+    // 2. School / Branch (formatted as (NAME))
     const school = inputSchool ? inputSchool.value.trim() : '';
     if (viewSchool) {
       if (school) {
         const cleanSchool = school.replace(/^\(|\)$/g, '');
         viewSchool.textContent = `(${cleanSchool})`;
-        const sLen = cleanSchool.length;
-        if (sLen > 34) {
-          viewSchool.style.fontSize = '1.35cqw';
-          viewSchool.style.lineHeight = '1.04';
-        } else if (sLen > 22) {
-          viewSchool.style.fontSize = '1.55cqw';
-          viewSchool.style.lineHeight = '1.06';
-        } else {
-          viewSchool.style.fontSize = '1.75cqw';
-          viewSchool.style.lineHeight = '1.08';
-        }
       } else {
         viewSchool.textContent = '';
       }
     }
+
+    // Auto-fit typography to container space
+    autoFitBearerText();
 
     // 3. ID Number
     if (viewId) {
@@ -563,6 +588,7 @@ document.addEventListener('DOMContentLoaded', () => {
       tabBack.classList.remove('active');
       if (colFront) colFront.style.display = 'flex';
       if (colBack) colBack.style.display = 'flex';
+      autoFitBearerText();
     });
 
     tabFront.addEventListener('click', () => {
@@ -571,6 +597,7 @@ document.addEventListener('DOMContentLoaded', () => {
       tabBack.classList.remove('active');
       if (colFront) colFront.style.display = 'flex';
       if (colBack) colBack.style.display = 'none';
+      autoFitBearerText();
     });
 
     tabBack.addEventListener('click', () => {
@@ -580,6 +607,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (colFront) colFront.style.display = 'none';
       if (colBack) colBack.style.display = 'flex';
     });
+
+    window.addEventListener('resize', autoFitBearerText);
   }
 
   // -------------------------------------------------------------------------

@@ -598,45 +598,44 @@ body {
   margin-top: 4px;
 }
 
-/* 2. Full Name & School Block directly beneath Passport Box (Non-overlapping & Auto-balanced) */
+/* 2. Full Name & School Block directly beneath Passport Box (Auto-fitting) */
 .overlay-bearer-block {
   position: absolute;
-  left: 60.5%;
-  width: 35.0%;
-  top: 53.6%;
-  height: 7.7%;
+  left: 54%;
+  width: 44%;
+  top: 53.2%;
+  height: 8.3%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
-  gap: 2px;
+  gap: 1.5px;
   overflow: hidden;
   pointer-events: none;
+  box-sizing: border-box;
 }
 
 .overlay-bearer-name {
   color: #0b3d23;
   font-weight: 900;
-  font-size: 2.4cqw;
+  font-size: 2.75cqw;
   text-transform: uppercase;
-  line-height: 1.1;
+  line-height: 1.12;
   letter-spacing: 0.15px;
   word-break: break-word;
   max-width: 100%;
-  transition: font-size 0.12s ease;
 }
 
 .overlay-bearer-school {
-  color: #1e3a8a;
-  font-weight: 700;
-  font-size: 1.75cqw;
+  color: #172554;
+  font-weight: 800;
+  font-size: 2.2cqw;
   text-transform: uppercase;
-  line-height: 1.1;
+  line-height: 1.12;
   letter-spacing: 0.1px;
   word-break: break-word;
   max-width: 100%;
-  transition: font-size 0.12s ease;
 }
 
 /* 3. Left 5 Data Rows (Aligned precisely to template lines) */
