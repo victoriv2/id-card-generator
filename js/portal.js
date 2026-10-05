@@ -81,27 +81,51 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Toggle Retrieve Section
-  if (btnShowRetrieve && retrieveSection) {
-    btnShowRetrieve.addEventListener('click', () => {
-      const isVisible = retrieveSection.style.display === 'block';
-      retrieveSection.style.display = isVisible ? 'none' : 'block';
-      if (!isVisible) {
-        renderRecords();
-        retrieveSection.scrollIntoView({ behavior: 'smooth' });
-        if (searchInput) {
-          searchInput.value = '';
-          setTimeout(() => searchInput.focus(), 150);
-        }
+  // Retrieve Modal Controls
+  const retrieveModal = document.getElementById('retrieveModal') || document.getElementById('retrieveSection');
+
+  function openRetrieveModal() {
+    if (!retrieveModal) return;
+    renderRecords();
+    retrieveModal.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+    if (searchInput) {
+      searchInput.value = '';
+      setTimeout(() => searchInput.focus(), 120);
+    }
+  }
+
+  function closeRetrieveModal() {
+    if (!retrieveModal) return;
+    retrieveModal.classList.remove('is-open');
+    document.body.style.overflow = '';
+    if (btnShowRetrieve) {
+      btnShowRetrieve.focus();
+    }
+  }
+
+  if (btnShowRetrieve) {
+    btnShowRetrieve.addEventListener('click', openRetrieveModal);
+  }
+
+  if (btnCloseRetrieve) {
+    btnCloseRetrieve.addEventListener('click', closeRetrieveModal);
+  }
+
+  if (retrieveModal) {
+    retrieveModal.addEventListener('click', (e) => {
+      if (e.target === retrieveModal) {
+        closeRetrieveModal();
       }
     });
   }
 
-  if (btnCloseRetrieve && retrieveSection) {
-    btnCloseRetrieve.addEventListener('click', () => {
-      retrieveSection.style.display = 'none';
-    });
-  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && retrieveModal && retrieveModal.classList.contains('is-open')) {
+      e.preventDefault();
+      closeRetrieveModal();
+    }
+  });
 
   if (searchInput) {
     searchInput.addEventListener('input', () => {

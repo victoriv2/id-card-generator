@@ -637,7 +637,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // Reset Form (Clear Name & School, Reset Photo, Keep Auto Credentials)
   // -------------------------------------------------------------------------
   if (btnResetAll) {
-    btnResetAll.addEventListener('click', () => {
+    btnResetAll.addEventListener('click', async () => {
+      if (typeof showModalConfirm === 'function') {
+        const confirmed = await showModalConfirm('Are you sure you want to reset all form fields and start fresh?', {
+          title: 'Reset Form',
+          confirmText: 'Yes, Reset',
+          cancelText: 'Cancel',
+          type: 'warning'
+        });
+        if (!confirmed) return;
+      }
       if (inputName) inputName.value = '';
       if (inputSchool) inputSchool.value = '';
       if (inputCategory) inputCategory.value = '';

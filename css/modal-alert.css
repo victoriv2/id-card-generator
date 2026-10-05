@@ -1,0 +1,153 @@
+/* ==========================================================================
+   Students Parliament Nigeria - Global Modal Alert & Dialog System
+   ========================================================================== */
+
+.spn-modal-alert-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(11, 61, 35, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              visibility 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.spn-modal-alert-backdrop.is-active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.spn-modal-alert-dialog {
+  background: #ffffff;
+  border-radius: 18px;
+  width: 100%;
+  max-width: 440px;
+  padding: 28px 24px 24px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45),
+              0 0 0 1px rgba(255, 255, 255, 0.1);
+  text-align: center;
+  position: relative;
+  transform: scale(0.92) translateY(16px);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+.spn-modal-alert-backdrop.is-active .spn-modal-alert-dialog {
+  transform: scale(1) translateY(0);
+}
+
+/* Alert Icon Wrapper */
+.spn-modal-alert-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  margin: 0 auto 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.12);
+}
+
+/* Type Variants */
+.spn-modal-alert-icon.warning {
+  background: #fef3c7;
+  color: #b45309;
+  border: 3px solid #fde68a;
+}
+
+.spn-modal-alert-icon.error {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 3px solid #fecaca;
+}
+
+.spn-modal-alert-icon.success {
+  background: #dcfce7;
+  color: #15803d;
+  border: 3px solid #bbf7d0;
+}
+
+.spn-modal-alert-icon.info {
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 3px solid #bae6fd;
+}
+
+/* Title & Message */
+.spn-modal-alert-title {
+  font-family: 'Cinzel', serif, system-ui;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #0b3d23;
+  margin: 0 0 10px;
+  letter-spacing: 0.3px;
+}
+
+.spn-modal-alert-message {
+  font-size: 0.95rem;
+  color: #475569;
+  line-height: 1.55;
+  margin: 0 0 24px;
+  word-break: break-word;
+}
+
+/* Action Buttons */
+.spn-modal-alert-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.spn-modal-alert-btn {
+  flex: 1;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+}
+
+.spn-modal-alert-btn-primary {
+  background: #0b3d23;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(11, 61, 35, 0.25);
+}
+
+.spn-modal-alert-btn-primary:hover {
+  background: #14532d;
+  transform: translateY(-1px);
+}
+
+.spn-modal-alert-btn-primary:active {
+  transform: translateY(0);
+}
+
+.spn-modal-alert-btn-cancel {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+.spn-modal-alert-btn-cancel:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+.spn-modal-alert-btn:focus-visible {
+  outline: 3px solid rgba(212, 175, 55, 0.6);
+  outline-offset: 2px;
+}
