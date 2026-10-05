@@ -224,6 +224,11 @@ body {
   box-shadow: 0 0 0 3px rgba(11, 61, 35, 0.15);
 }
 
+.select-modal-trigger .placeholder-text {
+  color: #94a3b8;
+  font-weight: 500;
+}
+
 /* Upload Dropzone - Fully Unclipped & Contained */
 .upload-dropzone {
   width: 100%;

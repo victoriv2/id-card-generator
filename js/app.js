@@ -111,15 +111,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateAutoCredentials() {
     const { dateIssued, year2Digits } = getSystemDates();
-    const cat = inputCategory ? inputCategory.value : 'STUDENT';
-    const catCode = CATEGORY_CODES[cat] || 'STU';
-    const seq = String(getCardSequenceNumber()).padStart(3, '0');
+    const cat = inputCategory ? inputCategory.value.trim() : '';
 
-    if (inputId) {
-      inputId.value = `SPA/ID/${catCode}/${year2Digits}/${seq}`;
-    }
     if (inputDateIssued) {
       inputDateIssued.value = dateIssued;
+    }
+
+    if (inputId) {
+      if (cat && CATEGORY_CODES[cat]) {
+        const catCode = CATEGORY_CODES[cat];
+        const seq = String(getCardSequenceNumber()).padStart(3, '0');
+        inputId.value = `SPA/ID/${catCode}/${year2Digits}/${seq}`;
+      } else {
+        inputId.value = '';
+      }
     }
   }
 
@@ -167,8 +172,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const idVal = inputId ? inputId.value.trim() : '';
     const nameVal = inputName ? inputName.value.trim() : '';
-    const catVal = inputCategory ? inputCategory.value : '';
-    const stateVal = inputState ? inputState.value.trim() : 'LAGOS';
+    const catVal = inputCategory ? inputCategory.value.trim() : '';
+    const stateVal = inputState ? inputState.value.trim() : '';
     const statusVal = inputStatus ? inputStatus.value : 'ACTIVE';
 
     if (!idVal && !nameVal) {
@@ -177,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     qrBox.innerHTML = '';
-    const qrText = `STUDENTS PARLIAMENT NIGERIA\nID: ${idVal}\nName: ${nameVal || 'N/A'}\nCategory: ${catVal}\nState: ${stateVal}\nStatus: ${statusVal}`;
+    const qrText = `STUDENTS PARLIAMENT NIGERIA\nID: ${idVal || 'N/A'}\nName: ${nameVal || 'N/A'}\nCategory: ${catVal || 'N/A'}\nState: ${stateVal || 'N/A'}\nStatus: ${statusVal}`;
 
     try {
       if (typeof QRCode !== 'undefined') {
@@ -227,13 +232,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 3. ID Number
-    if (viewId && inputId) {
-      viewId.textContent = inputId.value;
+    if (viewId) {
+      viewId.textContent = (inputId && inputId.value) ? inputId.value : '';
     }
 
     // 4. Category
-    if (viewCategory && inputCategory) {
-      viewCategory.textContent = inputCategory.value;
+    if (viewCategory) {
+      viewCategory.textContent = (inputCategory && inputCategory.value) ? inputCategory.value : '';
     }
 
     // 5. Date Issued
@@ -242,8 +247,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 6. State
-    if (viewState && inputState) {
-      viewState.textContent = inputState.value;
+    if (viewState) {
+      viewState.textContent = (inputState && inputState.value) ? inputState.value : '';
     }
 
     // 7. Status Badge
@@ -413,7 +418,10 @@ document.addEventListener('DOMContentLoaded', () => {
       opt.addEventListener('click', () => {
         const st = opt.getAttribute('data-state');
         if (inputState) inputState.value = st;
-        if (selectedStateText) selectedStateText.textContent = st;
+        if (selectedStateText) {
+          selectedStateText.textContent = st;
+          selectedStateText.classList.remove('placeholder-text');
+        }
 
         stateModalOptions.forEach(o => o.classList.remove('active'));
         opt.classList.add('active');
@@ -430,7 +438,10 @@ document.addEventListener('DOMContentLoaded', () => {
       opt.addEventListener('click', () => {
         const cat = opt.getAttribute('data-cat');
         if (inputCategory) inputCategory.value = cat;
-        if (selectedCategoryText) selectedCategoryText.textContent = cat;
+        if (selectedCategoryText) {
+          selectedCategoryText.textContent = cat;
+          selectedCategoryText.classList.remove('placeholder-text');
+        }
 
         simpleModalOptions.forEach(o => o.classList.remove('active'));
         opt.classList.add('active');
@@ -563,20 +574,23 @@ document.addEventListener('DOMContentLoaded', () => {
     btnResetAll.addEventListener('click', () => {
       if (inputName) inputName.value = '';
       if (inputSchool) inputSchool.value = '';
-      if (inputCategory) inputCategory.value = 'STUDENT';
-      if (selectedCategoryText) selectedCategoryText.textContent = 'STUDENT';
+      if (inputCategory) inputCategory.value = '';
+      if (selectedCategoryText) {
+        selectedCategoryText.textContent = 'Select Category';
+        selectedCategoryText.classList.add('placeholder-text');
+      }
       if (simpleModalOptions && simpleModalOptions.length > 0) {
-        simpleModalOptions.forEach(o => {
-          o.classList.toggle('active', o.getAttribute('data-cat') === 'STUDENT');
-        });
+        simpleModalOptions.forEach(o => o.classList.remove('active'));
       }
-      if (inputState) inputState.value = 'LAGOS';
-      if (selectedStateText) selectedStateText.textContent = 'LAGOS';
+      if (inputState) inputState.value = '';
+      if (selectedStateText) {
+        selectedStateText.textContent = 'Select State';
+        selectedStateText.classList.add('placeholder-text');
+      }
       if (stateModalOptions && stateModalOptions.length > 0) {
-        stateModalOptions.forEach(o => {
-          o.classList.toggle('active', o.getAttribute('data-state') === 'LAGOS');
-        });
+        stateModalOptions.forEach(o => o.classList.remove('active'));
       }
+      if (inputId) inputId.value = '';
       if (inputStatus) inputStatus.value = 'ACTIVE';
 
       hasPassport = false;

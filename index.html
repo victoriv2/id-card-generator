@@ -84,10 +84,10 @@
                 </span>
               </label>
               <div class="select-modal-trigger" id="categoryTrigger" role="button" tabindex="0">
-                <span id="selectedCategoryText">STUDENT</span>
+                <span id="selectedCategoryText" class="placeholder-text">Select Category</span>
                 <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
               </div>
-              <input type="hidden" id="inputCategory" value="STUDENT">
+              <input type="hidden" id="inputCategory" value="">
             </div>
 
             <!-- State / Chapter State (Click to Open Simple Modal with Search) -->
@@ -99,10 +99,10 @@
                 </span>
               </label>
               <div class="select-modal-trigger" id="stateTrigger" role="button" tabindex="0">
-                <span id="selectedStateText">LAGOS</span>
+                <span id="selectedStateText" class="placeholder-text">Select State</span>
                 <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
               </div>
-              <input type="hidden" id="inputState" value="LAGOS">
+              <input type="hidden" id="inputState" value="">
             </div>
 
             <!-- ID Number (Auto-Generated - Positioned Below State) -->
@@ -114,7 +114,7 @@
                 </span>
                 <span style="color: #10b981; font-size: 0.75rem; font-weight: 700;">AUTO</span>
               </label>
-              <input type="text" id="inputId" class="form-input" readonly value="SPA/ID/STU/26/001" style="background: #f8fafc; font-weight: 700; color: #b91c1c; cursor: default;">
+              <input type="text" id="inputId" class="form-input" readonly value="" placeholder="Generated upon selecting category" style="background: #f8fafc; font-weight: 700; color: #b91c1c; cursor: default;">
             </div>
 
             <!-- Date Issued (Auto-Generated) -->
@@ -286,7 +286,7 @@
                   <div class="overlay-data-val overlay-date-issued" id="viewDateIssued"></div>
 
                   <!-- 7. Left Side: STATE (Replaces Valid Until) -->
-                  <div class="overlay-data-val overlay-state" id="viewState">LAGOS</div>
+                  <div class="overlay-data-val overlay-state" id="viewState"></div>
 
                   <!-- 8. Left Side: STATUS BADGE -->
                   <div class="overlay-status-row" id="viewStatusRow">
@@ -339,7 +339,7 @@
         </button>
       </div>
       <div class="simple-modal-list">
-        <button type="button" class="simple-modal-option active" data-cat="STUDENT">STUDENT</button>
+        <button type="button" class="simple-modal-option" data-cat="STUDENT">STUDENT</button>
         <button type="button" class="simple-modal-option" data-cat="TEACHER">TEACHER</button>
         <button type="button" class="simple-modal-option" data-cat="EXECUTIVE">EXECUTIVE</button>
         <button type="button" class="simple-modal-option" data-cat="PARENT">PARENT</button>
@@ -393,7 +393,7 @@
         <button type="button" class="simple-modal-option state-modal-option" data-state="KEBBI">KEBBI</button>
         <button type="button" class="simple-modal-option state-modal-option" data-state="KOGI">KOGI</button>
         <button type="button" class="simple-modal-option state-modal-option" data-state="KWARA">KWARA</button>
-        <button type="button" class="simple-modal-option state-modal-option active" data-state="LAGOS">LAGOS</button>
+        <button type="button" class="simple-modal-option state-modal-option" data-state="LAGOS">LAGOS</button>
         <button type="button" class="simple-modal-option state-modal-option" data-state="NASARAWA">NASARAWA</button>
         <button type="button" class="simple-modal-option state-modal-option" data-state="NIGER">NIGER</button>
         <button type="button" class="simple-modal-option state-modal-option" data-state="OGUN">OGUN</button>
