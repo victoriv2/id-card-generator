@@ -371,12 +371,15 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   background: #f8fafc;
-  padding: 0.5rem 0.85rem;
+  padding: 0.55rem 0.85rem;
   border-radius: 8px;
   border: 1px solid #e2e8f0;
   margin-bottom: 0.25rem;
   gap: 0.5rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .export-quality-label {
@@ -388,31 +391,40 @@ body {
   gap: 0.4rem;
   text-transform: uppercase;
   letter-spacing: 0.3px;
+  white-space: nowrap;
 }
 
 .export-quality-label svg {
   color: var(--primary-green);
+  flex-shrink: 0;
 }
 
 .quality-pills-group {
   display: flex;
+  flex: 1 1 200px;
+  max-width: 100%;
   background: #e2e8f0;
   padding: 3px;
   border-radius: 6px;
   gap: 3px;
+  box-sizing: border-box;
 }
 
 .quality-pill-btn {
+  flex: 1;
   background: transparent;
   border: none;
-  font-size: 0.76rem;
+  font-size: 0.78rem;
   font-weight: 800;
   color: #64748b;
-  padding: 0.35rem 0.85rem;
+  padding: 0.38rem 0.45rem;
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.15s ease;
   letter-spacing: 0.3px;
+  text-align: center;
+  white-space: nowrap;
+  box-sizing: border-box;
 }
 
 .quality-pill-btn:hover {
@@ -429,10 +441,13 @@ body {
   display: flex;
   gap: 0.65rem;
   width: 100%;
+  box-sizing: border-box;
+  flex-wrap: wrap;
 }
 
 .export-row-split button {
-  flex: 1;
+  flex: 1 1 calc(50% - 0.35rem);
+  min-width: 130px;
 }
 
 .btn-primary-action,
