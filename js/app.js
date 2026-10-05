@@ -204,28 +204,43 @@ document.addEventListener('DOMContentLoaded', () => {
   // Real-Time Overlay Sync
   // -------------------------------------------------------------------------
   function syncOverlay() {
-    // 1. Full Name (with responsive scaling for multi-line names)
+    // 1. Full Name (with smart dynamic scaling for long or multi-line names)
     const name = inputName ? inputName.value.trim() : '';
     if (viewName) {
       viewName.textContent = name;
-      if (name.length > 30) {
-        viewName.style.fontSize = '1.85cqw';
-        viewName.style.lineHeight = '1.05';
-      } else if (name.length > 20) {
+      const len = name.length;
+      if (len > 34) {
+        viewName.style.fontSize = '1.65cqw';
+        viewName.style.lineHeight = '1.04';
+      } else if (len > 24) {
+        viewName.style.fontSize = '1.9cqw';
+        viewName.style.lineHeight = '1.06';
+      } else if (len > 15) {
         viewName.style.fontSize = '2.15cqw';
         viewName.style.lineHeight = '1.08';
       } else {
-        viewName.style.fontSize = '2.5cqw';
+        viewName.style.fontSize = '2.4cqw';
         viewName.style.lineHeight = '1.1';
       }
     }
 
-    // 2. School / Branch (formatted as (NAME))
+    // 2. School / Branch (formatted as (NAME) with smart scaling)
     const school = inputSchool ? inputSchool.value.trim() : '';
     if (viewSchool) {
       if (school) {
         const cleanSchool = school.replace(/^\(|\)$/g, '');
         viewSchool.textContent = `(${cleanSchool})`;
+        const sLen = cleanSchool.length;
+        if (sLen > 34) {
+          viewSchool.style.fontSize = '1.35cqw';
+          viewSchool.style.lineHeight = '1.04';
+        } else if (sLen > 22) {
+          viewSchool.style.fontSize = '1.55cqw';
+          viewSchool.style.lineHeight = '1.06';
+        } else {
+          viewSchool.style.fontSize = '1.75cqw';
+          viewSchool.style.lineHeight = '1.08';
+        }
       } else {
         viewSchool.textContent = '';
       }
