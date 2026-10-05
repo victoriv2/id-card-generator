@@ -680,7 +680,57 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // -------------------------------------------------------------------------
-  // High-Resolution Card Export Functions (PNG, JPEG, PDF, Print)
+  // Pre-load card background images as base64 data URLs
+  // This fixes html2canvas failing on file:// protocol (cross-origin taint error)
+  // -------------------------------------------------------------------------
+  function imgSrcToDataURL(src) {
+    return new Promise((resolve) => {
+      if (!src || src.startsWith('data:')) return resolve(src || null);
+
+      // Use XHR to load the image as a blob, then FileReader to base64 encode it
+      // This works on file:// protocol where CORS canvas approach fails
+      try {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', src, true);
+        xhr.responseType = 'blob';
+
+        xhr.onload = () => {
+          if (xhr.status === 200 || xhr.status === 0) {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.onerror = () => resolve(null);
+            reader.readAsDataURL(xhr.response);
+          } else {
+            resolve(null);
+          }
+        };
+
+        xhr.onerror = () => resolve(null);
+        xhr.send();
+      } catch (e) {
+        resolve(null);
+      }
+    });
+  }
+
+  async function preloadCardImages() {
+    const frontBg = cardStageFront ? cardStageFront.querySelector('.card-bg-template') : null;
+    const backBg = cardStageBack ? cardStageBack.querySelector('.card-bg-template') : null;
+
+    const [frontDataUrl, backDataUrl] = await Promise.all([
+      frontBg ? imgSrcToDataURL(frontBg.src) : Promise.resolve(null),
+      backBg ? imgSrcToDataURL(backBg.src) : Promise.resolve(null)
+    ]);
+
+    if (frontDataUrl && frontBg) frontBg.src = frontDataUrl;
+    if (backDataUrl && backBg) backBg.src = backDataUrl;
+  }
+
+  // Kick off pre-load (store promise so exports can await it if user clicks quickly)
+  const cardImagesReady = preloadCardImages().catch(() => {});
+
+  // -------------------------------------------------------------------------
+  // High-Resolution Card Export Helper Functions
   // -------------------------------------------------------------------------
   function getSanitizedId() {
     return (inputId && inputId.value.trim() ? inputId.value.trim() : 'card').replace(/[\/\\]/g, '-');
@@ -742,7 +792,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const canvas = await html2canvas(stageElement, {
         scale: scale,
         useCORS: true,
-        allowTaint: false,
+        allowTaint: true,
         logging: false,
         backgroundColor: isJpeg ? '#ffffff' : null
       });
@@ -769,6 +819,8 @@ document.addEventListener('DOMContentLoaded', () => {
     notify(`Rendering ${format.toUpperCase()} (${label})...`);
 
     try {
+      // Ensure card background images are fully converted to base64 first
+      await cardImagesReady;
       const canvas = await renderStageToCanvas(element, scale, format === 'jpeg');
       const mimeType = format === 'jpeg' ? 'image/jpeg' : 'image/png';
       const dataUrl = canvas.toDataURL(mimeType, jpegQuality);
@@ -791,6 +843,8 @@ document.addEventListener('DOMContentLoaded', () => {
     notify(`Generating PDF (${label})...`);
 
     try {
+      // Ensure card background images are fully converted to base64 first
+      await cardImagesReady;
       const { jsPDF } = window.jspdf;
       // Standard CR80 card dimensions (54mm x 85.6mm)
       const pdf = new jsPDF({
