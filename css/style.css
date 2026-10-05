@@ -619,7 +619,7 @@ body {
 .overlay-bearer-name {
   color: #0b3d23;
   font-weight: 900;
-  font-size: 2.75cqw;
+  font-size: 2.55cqw;
   text-transform: uppercase;
   line-height: 1.12;
   letter-spacing: 0.15px;
@@ -630,7 +630,7 @@ body {
 .overlay-bearer-school {
   color: #172554;
   font-weight: 800;
-  font-size: 2.2cqw;
+  font-size: 2.55cqw;
   text-transform: uppercase;
   line-height: 1.12;
   letter-spacing: 0.1px;

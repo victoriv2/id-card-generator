@@ -201,19 +201,18 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // -------------------------------------------------------------------------
-  // Auto-Fitting Typography for Bearer Name and School
+  // Auto-Fitting Typography for Bearer Name and School (Same Font Size)
   // -------------------------------------------------------------------------
   function autoFitBearerText() {
     const bearerBlock = document.getElementById('bearerBlock');
     if (!bearerBlock || !viewName || !viewSchool) return;
 
-    // Start with bold, prominent default sizes
-    let nameSize = 2.75;
-    let schoolSize = 2.2;
+    // Both text sizes start identical
+    let textSize = 2.55;
 
-    viewName.style.fontSize = `${nameSize}cqw`;
+    viewName.style.fontSize = `${textSize}cqw`;
     viewName.style.lineHeight = '1.12';
-    viewSchool.style.fontSize = `${schoolSize}cqw`;
+    viewSchool.style.fontSize = `${textSize}cqw`;
     viewSchool.style.lineHeight = '1.12';
 
     // Measure allocated bounds
@@ -234,16 +233,11 @@ document.addEventListener('DOMContentLoaded', () => {
         break; // Fits inside boundary!
       }
 
-      if (nameSize > 1.6) {
-        nameSize -= 0.08;
-        viewName.style.fontSize = `${nameSize.toFixed(2)}cqw`;
-      }
-      if (schoolSize > 1.3) {
-        schoolSize -= 0.06;
-        viewSchool.style.fontSize = `${schoolSize.toFixed(2)}cqw`;
-      }
-
-      if (nameSize <= 1.6 && schoolSize <= 1.3) {
+      if (textSize > 1.35) {
+        textSize -= 0.06;
+        viewName.style.fontSize = `${textSize.toFixed(2)}cqw`;
+        viewSchool.style.fontSize = `${textSize.toFixed(2)}cqw`;
+      } else {
         break;
       }
       attempts++;
