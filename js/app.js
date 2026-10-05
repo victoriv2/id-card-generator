@@ -913,18 +913,22 @@ document.addEventListener('DOMContentLoaded', () => {
       savedAt: new Date().toLocaleString()
     };
 
-    try {
-      let records = JSON.parse(localStorage.getItem('spa_card_records') || '[]');
-      const idx = records.findIndex(r => r.id === record.id);
-      if (idx >= 0) {
-        records[idx] = record;
-      } else {
-        records.unshift(record);
+    if (window.CloudDB) {
+      CloudDB.saveCard(record);
+    } else {
+      try {
+        let records = JSON.parse(localStorage.getItem('spa_card_records') || '[]');
+        const idx = records.findIndex(r => r.id === record.id);
+        if (idx >= 0) {
+          records[idx] = record;
+        } else {
+          records.unshift(record);
+        }
+        if (records.length > 50) records = records.slice(0, 50);
+        localStorage.setItem('spa_card_records', JSON.stringify(records));
+      } catch (e) {
+        console.warn('Could not save card to localStorage:', e);
       }
-      if (records.length > 50) records = records.slice(0, 50);
-      localStorage.setItem('spa_card_records', JSON.stringify(records));
-    } catch (e) {
-      console.warn('Could not save card to localStorage:', e);
     }
   }
 
@@ -952,7 +956,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (card.id && inputId) inputId.value = card.id;
       if (card.dateIssued && inputDateIssued) inputDateIssued.value = card.dateIssued;
-      if (card.photo && passportImg) {
+      if (card.photo && passportImg && !card.photo.includes('[cached_locally]')) {
         passportImg.onload = () => {
           fitPassportImage(passportImg);
           resetPhotoFraming();
@@ -970,11 +974,148 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // --- Attach Direct Export Triggers ---
+  // -------------------------------------------------------------------------
+  // Paystack Payment Gate & Download Lock Controller
+  // -------------------------------------------------------------------------
+  const paywallBox = document.getElementById('paywallBox');
+  const paywallVerifiedBox = document.getElementById('paywallVerifiedBox');
+  const paywallAmountDisplay = document.getElementById('paywallAmountDisplay');
+  const btnPayAmountDisplay = document.getElementById('btnPayAmountDisplay');
+  const btnPaystackPayNow = document.getElementById('btnPaystackPayNow');
+  const paywallEmailInput = document.getElementById('paywallEmailInput');
+  const exportButtonsGroup = document.getElementById('exportButtonsGroup');
+  const paywallVerifiedRef = document.getElementById('paywallVerifiedRef');
+  const paywallVerifiedAmount = document.getElementById('paywallVerifiedAmount');
+
+  function updatePaywallState() {
+    const id = getSanitizedId();
+    const isPaid = window.CloudDB ? CloudDB.isCardPaid(id) : false;
+    const price = window.CloudDB ? CloudDB.getPrice() : 1500;
+
+    if (paywallAmountDisplay) paywallAmountDisplay.textContent = price.toLocaleString();
+    if (btnPayAmountDisplay) btnPayAmountDisplay.textContent = `₦${price.toLocaleString()}`;
+
+    if (isPaid) {
+      if (paywallBox) paywallBox.style.display = 'none';
+      if (paywallVerifiedBox) {
+        paywallVerifiedBox.style.display = 'block';
+        const cards = window.CloudDB ? CloudDB.getLocalCards() : [];
+        const card = cards.find(c => c.id === id);
+        if (card) {
+          if (paywallVerifiedRef) paywallVerifiedRef.textContent = card.paymentRef || 'VERIFIED';
+          if (paywallVerifiedAmount) paywallVerifiedAmount.textContent = `₦${(card.amountPaid || price).toLocaleString()}`;
+        }
+      }
+      if (exportButtonsGroup) exportButtonsGroup.classList.remove('downloads-locked');
+    } else {
+      if (paywallBox) paywallBox.style.display = 'block';
+      if (paywallVerifiedBox) paywallVerifiedBox.style.display = 'none';
+      if (exportButtonsGroup) exportButtonsGroup.classList.add('downloads-locked');
+    }
+  }
+
+  function requirePaymentGate() {
+    const id = getSanitizedId();
+    const isPaid = window.CloudDB ? CloudDB.isCardPaid(id) : false;
+    if (isPaid) return true;
+
+    const price = window.CloudDB ? CloudDB.getPrice() : 1500;
+    showModalAlert(`Official payment of ₦${price.toLocaleString()} is required before downloading or printing your ID card. Please click "Pay Now with Paystack" to complete issuance.`, {
+      title: 'Payment Required',
+      type: 'warning'
+    });
+
+    if (paywallBox) {
+      paywallBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    if (paywallEmailInput) {
+      setTimeout(() => paywallEmailInput.focus(), 250);
+    }
+    return false;
+  }
+
+  if (btnPaystackPayNow) {
+    btnPaystackPayNow.addEventListener('click', () => {
+      const id = getSanitizedId();
+      const name = inputName ? inputName.value.trim() : '';
+      if (!name) {
+        showModalAlert('Please enter the Full Name on the card before proceeding with payment.', {
+          title: 'Name Required',
+          type: 'warning'
+        });
+        if (inputName) inputName.focus();
+        return;
+      }
+
+      const email = paywallEmailInput ? paywallEmailInput.value.trim() : '';
+      if (!email || !email.includes('@') || !email.includes('.')) {
+        showModalAlert('Please enter a valid email address to receive your Paystack transaction receipt.', {
+          title: 'Email Address Required',
+          type: 'warning'
+        });
+        if (paywallEmailInput) paywallEmailInput.focus();
+        return;
+      }
+
+      if (typeof PaystackPop === 'undefined') {
+        showModalAlert('Paystack gateway is currently initializing. Please check your internet connection and try again.', {
+          title: 'Gateway Connecting',
+          type: 'warning'
+        });
+        return;
+      }
+
+      const price = window.CloudDB ? CloudDB.getPrice() : 1500;
+      const ref = 'SPN-' + id.replace(/[^a-zA-Z0-9]/g, '') + '-' + Date.now();
+
+      const handler = PaystackPop.setup({
+        key: window.CloudDB ? CloudDB.paystackPublicKey : 'pk_live_732d9b62cd035b8dad96e981d7f6982540342e80',
+        email: email,
+        amount: price * 100, // Paystack amount is in Kobo
+        currency: 'NGN',
+        ref: ref,
+        metadata: {
+          custom_fields: [
+            { display_name: 'Member Name', variable_name: 'member_name', value: name },
+            { display_name: 'Card ID', variable_name: 'card_id', value: id },
+            { display_name: 'Category', variable_name: 'category', value: inputCategory ? inputCategory.value : 'MEMBER' },
+            { display_name: 'State', variable_name: 'state', value: inputState ? inputState.value : '' }
+          ]
+        },
+        callback: async function (response) {
+          saveCardRecord();
+          if (window.CloudDB) {
+            await CloudDB.markCardPaid(id, {
+              reference: response.reference,
+              amount: price,
+              email: email
+            });
+          }
+          updatePaywallState();
+          showModalAlert(`Official card issuance fee of ₦${price.toLocaleString()} confirmed (Ref: ${response.reference}). Your ID card is now completely unlocked for unlimited high-resolution download and printing!`, {
+            title: 'Payment Successful!',
+            type: 'success'
+          });
+        },
+        onClose: function () {
+          notify('Payment window closed.');
+        }
+      });
+
+      handler.openIframe();
+    });
+  }
+
+  // Update paywall state whenever ID or Category changes
+  if (inputId) inputId.addEventListener('input', updatePaywallState);
+  if (inputCategory) inputCategory.addEventListener('change', updatePaywallState);
+
+  // --- Attach Direct Export Triggers (Guarded by Paywall) ---
 
   // 1. Front (PNG)
   if (btnDownloadFrontPNG && cardStageFront) {
     btnDownloadFrontPNG.addEventListener('click', () => {
+      if (!requirePaymentGate()) return;
       saveCardRecord();
       exportCardAsImage(cardStageFront, `Front-${getSanitizedId()}-${selectedQuality}.png`, 'png');
     });
@@ -983,6 +1124,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 2. Back (PNG)
   if (btnDownloadBackPNG && cardStageBack) {
     btnDownloadBackPNG.addEventListener('click', () => {
+      if (!requirePaymentGate()) return;
       saveCardRecord();
       exportCardAsImage(cardStageBack, `Back-${getSanitizedId()}-${selectedQuality}.png`, 'png');
     });
@@ -991,6 +1133,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 3. Front (JPEG)
   if (btnDownloadFrontJPEG && cardStageFront) {
     btnDownloadFrontJPEG.addEventListener('click', () => {
+      if (!requirePaymentGate()) return;
       saveCardRecord();
       exportCardAsImage(cardStageFront, `Front-${getSanitizedId()}-${selectedQuality}.jpg`, 'jpeg');
     });
@@ -999,6 +1142,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 4. Back (JPEG)
   if (btnDownloadBackJPEG && cardStageBack) {
     btnDownloadBackJPEG.addEventListener('click', () => {
+      if (!requirePaymentGate()) return;
       saveCardRecord();
       exportCardAsImage(cardStageBack, `Back-${getSanitizedId()}-${selectedQuality}.jpg`, 'jpeg');
     });
@@ -1007,6 +1151,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 5. Download Both as PDF
   if (btnDownloadBothPDF && cardStageFront && cardStageBack) {
     btnDownloadBothPDF.addEventListener('click', () => {
+      if (!requirePaymentGate()) return;
       saveCardRecord();
       exportCardAsPdf();
     });
@@ -1015,13 +1160,15 @@ document.addEventListener('DOMContentLoaded', () => {
   // 6. Print Cards
   if (btnPrintCard) {
     btnPrintCard.addEventListener('click', () => {
+      if (!requirePaymentGate()) return;
       saveCardRecord();
       printCards();
     });
   }
 
-  // Initialize auto credentials, real-time sync, and check for retrieval payload
+  // Initialize auto credentials, real-time sync, check for retrieval payload, and update paywall state
   updateAutoCredentials();
   syncOverlay();
   loadCardFromStorage();
+  updatePaywallState();
 });

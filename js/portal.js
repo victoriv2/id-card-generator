@@ -12,6 +12,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const emptyState = document.getElementById('portalEmptyState');
 
   function getRecords() {
+    if (window.CloudDB) {
+      return CloudDB.getLocalCards();
+    }
     try {
       return JSON.parse(localStorage.getItem('spa_card_records') || '[]');
     } catch (e) {
