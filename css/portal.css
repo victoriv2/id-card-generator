@@ -70,20 +70,19 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
   position: relative;
   overflow: hidden;
 }
 
 .portal-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 30px -10px rgba(11, 61, 35, 0.12);
+  box-shadow: 0 12px 24px -6px rgba(11, 61, 35, 0.1);
   border-color: #0b3d23;
 }
 
 .portal-card.retrieve-card:hover {
   border-color: #b45309;
-  box-shadow: 0 20px 30px -10px rgba(180, 83, 9, 0.15);
+  box-shadow: 0 12px 24px -6px rgba(180, 83, 9, 0.12);
 }
 
 .portal-card-icon {
