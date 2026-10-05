@@ -221,10 +221,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const maxW = bearerBlock.clientWidth;
     if (!maxH || !maxW) return;
 
+    const blockStyle = window.getComputedStyle(bearerBlock);
+    const gap = parseFloat(blockStyle.gap || blockStyle.rowGap || '0') || 0;
+
     // Only shrink if there is actual physical overflow of container height or width
     let attempts = 0;
     while (attempts < 25) {
-      const currentH = (viewName.offsetHeight || 0) + (viewSchool.offsetHeight || 0) + 2;
+      const currentH = (viewName.offsetHeight || 0) + (viewSchool.offsetHeight || 0) + gap;
       const currentW = Math.max(viewName.scrollWidth || 0, viewSchool.scrollWidth || 0);
 
       if (currentH <= maxH && currentW <= maxW) {

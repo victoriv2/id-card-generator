@@ -604,13 +604,13 @@ body {
   left: 54%;
   width: 44%;
   top: 53.2%;
-  height: 8.3%;
+  height: 8.5%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
-  gap: 1.5px;
+  gap: clamp(7px, 2cqw, 16px);
   overflow: hidden;
   pointer-events: none;
   box-sizing: border-box;
