@@ -878,11 +878,95 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 250);
   }
 
+  // -------------------------------------------------------------------------
+  // Card Record Persistence (Supports Retrieval on Main Portal)
+  // -------------------------------------------------------------------------
+  function saveCardRecord() {
+    const id = inputId ? inputId.value.trim() : '';
+    const name = inputName ? inputName.value.trim() : '';
+    if (!id && !name) return;
+
+    const school = inputSchool ? inputSchool.value.trim() : '';
+    const category = inputCategory ? inputCategory.value.trim() : '';
+    const state = inputState ? inputState.value.trim() : '';
+    const dateIssued = inputDateIssued ? inputDateIssued.value.trim() : '';
+    const photo = hasPassport && passportImg ? passportImg.src : '';
+
+    const record = {
+      id: id || `SPA/ID/${Date.now()}`,
+      name: name || 'UNKNOWN',
+      school,
+      category,
+      state,
+      dateIssued,
+      status: 'ACTIVE',
+      photo,
+      savedAt: new Date().toLocaleString()
+    };
+
+    try {
+      let records = JSON.parse(localStorage.getItem('spa_card_records') || '[]');
+      const idx = records.findIndex(r => r.id === record.id);
+      if (idx >= 0) {
+        records[idx] = record;
+      } else {
+        records.unshift(record);
+      }
+      if (records.length > 50) records = records.slice(0, 50);
+      localStorage.setItem('spa_card_records', JSON.stringify(records));
+    } catch (e) {
+      console.warn('Could not save card to localStorage:', e);
+    }
+  }
+
+  function loadCardFromStorage() {
+    const raw = sessionStorage.getItem('spa_load_card');
+    if (!raw) return;
+    try {
+      const card = JSON.parse(raw);
+      sessionStorage.removeItem('spa_load_card');
+      if (card.name && inputName) inputName.value = card.name;
+      if (card.school && inputSchool) inputSchool.value = card.school;
+      if (card.category && inputCategory) {
+        inputCategory.value = card.category;
+        if (selectedCategoryText) {
+          selectedCategoryText.textContent = card.category;
+          selectedCategoryText.classList.remove('placeholder-text');
+        }
+      }
+      if (card.state && inputState) {
+        inputState.value = card.state;
+        if (selectedStateText) {
+          selectedStateText.textContent = card.state;
+          selectedStateText.classList.remove('placeholder-text');
+        }
+      }
+      if (card.id && inputId) inputId.value = card.id;
+      if (card.dateIssued && inputDateIssued) inputDateIssued.value = card.dateIssued;
+      if (card.photo && passportImg) {
+        passportImg.onload = () => {
+          fitPassportImage(passportImg);
+          resetPhotoFraming();
+        };
+        passportImg.src = card.photo;
+        passportImg.style.display = 'block';
+        if (passportEmptyHint) passportEmptyHint.style.display = 'none';
+        hasPassport = true;
+        if (photoAdjustBox) photoAdjustBox.style.display = 'flex';
+      }
+      syncOverlay();
+      notify(`Loaded ID card: ${card.id || card.name}`);
+    } catch (e) {
+      console.warn('Error loading card from storage:', e);
+    }
+  }
+
   // --- Attach Direct Export Triggers ---
 
   // 1. Front (PNG)
   if (btnDownloadFrontPNG && cardStageFront) {
     btnDownloadFrontPNG.addEventListener('click', () => {
+      saveCardRecord();
       exportCardAsImage(cardStageFront, `Front-${getSanitizedId()}-${selectedQuality}.png`, 'png');
     });
   }
@@ -890,6 +974,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 2. Back (PNG)
   if (btnDownloadBackPNG && cardStageBack) {
     btnDownloadBackPNG.addEventListener('click', () => {
+      saveCardRecord();
       exportCardAsImage(cardStageBack, `Back-${getSanitizedId()}-${selectedQuality}.png`, 'png');
     });
   }
@@ -897,6 +982,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 3. Front (JPEG)
   if (btnDownloadFrontJPEG && cardStageFront) {
     btnDownloadFrontJPEG.addEventListener('click', () => {
+      saveCardRecord();
       exportCardAsImage(cardStageFront, `Front-${getSanitizedId()}-${selectedQuality}.jpg`, 'jpeg');
     });
   }
@@ -904,6 +990,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 4. Back (JPEG)
   if (btnDownloadBackJPEG && cardStageBack) {
     btnDownloadBackJPEG.addEventListener('click', () => {
+      saveCardRecord();
       exportCardAsImage(cardStageBack, `Back-${getSanitizedId()}-${selectedQuality}.jpg`, 'jpeg');
     });
   }
@@ -911,6 +998,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 5. Download Both as PDF
   if (btnDownloadBothPDF && cardStageFront && cardStageBack) {
     btnDownloadBothPDF.addEventListener('click', () => {
+      saveCardRecord();
       exportCardAsPdf();
     });
   }
@@ -918,11 +1006,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // 6. Print Cards
   if (btnPrintCard) {
     btnPrintCard.addEventListener('click', () => {
+      saveCardRecord();
       printCards();
     });
   }
 
-  // Initialize auto credentials and real-time sync
+  // Initialize auto credentials, real-time sync, and check for retrieval payload
   updateAutoCredentials();
   syncOverlay();
+  loadCardFromStorage();
 });

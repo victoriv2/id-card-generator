@@ -1,0 +1,340 @@
+/* ==========================================================================
+   Students Parliament Nigeria - Main Portal Page Styles
+   ========================================================================== */
+
+.portal-body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f8fafc;
+}
+
+/* Hero Section */
+.portal-hero {
+  text-align: center;
+  padding: 48px 20px 32px;
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+.portal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(11, 61, 35, 0.08);
+  color: #0b3d23;
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+  border: 1px solid rgba(11, 61, 35, 0.15);
+}
+
+.portal-hero h1 {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(1.8rem, 4vw, 2.75rem);
+  font-weight: 900;
+  color: #0b3d23;
+  line-height: 1.2;
+  margin-bottom: 14px;
+}
+
+.portal-hero p {
+  color: #475569;
+  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  line-height: 1.6;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+/* Action Cards Grid */
+.portal-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 28px;
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto 40px;
+  padding: 0 20px;
+}
+
+.portal-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 36px 30px;
+  border: 2px solid #e2e8f0;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.portal-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 30px -10px rgba(11, 61, 35, 0.12);
+  border-color: #0b3d23;
+}
+
+.portal-card.retrieve-card:hover {
+  border-color: #b45309;
+  box-shadow: 0 20px 30px -10px rgba(180, 83, 9, 0.15);
+}
+
+.portal-card-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 14px;
+  background: #0b3d23;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 22px;
+  box-shadow: 0 6px 15px rgba(11, 61, 35, 0.25);
+}
+
+.portal-card.retrieve-card .portal-card-icon {
+  background: #b45309;
+  box-shadow: 0 6px 15px rgba(180, 83, 9, 0.25);
+}
+
+.portal-card h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 12px;
+}
+
+.portal-card p {
+  color: #64748b;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  margin-bottom: 26px;
+  flex-grow: 1;
+}
+
+.portal-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 24px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 1rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.portal-btn-primary {
+  background: #0b3d23;
+  color: #ffffff;
+}
+
+.portal-btn-primary:hover {
+  background: #14532d;
+  color: #ffffff;
+}
+
+.portal-btn-secondary {
+  background: #b45309;
+  color: #ffffff;
+}
+
+.portal-btn-secondary:hover {
+  background: #92400e;
+  color: #ffffff;
+}
+
+/* Retrieval Section (Inline or Modal) */
+.portal-retrieve-section {
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto 50px;
+  padding: 0 20px;
+  display: none;
+}
+
+.portal-retrieve-box {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 30px;
+  border: 2px solid #b45309;
+  box-shadow: 0 15px 30px -5px rgba(180, 83, 9, 0.1);
+}
+
+.portal-retrieve-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.portal-retrieve-header h3 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.portal-btn-close {
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.portal-btn-close:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.portal-search-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.portal-search-input {
+  flex-grow: 1;
+  padding: 14px 18px;
+  border: 2px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #0f172a;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.portal-search-input:focus {
+  border-color: #b45309;
+}
+
+.portal-results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.portal-record-item {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: #f8fafc;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.portal-record-item:hover {
+  background: #ffffff;
+  border-color: #cbd5e1;
+}
+
+.portal-record-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-grow: 1;
+}
+
+.portal-record-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #e2e8f0;
+  border: 1px solid #cbd5e1;
+}
+
+.portal-record-details h4 {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+
+.portal-record-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.portal-record-badge {
+  background: #0b3d23;
+  color: #ffffff;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+
+.portal-record-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.portal-record-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.portal-record-btn-load {
+  background: #0b3d23;
+  color: #ffffff;
+}
+
+.portal-record-btn-load:hover {
+  background: #14532d;
+}
+
+.portal-empty-state {
+  text-align: center;
+  padding: 30px 10px;
+  color: #64748b;
+}
+
+.portal-empty-state svg {
+  margin-bottom: 12px;
+  opacity: 0.4;
+}
+
+/* Footer */
+.portal-footer {
+  margin-top: auto;
+  text-align: center;
+  padding: 24px;
+  color: #64748b;
+  font-size: 0.85rem;
+  border-top: 1px solid #e2e8f0;
+}
