@@ -610,7 +610,7 @@ body {
   justify-content: center;
   align-items: center;
   text-align: center;
-  gap: clamp(7px, 2cqw, 16px);
+  gap: clamp(4px, 1.2cqw, 10px);
   overflow: hidden;
   pointer-events: none;
   box-sizing: border-box;
