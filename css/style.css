@@ -671,26 +671,32 @@ body {
 /* 1. Upper White Box: Passport Photograph */
 .overlay-passport-box {
   position: absolute;
-  left: 62.28%;
-  top: 29.72%;
-  width: 32.43%;
-  height: 23.48%;
+  left: 62.12%;
+  top: 29.58%;
+  width: 32.74%;
+  height: 23.67%;
   border-radius: 4px;
   overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   background: transparent;
 }
 
 .overlay-passport-box img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform-origin: center center;
+  transform: translate(-50%, -50%);
   display: block;
+  /* Natural aspect ratio preserved - never squished or pressed */
+  width: auto;
+  height: 100%;
+  max-width: none;
+  max-height: none;
 }
 
 .passport-empty-hint {
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -698,6 +704,7 @@ body {
   text-align: center;
   color: #94a3b8;
   padding: 8px;
+  pointer-events: none;
 }
 
 .passport-empty-hint svg {

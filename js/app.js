@@ -141,11 +141,34 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // -------------------------------------------------------------------------
-  // Photo Transform (Zoom & Pan)
+  // Photo Transform (Zoom & Pan) with Aspect-Ratio Protection
   // -------------------------------------------------------------------------
+  function fitPassportImage(imgElement) {
+    if (!imgElement || !imgElement.naturalWidth || !imgElement.naturalHeight) return;
+    const nw = imgElement.naturalWidth;
+    const nh = imgElement.naturalHeight;
+    const imgAR = nw / nh;
+    // Box on official card is 2160 x 2480 = 0.871
+    const boxAR = 2160 / 2480;
+
+    if (imgAR >= boxAR) {
+      // Photo is wider than box: fill height (100%), width auto (extends evenly, centered)
+      imgElement.style.width = 'auto';
+      imgElement.style.height = '100%';
+      imgElement.style.maxWidth = 'none';
+      imgElement.style.maxHeight = 'none';
+    } else {
+      // Photo is taller than box: fill width (100%), height auto (extends evenly, centered)
+      imgElement.style.width = '100%';
+      imgElement.style.height = 'auto';
+      imgElement.style.maxWidth = 'none';
+      imgElement.style.maxHeight = 'none';
+    }
+  }
+
   function applyPhotoTransform() {
     if (!passportImg || !hasPassport) return;
-    passportImg.style.transform = `scale(${currentScale}) translate(${currentPanX}px, ${currentPanY}px)`;
+    passportImg.style.transform = `translate(calc(-50% + ${currentPanX}px), calc(-50% + ${currentPanY}px)) scale(${currentScale})`;
   }
 
   function resetPhotoFraming() {
@@ -541,6 +564,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const reader = new FileReader();
     reader.onload = (e) => {
+      passportImg.onload = () => {
+        fitPassportImage(passportImg);
+        resetPhotoFraming();
+      };
       passportImg.src = e.target.result;
       passportImg.style.display = 'block';
       if (passportEmptyHint) passportEmptyHint.style.display = 'none';
@@ -548,7 +575,6 @@ document.addEventListener('DOMContentLoaded', () => {
       hasPassport = true;
       if (photoAdjustBox) photoAdjustBox.style.display = 'flex';
 
-      resetPhotoFraming();
       notify('Passport photo added to card!');
     };
     reader.readAsDataURL(file);
@@ -732,6 +758,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!stageElement) throw new Error('Target card element not found');
 
     ensureTemplatesLoaded();
+    if (hasPassport && passportImg) {
+      fitPassportImage(passportImg);
+      applyPhotoTransform();
+    }
 
     // If the stage's column is hidden (tab view), temporarily unhide offscreen
     const col = stageElement.closest('.card-column');
