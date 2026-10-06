@@ -96,6 +96,15 @@ document.addEventListener('DOMContentLoaded', () => {
       searchInput.value = '';
       setTimeout(() => searchInput.focus(), 120);
     }
+
+    // Refresh from cloud in background to pick up newly issued or verified cards
+    if (window.CloudDB && typeof CloudDB.loadFromCloud === 'function') {
+      CloudDB.loadFromCloud().then(() => {
+        if (retrieveModal.classList.contains('is-open')) {
+          renderRecords(searchInput ? searchInput.value : '');
+        }
+      }).catch(err => console.warn('[Portal] Cloud fetch deferred:', err));
+    }
   }
 
   function closeRetrieveModal() {

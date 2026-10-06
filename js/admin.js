@@ -81,6 +81,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   // -------------------------------------------------------------------------
   // Dashboard Data Loading & Filtering
   // -------------------------------------------------------------------------
+  function formatNaira(amount) {
+    return new Intl.NumberFormat('en-NG').format(amount || 0);
+  }
+
   let allCards = [];
 
   async function loadDashboard() {
@@ -125,7 +129,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (statTotalRegistered) statTotalRegistered.textContent = total.toLocaleString();
     if (statTotalPaid) statTotalPaid.textContent = paidCount.toLocaleString();
     if (statTotalPending) statTotalPending.textContent = pendingCount.toLocaleString();
-    if (statTotalRevenue) statTotalRevenue.textContent = '₦' + revenueSum.toLocaleString();
+    if (statTotalRevenue) statTotalRevenue.textContent = '₦' + formatNaira(revenueSum);
 
     // Category Pills
     if (categoryPillsList) {
@@ -216,7 +220,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         : '';
 
       const amountDisplay = isPaid
-        ? `₦${(card.amountPaid || CloudDB.getPrice()).toLocaleString()}`
+        ? `₦${formatNaira(card.amountPaid || CloudDB.getPrice())}`
         : '—';
 
       tr.innerHTML = `
@@ -314,7 +318,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
       await CloudDB.setPrice(newPrice);
-      showModalAlert(`The official card issuance fee has been updated to ₦${newPrice.toLocaleString()}. All generator downloads now reflect this price.`, {
+      showModalAlert(`The official card issuance fee has been updated to ₦${formatNaira(newPrice)}. All generator downloads now reflect this price.`, {
         title: 'Price Updated',
         type: 'success'
       });

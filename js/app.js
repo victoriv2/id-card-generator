@@ -111,6 +111,14 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('spa_card_counter', next.toString());
   }
 
+  function advanceCardSequenceIfCurrent(cardId) {
+    if (!cardId) return;
+    const currentSeqStr = String(getCardSequenceNumber()).padStart(3, '0');
+    if (cardId.endsWith(`/${currentSeqStr}`)) {
+      advanceCardSequence();
+    }
+  }
+
   function updateAutoCredentials() {
     const { dateIssued, year2Digits } = getSystemDates();
     const cat = inputCategory ? inputCategory.value.trim() : '';
@@ -555,7 +563,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function processUploadedImage(file) {
     if (!file.type.startsWith('image/')) {
-      alert('Please upload an image file (JPG, PNG, WEBP).');
+      showModalAlert('Please upload a valid image file (JPG, PNG, WEBP).', {
+        title: 'Invalid File Type',
+        type: 'warning'
+      });
       return;
     }
 
@@ -810,7 +821,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function exportCardAsImage(element, filename, format = 'png') {
     if (typeof html2canvas === 'undefined') {
-      alert('Rendering library is loading. Please wait a moment.');
+      showModalAlert('Rendering library is loading. Please wait a moment and try again.', {
+        title: 'Rendering Initializing',
+        type: 'info'
+      });
       return;
     }
 
@@ -830,13 +844,19 @@ document.addEventListener('DOMContentLoaded', () => {
       notify(`Download complete: ${filename}`);
     } catch (err) {
       console.error('[ID Card] Download error:', err);
-      alert('Could not render image: ' + (err.message || String(err)));
+      showModalAlert('Could not render image: ' + (err.message || String(err)), {
+        title: 'Export Failed',
+        type: 'error'
+      });
     }
   }
 
   async function exportCardAsPdf() {
     if (typeof html2canvas === 'undefined' || !window.jspdf) {
-      alert('PDF Export libraries are initializing. Please wait a moment.');
+      showModalAlert('PDF Export libraries are initializing. Please wait a moment.', {
+        title: 'PDF Initializing',
+        type: 'info'
+      });
       return;
     }
 
@@ -868,7 +888,10 @@ document.addEventListener('DOMContentLoaded', () => {
       notify(`PDF Download complete: ${filename}`);
     } catch (err) {
       console.error('[ID Card] PDF export error:', err);
-      alert('Could not export PDF: ' + (err.message || String(err)));
+      showModalAlert('Could not export PDF: ' + (err.message || String(err)), {
+        title: 'PDF Export Failed',
+        type: 'error'
+      });
     }
   }
 
@@ -912,6 +935,8 @@ document.addEventListener('DOMContentLoaded', () => {
       photo,
       savedAt: new Date().toLocaleString()
     };
+
+    advanceCardSequenceIfCurrent(record.id);
 
     if (window.CloudDB) {
       CloudDB.saveCard(record);
@@ -1024,7 +1049,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isPaid) return true;
 
     const price = window.CloudDB ? CloudDB.getPrice() : 1500;
-    showModalAlert(`Official payment of ₦${price.toLocaleString()} is required before downloading or printing your ID card. Please click "Pay Now with Paystack" to complete issuance.`, {
+    const formattedPrice = new Intl.NumberFormat('en-NG').format(price);
+    showModalAlert(`Official payment of ₦${formattedPrice} is required before downloading or printing your ID card. Please click "Pay Now with Paystack" to complete issuance.`, {
       title: 'Payment Required',
       type: 'warning'
     });
@@ -1096,7 +1122,8 @@ document.addEventListener('DOMContentLoaded', () => {
             });
           }
           updatePaywallState();
-          showModalAlert(`Official card issuance fee of ₦${price.toLocaleString()} confirmed (Ref: ${response.reference}). Your ID card is now completely unlocked for unlimited high-resolution download and printing!`, {
+          const formattedPrice = new Intl.NumberFormat('en-NG').format(price);
+          showModalAlert(`Official card issuance fee of ₦${formattedPrice} confirmed (Ref: ${response.reference}). Your ID card is now completely unlocked for unlimited high-resolution download and printing!`, {
             title: 'Payment Successful!',
             type: 'success'
           });
@@ -1175,4 +1202,11 @@ document.addEventListener('DOMContentLoaded', () => {
   syncOverlay();
   loadCardFromStorage();
   updatePaywallState();
+
+  // Background sync with cloud to ensure latest pricing and paid statuses
+  if (window.CloudDB && typeof CloudDB.loadFromCloud === 'function') {
+    CloudDB.loadFromCloud().then(() => {
+      updatePaywallState();
+    }).catch(err => console.warn('[App] Background cloud sync deferred:', err));
+  }
 });
