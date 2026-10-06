@@ -1,34 +1,99 @@
 /**
  * Students Parliament Nigeria - Cloud & Local Database Layer
- * Synchronizes card records and pricing settings between LocalStorage and JSONBin.io
+ * Powered by Supabase Cloud Database (PostgreSQL) with offline LocalStorage fallback
  */
 
 (function () {
   'use strict';
 
-  const JSONBIN_MASTER_KEY = '$2a$10$nnSfeJQZY9FjkKghjfzlPuWFrIe/JV46TLSQbnho77T3kkmx/mMvK';
+  const SUPABASE_URL = 'https://iooacyhvvwqcwvkfxmjt.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlvb2FjeWh2dndxY3d2a2Z4bWp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzMTQ2MzIsImV4cCI6MjEwNjg5MDYzMn0.1vfrl4ZbdPIDlHqdi_PZxy-FGMOItKq91QFyMrbFXEs';
   const PAYSTACK_PUBLIC_KEY = 'pk_live_732d9b62cd035b8dad96e981d7f6982540342e80';
   const DEFAULT_PRICE_NGN = 1500;
 
   const STORAGE_KEYS = {
     RECORDS: 'spa_card_records',
-    BIN_ID: 'spa_jsonbin_id',
-    PRICE: 'spa_card_price_ngn',
-    PAYSTACK_KEY: 'spa_paystack_key'
+    PRICE: 'spa_card_price_ngn'
   };
 
+  /**
+   * Universal Supabase REST helper using PostgREST endpoints
+   */
+  async function supabaseRequest(endpoint, options = {}) {
+    const url = `${SUPABASE_URL}/rest/v1/${endpoint}`;
+    const headers = {
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+      'Content-Type': 'application/json',
+      ...(options.headers || {})
+    };
+
+    const res = await fetch(url, {
+      ...options,
+      headers
+    });
+
+    if (!res.ok) {
+      const errText = await res.text().catch(() => '');
+      throw new Error(`Supabase error (${res.status}): ${errText}`);
+    }
+
+    const contentType = res.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      return await res.json();
+    }
+    return null;
+  }
+
+  /**
+   * Convert client camelCase card record to Supabase snake_case row
+   */
+  function toRow(c) {
+    return {
+      id: c.id,
+      name: c.name || 'UNKNOWN',
+      school: c.school || '',
+      category: (c.category || 'STUDENT').toUpperCase(),
+      state: c.state || '',
+      date_issued: c.dateIssued || c.date_issued || '',
+      status: c.status || 'ACTIVE',
+      photo: c.photo || '',
+      is_paid: !!(c.isPaid || c.is_paid),
+      payment_ref: c.paymentRef || c.payment_ref || null,
+      amount_paid: c.amountPaid != null ? Number(c.amountPaid) : DEFAULT_PRICE_NGN,
+      payer_email: c.payerEmail || c.payer_email || null,
+      paid_at: c.paidAt || c.paid_at || null,
+      saved_at: c.savedAt ? new Date(c.savedAt).toISOString() : new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+  }
+
+  /**
+   * Convert Supabase snake_case row to client camelCase card record
+   */
+  function fromRow(r) {
+    return {
+      id: r.id,
+      name: r.name,
+      school: r.school || '',
+      category: (r.category || 'STUDENT').toUpperCase(),
+      state: r.state || '',
+      dateIssued: r.date_issued || '',
+      status: r.status || 'ACTIVE',
+      photo: r.photo || '',
+      isPaid: !!r.is_paid,
+      paymentRef: r.payment_ref || '',
+      amountPaid: r.amount_paid != null ? Number(r.amount_paid) : DEFAULT_PRICE_NGN,
+      payerEmail: r.payer_email || '',
+      paidAt: r.paid_at || '',
+      savedAt: r.saved_at || r.created_at || new Date().toISOString()
+    };
+  }
+
   const CloudDB = {
-    // Keys
-    masterKey: JSONBIN_MASTER_KEY,
+    supabaseUrl: SUPABASE_URL,
+    supabaseAnonKey: SUPABASE_ANON_KEY,
     paystackPublicKey: PAYSTACK_PUBLIC_KEY,
-
-    getBinId() {
-      return localStorage.getItem(STORAGE_KEYS.BIN_ID) || '';
-    },
-
-    setBinId(id) {
-      if (id) localStorage.setItem(STORAGE_KEYS.BIN_ID, id.trim());
-    },
 
     // Price Settings
     getPrice() {
@@ -42,11 +107,25 @@
     async setPrice(price) {
       const p = parseInt(price, 10) || DEFAULT_PRICE_NGN;
       localStorage.setItem(STORAGE_KEYS.PRICE, p.toString());
-      await this.saveToCloud();
+
+      try {
+        await supabaseRequest('app_settings', {
+          method: 'POST',
+          headers: { 'Prefer': 'resolution=merge-duplicates,return=representation' },
+          body: JSON.stringify({
+            key: 'card_price_ngn',
+            value: p.toString(),
+            updated_at: new Date().toISOString()
+          })
+        });
+      } catch (err) {
+        console.warn('[CloudDB] Supabase price sync skipped/deferred:', err);
+      }
+
       return p;
     },
 
-    // Local Card Records
+    // Local Storage Helpers
     getLocalCards() {
       try {
         return JSON.parse(localStorage.getItem(STORAGE_KEYS.RECORDS) || '[]');
@@ -59,11 +138,6 @@
       localStorage.setItem(STORAGE_KEYS.RECORDS, JSON.stringify(cards));
     },
 
-    /**
-     * Check if a card is paid
-     * @param {string} id - Card ID
-     * @returns {boolean}
-     */
     isCardPaid(id) {
       if (!id) return false;
       const cards = this.getLocalCards();
@@ -72,15 +146,14 @@
     },
 
     /**
-     * Save or update a card record
+     * Save or update a card record in LocalStorage and Supabase
      */
     async saveCard(record) {
       if (!record || !record.id) return;
       const cards = this.getLocalCards();
       const idx = cards.findIndex(c => c.id === record.id);
-      
+
       if (idx >= 0) {
-        // Preserve payment status if existing card was already paid
         if (cards[idx].isPaid && !record.isPaid) {
           record.isPaid = true;
           record.paymentRef = cards[idx].paymentRef || record.paymentRef;
@@ -93,8 +166,17 @@
       }
 
       this.saveLocalCards(cards);
-      // Asynchronously trigger cloud backup
-      this.saveToCloud().catch(err => console.warn('[CloudDB] Cloud sync skipped/failed:', err));
+
+      // Async sync to Supabase
+      try {
+        await supabaseRequest('cards', {
+          method: 'POST',
+          headers: { 'Prefer': 'resolution=merge-duplicates,return=representation' },
+          body: JSON.stringify(toRow(record))
+        });
+      } catch (err) {
+        console.warn('[CloudDB] Supabase card save deferred:', err);
+      }
     },
 
     /**
@@ -111,130 +193,103 @@
         payerEmail: paymentInfo.email || ''
       };
 
+      let fullRecord;
       if (idx >= 0) {
         cards[idx] = { ...cards[idx], ...paidData };
+        fullRecord = cards[idx];
       } else {
-        cards.unshift({
+        fullRecord = {
           id,
           ...paidData,
           savedAt: new Date().toLocaleString()
-        });
+        };
+        cards.unshift(fullRecord);
       }
 
       this.saveLocalCards(cards);
-      await this.saveToCloud();
-      return cards.find(c => c.id === id);
+
+      // Async sync payment update to Supabase
+      try {
+        await supabaseRequest(`cards?id=eq.${encodeURIComponent(id)}`, {
+          method: 'PATCH',
+          headers: { 'Prefer': 'return=representation' },
+          body: JSON.stringify({
+            is_paid: true,
+            payment_ref: paidData.paymentRef,
+            amount_paid: paidData.amountPaid,
+            payer_email: paidData.payerEmail || null,
+            paid_at: paidData.paidAt,
+            updated_at: new Date().toISOString()
+          })
+        });
+      } catch (err) {
+        console.warn('[CloudDB] Supabase payment sync deferred:', err);
+      }
+
+      return fullRecord;
     },
 
     /**
-     * Delete a card record
+     * Delete a card record locally and from Supabase
      */
     async deleteCard(id) {
       let cards = this.getLocalCards();
       cards = cards.filter(c => c.id !== id);
       this.saveLocalCards(cards);
-      await this.saveToCloud();
+
+      try {
+        await supabaseRequest(`cards?id=eq.${encodeURIComponent(id)}`, {
+          method: 'DELETE'
+        });
+      } catch (err) {
+        console.warn('[CloudDB] Supabase delete deferred:', err);
+      }
+
       return cards;
     },
 
-    // -----------------------------------------------------------------------
-    // Cloud Synchronization via JSONBin.io v3
-    // -----------------------------------------------------------------------
-
     /**
-     * Save all local cards and current settings to JSONBin
+     * Bulk save all local cards to Supabase (used for manual sync or initial migration)
      */
     async saveToCloud() {
-      const binId = this.getBinId();
-      const payload = {
-        settings: {
-          price: this.getPrice(),
-          currency: 'NGN',
-          updatedAt: new Date().toISOString()
-        },
-        cards: this.getLocalCards().map(c => {
-          // Keep cloud payload lightweight: strip full high-res base64 photo if too big (>50KB)
-          // to conserve JSONBin storage limit, but keep preview thumbnail
-          if (c.photo && c.photo.length > 60000) {
-            return { ...c, photo: c.photo.substring(0, 100) + '...[cached_locally]' };
-          }
-          return c;
-        })
-      };
-
-      if (!binId) {
-        // Create new bin
-        try {
-          const res = await fetch('https://api.jsonbin.io/v3/b', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-Master-Key': this.masterKey,
-              'X-Bin-Name': 'spn_id_cards_db',
-              'X-Bin-Private': 'true'
-            },
-            body: JSON.stringify(payload)
-          });
-          if (res.ok) {
-            const data = await res.json();
-            if (data.metadata && data.metadata.id) {
-              this.setBinId(data.metadata.id);
-              console.log('[CloudDB] New Cloud Bin Created:', data.metadata.id);
-            }
-          }
-        } catch (e) {
-          console.warn('[CloudDB] Could not create new bin:', e);
-        }
-      } else {
-        // Update existing bin
-        try {
-          await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-Master-Key': this.masterKey
-            },
-            body: JSON.stringify(payload)
-          });
-        } catch (e) {
-          console.warn('[CloudDB] Cloud update failed:', e);
-        }
+      const localCards = this.getLocalCards();
+      if (localCards.length > 0) {
+        const rows = localCards.map(toRow);
+        await supabaseRequest('cards', {
+          method: 'POST',
+          headers: { 'Prefer': 'resolution=merge-duplicates,return=representation' },
+          body: JSON.stringify(rows)
+        });
       }
+
+      await this.setPrice(this.getPrice());
     },
 
     /**
-     * Fetch latest cards and settings from JSONBin and merge with local storage
+     * Load latest cards and settings from Supabase and merge with LocalStorage
      */
     async loadFromCloud() {
-      const binId = this.getBinId();
-      if (!binId) return this.getLocalCards();
-
       try {
-        const res = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
-          method: 'GET',
-          headers: {
-            'X-Master-Key': this.masterKey
+        // 1. Sync Price
+        const settingsRes = await supabaseRequest('app_settings?key=eq.card_price_ngn&select=*').catch(() => null);
+        if (Array.isArray(settingsRes) && settingsRes.length > 0 && settingsRes[0].value) {
+          const cloudPrice = parseInt(settingsRes[0].value, 10);
+          if (!isNaN(cloudPrice)) {
+            localStorage.setItem(STORAGE_KEYS.PRICE, cloudPrice.toString());
           }
-        });
+        }
 
-        if (res.ok) {
-          const data = await res.json();
-          const cloudRecord = data.record || {};
-
-          // Sync price setting if found
-          if (cloudRecord.settings && cloudRecord.settings.price) {
-            localStorage.setItem(STORAGE_KEYS.PRICE, cloudRecord.settings.price.toString());
-          }
-
-          // Merge cloud cards with local cards
-          const cloudCards = Array.isArray(cloudRecord.cards) ? cloudRecord.cards : [];
+        // 2. Fetch Cards from Supabase
+        const cloudRows = await supabaseRequest('cards?select=*&order=saved_at.desc');
+        if (Array.isArray(cloudRows)) {
+          const cloudCards = cloudRows.map(fromRow);
           const localCards = this.getLocalCards();
           const mergedMap = new Map();
 
           // Add local first
           localCards.forEach(c => mergedMap.set(c.id, c));
 
-          // Merge cloud (giving priority to paid status and newest info)
+          // Merge cloud (cloud takes authority on paid status and details)
           cloudCards.forEach(c => {
             if (!mergedMap.has(c.id)) {
               mergedMap.set(c.id, c);
@@ -245,8 +300,7 @@
                 ...existing,
                 isPaid: existing.isPaid || c.isPaid,
                 paymentRef: existing.paymentRef || c.paymentRef,
-                // Preserve local photo if cloud was stripped
-                photo: (existing.photo && !existing.photo.includes('[cached_locally]')) ? existing.photo : c.photo
+                photo: (existing.photo && !existing.photo.includes('[cached_locally]')) ? existing.photo : (c.photo || '')
               });
             }
           });
@@ -256,13 +310,12 @@
           return finalCards;
         }
       } catch (err) {
-        console.warn('[CloudDB] Could not load from cloud:', err);
+        console.warn('[CloudDB] Supabase load deferred, using local cache:', err);
       }
 
       return this.getLocalCards();
     }
   };
 
-  // Export globally
   window.CloudDB = CloudDB;
 })();

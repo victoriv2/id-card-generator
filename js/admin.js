@@ -337,7 +337,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         allCards = await CloudDB.loadFromCloud();
         updateStatsAndRender();
         if (syncStatus) syncStatus.textContent = '● Online & Synchronized';
-        showModalAlert('Database synchronized successfully with JSONBin Cloud!', { type: 'success' });
+        showModalAlert('Database synchronized successfully with Supabase Cloud Database!', { type: 'success' });
       } catch (err) {
         if (syncStatus) syncStatus.textContent = '● Sync error';
         showModalAlert('Could not synchronize: ' + (err.message || String(err)), { type: 'error' });
