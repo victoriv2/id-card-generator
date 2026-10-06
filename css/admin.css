@@ -304,13 +304,40 @@ body.admin-body {
 }
 
 .admin-section-header h2 {
-  font-size: 1.1rem;
+  font-size: 1.08rem;
   font-weight: 800;
   color: #0b3d23;
   margin: 0;
   display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  line-height: 1.35;
+}
+
+.admin-header-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.admin-header-icon.gold {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.admin-header-icon.blue {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.admin-header-icon.green {
+  background: #dcfce7;
+  color: #15803d;
 }
 
 .admin-cat-pills-list {
@@ -343,7 +370,7 @@ body.admin-body {
 /* Price & Cloud Settings Card */
 .admin-settings-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 20px;
   margin-bottom: 24px;
 }
@@ -354,18 +381,31 @@ body.admin-body {
   padding: 24px;
   border: 1px solid var(--admin-border);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-panel-card p {
+  color: #64748b;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  margin: 0 0 14px;
+  flex-grow: 1;
 }
 
 .admin-price-control {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: 12px;
+  align-items: stretch;
+  gap: 10px;
+  margin-top: 14px;
+  flex-wrap: wrap;
 }
 
 .admin-price-input-wrap {
   position: relative;
-  flex-grow: 1;
+  flex: 1 1 150px;
+  min-width: 140px;
+  height: 46px;
 }
 
 .admin-price-prefix {
@@ -375,18 +415,101 @@ body.admin-body {
   transform: translateY(-50%);
   font-weight: 800;
   color: #0b3d23;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
+  pointer-events: none;
+  z-index: 2;
 }
 
 .admin-price-input {
   width: 100%;
+  height: 46px;
   box-sizing: border-box;
-  padding: 12px 14px 12px 34px;
+  padding: 0 12px 0 36px;
   border: 2px solid #cbd5e1;
   border-radius: 10px;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   font-weight: 800;
   color: #0f172a;
+  outline: none;
+  background: #ffffff;
+  font-family: inherit;
+  -moz-appearance: textfield;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.admin-price-input::-webkit-outer-spin-button,
+.admin-price-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.admin-price-input:focus {
+  border-color: #0b3d23;
+  box-shadow: 0 0 0 3px rgba(11, 61, 35, 0.12);
+}
+
+.admin-price-control .btn-admin-action {
+  height: 46px;
+  padding: 0 20px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  flex: 1 1 auto;
+}
+
+.admin-cloud-actions {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.btn-cloud-sync {
+  background: #0369a1 !important;
+  height: 46px;
+  padding: 0 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex: 1 1 auto;
+  white-space: nowrap;
+  border-radius: 10px;
+}
+
+.btn-cloud-sync:hover {
+  background: #0284c7 !important;
+}
+
+.btn-csv-export {
+  height: 46px;
+  padding: 0 16px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex: 1 1 auto;
+  white-space: nowrap;
+  border-radius: 10px;
+}
+
+.admin-sync-status-wrap {
+  width: 100%;
+  margin-top: 6px;
+}
+
+.cloud-status-badge {
+  font-size: 0.82rem;
+  color: #15803d;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .btn-admin-action {
@@ -652,7 +775,16 @@ body.admin-body {
   .admin-price-input-wrap {
     width: 100%;
   }
-  .btn-admin-action {
+  .admin-price-control .btn-admin-action {
+    width: 100%;
+    text-align: center;
+  }
+  .admin-cloud-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .btn-cloud-sync,
+  .btn-csv-export {
     width: 100%;
     text-align: center;
   }
