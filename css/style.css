@@ -1312,8 +1312,7 @@ body {
 
 .btn-paystack-pay:hover {
   background: linear-gradient(135deg, #14532d 0%, #16a34a 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(11, 61, 35, 0.4);
+  box-shadow: 0 4px 18px rgba(11, 61, 35, 0.38);
 }
 
 .paywall-verified-box {

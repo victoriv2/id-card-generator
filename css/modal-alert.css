@@ -129,11 +129,10 @@
 
 .spn-modal-alert-btn-primary:hover {
   background: #14532d;
-  transform: translateY(-1px);
 }
 
 .spn-modal-alert-btn-primary:active {
-  transform: translateY(0);
+  opacity: 0.95;
 }
 
 .spn-modal-alert-btn-cancel {

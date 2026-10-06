@@ -118,12 +118,11 @@
 
 .btn-paystack-pay:hover {
   background: linear-gradient(135deg, #14532d 0%, #16a34a 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(11, 61, 35, 0.42);
+  box-shadow: 0 4px 18px rgba(11, 61, 35, 0.38);
 }
 
 .btn-paystack-pay:active {
-  transform: translateY(0);
+  opacity: 0.95;
 }
 
 /* Verified Box */
