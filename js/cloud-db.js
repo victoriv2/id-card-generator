@@ -9,6 +9,7 @@
   const SUPABASE_URL = 'https://iooacyhvvwqcwvkfxmjt.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlvb2FjeWh2dndxY3d2a2Z4bWp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzMTQ2MzIsImV4cCI6MjEwNjg5MDYzMn0.1vfrl4ZbdPIDlHqdi_PZxy-FGMOItKq91QFyMrbFXEs';
   const PAYSTACK_PUBLIC_KEY = 'pk_live_732d9b62cd035b8dad96e981d7f6982540342e80';
+  const DEFAULT_PAYMENT_EMAIL = 'we.are.danithuga@gmail.com';
   const DEFAULT_PRICE_NGN = 1500;
 
   const STORAGE_KEYS = {
@@ -94,6 +95,7 @@
     supabaseUrl: SUPABASE_URL,
     supabaseAnonKey: SUPABASE_ANON_KEY,
     paystackPublicKey: PAYSTACK_PUBLIC_KEY,
+    defaultPaymentEmail: DEFAULT_PAYMENT_EMAIL,
 
     // Price Settings
     getPrice() {

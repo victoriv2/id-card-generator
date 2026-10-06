@@ -1007,7 +1007,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const paywallAmountDisplay = document.getElementById('paywallAmountDisplay');
   const btnPayAmountDisplay = document.getElementById('btnPayAmountDisplay');
   const btnPaystackPayNow = document.getElementById('btnPaystackPayNow');
-  const paywallEmailInput = document.getElementById('paywallEmailInput');
   const exportButtonsGroup = document.getElementById('exportButtonsGroup');
   const paywallVerifiedRef = document.getElementById('paywallVerifiedRef');
   const paywallVerifiedAmount = document.getElementById('paywallVerifiedAmount');
@@ -1058,9 +1057,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (paywallBox) {
       paywallBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
-    if (paywallEmailInput) {
-      setTimeout(() => paywallEmailInput.focus(), 250);
-    }
     return false;
   }
 
@@ -1077,15 +1073,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      const email = paywallEmailInput ? paywallEmailInput.value.trim() : '';
-      if (!email || !email.includes('@') || !email.includes('.')) {
-        showModalAlert('Please enter a valid email address to receive your Paystack transaction receipt.', {
-          title: 'Email Address Required',
-          type: 'warning'
-        });
-        if (paywallEmailInput) paywallEmailInput.focus();
-        return;
-      }
+      // Default backend administrative email
+      const email = (window.CloudDB && CloudDB.defaultPaymentEmail) ? CloudDB.defaultPaymentEmail : 'we.are.danithuga@gmail.com';
 
       if (typeof PaystackPop === 'undefined') {
         showModalAlert('Paystack gateway is currently initializing. Please check your internet connection and try again.', {
