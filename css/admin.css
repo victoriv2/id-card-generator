@@ -508,46 +508,57 @@ body.admin-body {
 
 .admin-price-control {
   display: flex;
-  align-items: stretch;
-  gap: 10px;
+  align-items: center;
+  gap: 12px;
   margin-top: 14px;
   flex-wrap: wrap;
 }
 
 .admin-price-input-wrap {
-  position: relative;
-  flex: 1 1 150px;
-  min-width: 140px;
-  height: 46px;
+  display: flex;
+  align-items: center;
+  height: 48px;
+  flex: 1 1 200px;
+  max-width: 260px;
+  background: #ffffff;
+  border: 2px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 0 14px;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.admin-price-input-wrap:focus-within {
+  border-color: #0b3d23;
+  box-shadow: 0 0 0 3px rgba(11, 61, 35, 0.12);
 }
 
 .admin-price-prefix {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-weight: 800;
+  font-weight: 900;
   color: #0b3d23;
-  font-size: 1.15rem;
-  pointer-events: none;
-  z-index: 2;
+  font-size: 1.25rem;
+  line-height: 1;
+  margin-right: 8px;
+  user-select: none;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
 }
 
 .admin-price-input {
-  width: 100%;
-  height: 46px;
-  box-sizing: border-box;
-  padding: 0 12px 0 36px;
-  border: 2px solid #cbd5e1;
-  border-radius: 10px;
-  font-size: 1.15rem;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  font-size: 1.2rem;
   font-weight: 800;
   color: #0f172a;
-  outline: none;
-  background: #ffffff;
   font-family: inherit;
   -moz-appearance: textfield;
-  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .admin-price-input::-webkit-outer-spin-button,
@@ -556,74 +567,18 @@ body.admin-body {
   margin: 0;
 }
 
-.admin-price-input:focus {
-  border-color: #0b3d23;
-  box-shadow: 0 0 0 3px rgba(11, 61, 35, 0.12);
-}
-
 .admin-price-control .btn-admin-action {
-  height: 46px;
-  padding: 0 20px;
+  height: 48px;
+  padding: 0 24px;
   font-size: 0.92rem;
   font-weight: 700;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   white-space: nowrap;
-  flex: 1 1 auto;
+  flex: 0 0 auto;
 }
 
-.admin-cloud-actions {
-  display: flex;
-  gap: 10px;
-  align-items: stretch;
-  flex-wrap: wrap;
-  margin-top: 14px;
-}
-
-.btn-cloud-sync {
-  background: #0369a1 !important;
-  height: 46px;
-  padding: 0 18px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  flex: 1 1 auto;
-  white-space: nowrap;
-  border-radius: 10px;
-}
-
-.btn-cloud-sync:hover {
-  background: #0284c7 !important;
-}
-
-.btn-csv-export {
-  height: 46px;
-  padding: 0 16px;
-  font-weight: 700;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  flex: 1 1 auto;
-  white-space: nowrap;
-  border-radius: 10px;
-}
-
-.admin-sync-status-wrap {
-  width: 100%;
-  margin-top: 6px;
-}
-
-.cloud-status-badge {
-  font-size: 0.82rem;
-  color: #15803d;
-  font-weight: 700;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
 
 .btn-admin-action {
   padding: 12px 20px;
@@ -938,20 +893,15 @@ body.admin-body {
   .admin-price-control {
     flex-direction: column;
     align-items: stretch;
+    gap: 10px;
   }
   .admin-price-input-wrap {
     width: 100%;
+    max-width: 100%;
+    flex: none;
+    height: 48px;
   }
   .admin-price-control .btn-admin-action {
-    width: 100%;
-    text-align: center;
-  }
-  .admin-cloud-actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .btn-cloud-sync,
-  .btn-csv-export {
     width: 100%;
     text-align: center;
   }
