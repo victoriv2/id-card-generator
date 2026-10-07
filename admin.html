@@ -169,31 +169,32 @@
           </div>
 
           <div class="admin-filters-group">
-            <!-- Category Filter -->
-            <select id="filterCategory" class="admin-select">
-              <option value="ALL">All Categories</option>
-              <option value="STUDENT">STUDENT</option>
-              <option value="TEACHER">TEACHER</option>
-              <option value="EXECUTIVE">EXECUTIVE</option>
-              <option value="PARENT">PARENT</option>
-              <option value="OFFICIAL">OFFICIAL</option>
-            </select>
+            <!-- Category Filter Modal Trigger -->
+            <div class="admin-select-trigger-wrap">
+              <div class="select-modal-trigger admin-modal-trigger" id="filterCategoryTrigger" role="button" tabindex="0">
+                <span id="filterCategoryText">All Categories</span>
+                <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+              </div>
+              <input type="hidden" id="filterCategory" value="ALL">
+            </div>
 
-            <!-- Payment Filter -->
-            <select id="filterPayment" class="admin-select">
-              <option value="ALL">All Payments</option>
-              <option value="PAID">Paid Only</option>
-              <option value="PENDING">Pending Only</option>
-            </select>
+            <!-- Payment Filter Modal Trigger -->
+            <div class="admin-select-trigger-wrap">
+              <div class="select-modal-trigger admin-modal-trigger" id="filterPaymentTrigger" role="button" tabindex="0">
+                <span id="filterPaymentText">All Payments</span>
+                <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+              </div>
+              <input type="hidden" id="filterPayment" value="ALL">
+            </div>
 
-            <!-- Sort Order -->
-            <select id="sortOrder" class="admin-select">
-              <option value="newest">Sort: Newest First</option>
-              <option value="oldest">Sort: Oldest First</option>
-              <option value="name_asc">Sort: Name (A-Z)</option>
-              <option value="name_desc">Sort: Name (Z-A)</option>
-              <option value="id_asc">Sort: ID Number</option>
-            </select>
+            <!-- Sort Order Modal Trigger -->
+            <div class="admin-select-trigger-wrap">
+              <div class="select-modal-trigger admin-modal-trigger" id="sortOrderTrigger" role="button" tabindex="0">
+                <span id="sortOrderText">Sort: Newest First</span>
+                <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+              </div>
+              <input type="hidden" id="sortOrder" value="newest">
+            </div>
           </div>
         </section>
 
@@ -249,14 +250,12 @@
                   <input type="text" id="inputNewSchoolName" placeholder="e.g. FEDERAL UNIVERSITY OF TECHNOLOGY AKURE" required>
                 </div>
                 <div class="admin-school-input-wrap">
-                  <label for="selectNewSchoolCategory">Category / Role</label>
-                  <select id="selectNewSchoolCategory">
-                    <option value="STUDENT">STUDENT</option>
-                    <option value="TEACHER">TEACHER</option>
-                    <option value="EXECUTIVE">EXECUTIVE</option>
-                    <option value="PARENT">PARENT</option>
-                    <option value="OFFICIAL">OFFICIAL</option>
-                  </select>
+                  <label for="selectNewSchoolCategoryTrigger">Categories / Roles (Multi-Select)</label>
+                  <div class="select-modal-trigger admin-modal-trigger" id="selectNewSchoolCategoryTrigger" role="button" tabindex="0">
+                    <span id="selectedNewSchoolCategoryText">STUDENT</span>
+                    <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+                  </div>
+                  <input type="hidden" id="selectNewSchoolCategory" value="STUDENT">
                 </div>
                 <button type="submit" id="btnAddSchool" class="btn-admin-action btn-add-school">
                   <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
@@ -270,15 +269,12 @@
               <div class="admin-schools-toolbar">
                 <span class="admin-schools-count-label">Directory List (<span id="schoolDirectoryCount">0</span>)</span>
                 <div class="admin-schools-filter-group">
-                  <label for="filterSchoolCat" style="font-size: 0.82rem; font-weight: 700; color: #475569;">Filter Category:</label>
-                  <select id="filterSchoolCat" class="admin-select admin-select-sm">
-                    <option value="ALL">All Categories</option>
-                    <option value="STUDENT">STUDENT</option>
-                    <option value="TEACHER">TEACHER</option>
-                    <option value="EXECUTIVE">EXECUTIVE</option>
-                    <option value="PARENT">PARENT</option>
-                    <option value="OFFICIAL">OFFICIAL</option>
-                  </select>
+                  <span style="font-size: 0.82rem; font-weight: 700; color: #475569;">Filter Category:</span>
+                  <div class="select-modal-trigger admin-modal-trigger admin-select-sm" id="filterSchoolCatTrigger" role="button" tabindex="0" style="min-width: 140px;">
+                    <span id="filterSchoolCatText">All Categories</span>
+                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+                  </div>
+                  <input type="hidden" id="filterSchoolCat" value="ALL">
                 </div>
               </div>
               <div class="admin-schools-table-scroll">
@@ -355,6 +351,135 @@
         </section>
       </div>
     </main>
+  </div>
+
+  <!-- ================================================================
+       ADMIN MODALS (Replaces all native dropdown menus)
+       ================================================================ -->
+
+  <!-- 1. Multi-Category Selector Modal for Adding School -->
+  <div class="modal-backdrop" id="adminMultiCatModal" style="display: none;">
+    <div class="modal-dialog-simple">
+      <div class="modal-header-simple">
+        <span>Select Category / Roles (Multi-Select)</span>
+        <button type="button" class="btn-modal-close" id="btnCloseAdminMultiCatModal" title="Close">
+          <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
+      <div class="admin-modal-multi-body">
+        <p style="margin: 0 0 12px; font-size: 0.82rem; color: #64748b; text-align: left;">
+          Choose all categories that apply to this institution/branch:
+        </p>
+        <div class="admin-multi-cat-list" id="adminMultiCatOptionsList">
+          <label class="admin-checkbox-item">
+            <input type="checkbox" value="STUDENT" checked>
+            <span class="admin-checkbox-box"></span>
+            <span class="admin-checkbox-label">STUDENT</span>
+          </label>
+          <label class="admin-checkbox-item">
+            <input type="checkbox" value="TEACHER">
+            <span class="admin-checkbox-box"></span>
+            <span class="admin-checkbox-label">TEACHER</span>
+          </label>
+          <label class="admin-checkbox-item">
+            <input type="checkbox" value="EXECUTIVE">
+            <span class="admin-checkbox-box"></span>
+            <span class="admin-checkbox-label">EXECUTIVE</span>
+          </label>
+          <label class="admin-checkbox-item">
+            <input type="checkbox" value="PARENT">
+            <span class="admin-checkbox-box"></span>
+            <span class="admin-checkbox-label">PARENT</span>
+          </label>
+          <label class="admin-checkbox-item">
+            <input type="checkbox" value="OFFICIAL">
+            <span class="admin-checkbox-box"></span>
+            <span class="admin-checkbox-label">OFFICIAL</span>
+          </label>
+        </div>
+      </div>
+      <div class="admin-modal-actions-bar">
+        <button type="button" class="btn-admin-action" id="btnApplyAdminMultiCat" style="width: 100%;">
+          Confirm Categories
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Records Category Filter Modal -->
+  <div class="modal-backdrop" id="adminCatFilterModal" style="display: none;">
+    <div class="modal-dialog-simple">
+      <div class="modal-header-simple">
+        <span>Filter Records by Category</span>
+        <button type="button" class="btn-modal-close" id="btnCloseAdminCatFilterModal" title="Close">
+          <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
+      <div class="simple-modal-list" id="adminCatFilterList">
+        <button type="button" class="simple-modal-option active" data-val="ALL">All Categories</button>
+        <button type="button" class="simple-modal-option" data-val="STUDENT">STUDENT</button>
+        <button type="button" class="simple-modal-option" data-val="TEACHER">TEACHER</button>
+        <button type="button" class="simple-modal-option" data-val="EXECUTIVE">EXECUTIVE</button>
+        <button type="button" class="simple-modal-option" data-val="PARENT">PARENT</button>
+        <button type="button" class="simple-modal-option" data-val="OFFICIAL">OFFICIAL</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Records Payment Filter Modal -->
+  <div class="modal-backdrop" id="adminPayFilterModal" style="display: none;">
+    <div class="modal-dialog-simple">
+      <div class="modal-header-simple">
+        <span>Filter Records by Payment</span>
+        <button type="button" class="btn-modal-close" id="btnCloseAdminPayFilterModal" title="Close">
+          <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
+      <div class="simple-modal-list" id="adminPayFilterList">
+        <button type="button" class="simple-modal-option active" data-val="ALL">All Payments</button>
+        <button type="button" class="simple-modal-option" data-val="PAID">Paid Only</button>
+        <button type="button" class="simple-modal-option" data-val="PENDING">Pending Only</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Records Sort Order Modal -->
+  <div class="modal-backdrop" id="adminSortModal" style="display: none;">
+    <div class="modal-dialog-simple">
+      <div class="modal-header-simple">
+        <span>Sort Records</span>
+        <button type="button" class="btn-modal-close" id="btnCloseAdminSortModal" title="Close">
+          <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
+      <div class="simple-modal-list" id="adminSortList">
+        <button type="button" class="simple-modal-option active" data-val="newest">Sort: Newest First</button>
+        <button type="button" class="simple-modal-option" data-val="oldest">Sort: Oldest First</button>
+        <button type="button" class="simple-modal-option" data-val="name_asc">Sort: Name (A-Z)</button>
+        <button type="button" class="simple-modal-option" data-val="name_desc">Sort: Name (Z-A)</button>
+        <button type="button" class="simple-modal-option" data-val="id_asc">Sort: ID Number</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Schools Directory Filter Modal -->
+  <div class="modal-backdrop" id="adminSchoolCatFilterModal" style="display: none;">
+    <div class="modal-dialog-simple">
+      <div class="modal-header-simple">
+        <span>Filter Directory by Category</span>
+        <button type="button" class="btn-modal-close" id="btnCloseAdminSchoolCatFilterModal" title="Close">
+          <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
+      <div class="simple-modal-list" id="adminSchoolCatFilterList">
+        <button type="button" class="simple-modal-option active" data-val="ALL">All Categories</button>
+        <button type="button" class="simple-modal-option" data-val="STUDENT">STUDENT</button>
+        <button type="button" class="simple-modal-option" data-val="TEACHER">TEACHER</button>
+        <button type="button" class="simple-modal-option" data-val="EXECUTIVE">EXECUTIVE</button>
+        <button type="button" class="simple-modal-option" data-val="PARENT">PARENT</button>
+        <button type="button" class="simple-modal-option" data-val="OFFICIAL">OFFICIAL</button>
+      </div>
+    </div>
   </div>
 
   <!-- Shared Scripts -->

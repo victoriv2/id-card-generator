@@ -1076,3 +1076,123 @@ body.admin-body {
   }
 }
 
+/* ==========================================================================
+   Admin Modal Selectors & Multi-Category Checkbox Styles
+   ========================================================================== */
+.admin-select-trigger-wrap {
+  min-width: 155px;
+}
+
+.admin-modal-trigger {
+  width: 100%;
+  box-sizing: border-box;
+  height: 42px;
+  padding: 0 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 0.88rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+
+.admin-modal-trigger:hover,
+.admin-modal-trigger:focus {
+  border-color: #0b3d23;
+  box-shadow: 0 0 0 3px rgba(11, 61, 35, 0.1);
+  outline: none;
+}
+
+.admin-modal-trigger svg {
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.admin-select-sm.admin-modal-trigger {
+  height: 36px;
+  font-size: 0.82rem;
+  padding: 0 10px;
+}
+
+/* Multi-Select Checkboxes inside Modal */
+.admin-modal-multi-body {
+  padding: 16px 20px 10px;
+}
+
+.admin-multi-cat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s ease;
+}
+
+.admin-checkbox-item:hover {
+  background: #f0fdf4;
+  border-color: #86efac;
+}
+
+.admin-checkbox-item input[type="checkbox"] {
+  display: none;
+}
+
+.admin-checkbox-box {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #94a3b8;
+  border-radius: 6px;
+  background: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.admin-checkbox-item input[type="checkbox"]:checked + .admin-checkbox-box {
+  background: #15803d;
+  border-color: #15803d;
+}
+
+.admin-checkbox-item input[type="checkbox"]:checked + .admin-checkbox-box::after {
+  content: '';
+  width: 5px;
+  height: 9px;
+  border: solid #ffffff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  margin-bottom: 2px;
+}
+
+.admin-checkbox-label {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #1e293b;
+  letter-spacing: 0.3px;
+}
+
+.admin-modal-actions-bar {
+  padding: 14px 20px 20px;
+  border-top: 1px solid #f1f5f9;
+}
+
+

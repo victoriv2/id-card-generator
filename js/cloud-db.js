@@ -152,8 +152,11 @@
     async getSchoolsByCategory(category) {
       const allSchools = await this.loadSchools();
       if (!category || category === 'ALL') return allSchools;
-      const targetCat = category.toUpperCase();
-      return allSchools.filter(s => (s.category || '').toUpperCase() === targetCat);
+      const targetCat = category.toUpperCase().trim();
+      return allSchools.filter(s => {
+        const cats = (s.category || '').toUpperCase().split(',').map(c => c.trim());
+        return cats.includes(targetCat);
+      });
     },
 
     async loadSchools() {
@@ -175,16 +178,37 @@
       return this.getLocalSchools();
     },
 
-    async addSchool(name, category) {
+    async addSchool(name, categories) {
       const cleanName = (name || '').trim().toUpperCase();
-      const cleanCat = (category || 'STUDENT').trim().toUpperCase();
+      let catsArray = Array.isArray(categories) ? categories : (categories ? String(categories).split(',') : ['STUDENT']);
+      catsArray = catsArray.map(c => c.trim().toUpperCase()).filter(Boolean);
+      if (catsArray.length === 0) catsArray = ['STUDENT'];
+      const cleanCat = catsArray.join(', ');
+
       if (!cleanName) throw new Error('School/Chapter name is required');
 
       let current = this.getLocalSchools();
-      // Avoid exact duplicate
-      const exists = current.some(s => s.name.toUpperCase() === cleanName && s.category.toUpperCase() === cleanCat);
-      if (exists) {
-        throw new Error(`"${cleanName}" already exists under ${cleanCat}`);
+      const existingIdx = current.findIndex(s => s.name.toUpperCase() === cleanName);
+      if (existingIdx >= 0) {
+        const existing = current[existingIdx];
+        if (existing.category.toUpperCase() === cleanCat) {
+          throw new Error(`"${cleanName}" is already registered under ${cleanCat}`);
+        }
+        // Update category on existing school
+        existing.category = cleanCat;
+        this.saveLocalSchools(current);
+        try {
+          if (existing.id && !existing.id.startsWith('sch-')) {
+            await supabaseRequest(`schools?id=eq.${encodeURIComponent(existing.id)}`, {
+              method: 'PATCH',
+              headers: { 'Prefer': 'return=representation' },
+              body: JSON.stringify({ category: cleanCat })
+            });
+          }
+        } catch (err) {
+          console.warn('[CloudDB] Supabase school update deferred:', err);
+        }
+        return existing;
       }
 
       const tempItem = {

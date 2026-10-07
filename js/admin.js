@@ -359,12 +359,95 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // -------------------------------------------------------------------------
-  // Filter & Search Event Listeners
+  // Filter & Search Event Listeners & Modals
   // -------------------------------------------------------------------------
   if (searchInput) searchInput.addEventListener('input', renderTable);
-  if (filterCategory) filterCategory.addEventListener('change', renderTable);
-  if (filterPayment) filterPayment.addEventListener('change', renderTable);
-  if (sortOrder) sortOrder.addEventListener('change', renderTable);
+
+  function setupAdminSelectModal(config) {
+    const trigger = document.getElementById(config.triggerId);
+    const textEl = document.getElementById(config.textId);
+    const hiddenInput = document.getElementById(config.hiddenInputId);
+    const modal = document.getElementById(config.modalId);
+    const closeBtn = document.getElementById(config.closeBtnId);
+    const optionsList = document.getElementById(config.optionsListId);
+    if (!trigger || !modal) return;
+
+    function openModal() {
+      modal.style.display = 'flex';
+    }
+
+    function closeModal() {
+      modal.style.display = 'none';
+    }
+
+    trigger.addEventListener('click', openModal);
+    trigger.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openModal();
+      }
+    });
+
+    if (closeBtn) {
+      closeBtn.addEventListener('click', closeModal);
+    }
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    if (optionsList) {
+      optionsList.querySelectorAll('.simple-modal-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const val = btn.getAttribute('data-val');
+          const label = btn.textContent.trim();
+          optionsList.querySelectorAll('.simple-modal-option').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+
+          if (hiddenInput) hiddenInput.value = val;
+          if (textEl) textEl.textContent = label;
+
+          closeModal();
+          if (typeof config.onChange === 'function') {
+            config.onChange(val);
+          }
+        });
+      });
+    }
+  }
+
+  // Records Category Filter Modal
+  setupAdminSelectModal({
+    triggerId: 'filterCategoryTrigger',
+    textId: 'filterCategoryText',
+    hiddenInputId: 'filterCategory',
+    modalId: 'adminCatFilterModal',
+    closeBtnId: 'btnCloseAdminCatFilterModal',
+    optionsListId: 'adminCatFilterList',
+    onChange: () => renderTable()
+  });
+
+  // Records Payment Filter Modal
+  setupAdminSelectModal({
+    triggerId: 'filterPaymentTrigger',
+    textId: 'filterPaymentText',
+    hiddenInputId: 'filterPayment',
+    modalId: 'adminPayFilterModal',
+    closeBtnId: 'btnCloseAdminPayFilterModal',
+    optionsListId: 'adminPayFilterList',
+    onChange: () => renderTable()
+  });
+
+  // Records Sort Order Modal
+  setupAdminSelectModal({
+    triggerId: 'sortOrderTrigger',
+    textId: 'sortOrderText',
+    hiddenInputId: 'sortOrder',
+    modalId: 'adminSortModal',
+    closeBtnId: 'btnCloseAdminSortModal',
+    optionsListId: 'adminSortList',
+    onChange: () => renderTable()
+  });
 
   // -------------------------------------------------------------------------
   // Adjust Price
@@ -459,7 +542,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const catFilter = filterSchoolCat ? filterSchoolCat.value : 'ALL';
     const filtered = allSchools.filter(s => {
       if (catFilter === 'ALL') return true;
-      return (s.category || '').toUpperCase() === catFilter.toUpperCase();
+      const cats = (s.category || '').toUpperCase().split(',').map(c => c.trim());
+      return cats.includes(catFilter.toUpperCase());
     });
 
     if (schoolDirectoryCount) {
@@ -481,13 +565,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     adminSchoolsTableBody.innerHTML = filtered.map(s => {
-      const cat = (s.category || 'STUDENT').toUpperCase();
-      const badgeClass = cat.toLowerCase();
+      const rawCat = (s.category || 'STUDENT').toUpperCase();
+      const catList = rawCat.split(',').map(c => c.trim()).filter(Boolean);
+      const badgesHtml = catList.map(c => {
+        const badgeClass = c.toLowerCase();
+        return `<span class="admin-school-cat-badge ${escapeHtml(badgeClass)}">${escapeHtml(c)}</span>`;
+      }).join(' ');
       const idParam = s.id || s.name;
       return `
         <tr>
           <td style="font-weight: 700; color: #0f172a;">${escapeHtml(s.name)}</td>
-          <td><span class="admin-school-cat-badge ${badgeClass}">${cat}</span></td>
+          <td><div style="display: flex; flex-wrap: wrap; gap: 4px;">${badgesHtml}</div></td>
           <td style="text-align: center;">
             <button type="button" class="btn-del-school" data-school-id="${escapeHtml(idParam)}" data-school-name="${escapeHtml(s.name)}" title="Delete from directory">
               Delete
@@ -520,15 +608,93 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  if (filterSchoolCat) {
-    filterSchoolCat.addEventListener('change', renderSchoolsTable);
+  // School Directory Category Filter Modal
+  setupAdminSelectModal({
+    triggerId: 'filterSchoolCatTrigger',
+    textId: 'filterSchoolCatText',
+    hiddenInputId: 'filterSchoolCat',
+    modalId: 'adminSchoolCatFilterModal',
+    closeBtnId: 'btnCloseAdminSchoolCatFilterModal',
+    optionsListId: 'adminSchoolCatFilterList',
+    onChange: () => renderSchoolsTable()
+  });
+
+  // -------------------------------------------------------------------------
+  // Multi-Category Selection Modal (For Adding School / Chapter)
+  // -------------------------------------------------------------------------
+  const selectNewSchoolCategoryTrigger = document.getElementById('selectNewSchoolCategoryTrigger');
+  const selectedNewSchoolCategoryText = document.getElementById('selectedNewSchoolCategoryText');
+  const adminMultiCatModal = document.getElementById('adminMultiCatModal');
+  const btnCloseAdminMultiCatModal = document.getElementById('btnCloseAdminMultiCatModal');
+  const btnApplyAdminMultiCat = document.getElementById('btnApplyAdminMultiCat');
+  const multiCatCheckboxes = document.querySelectorAll('#adminMultiCatOptionsList input[type="checkbox"]');
+
+  function openMultiCatModal() {
+    if (!adminMultiCatModal) return;
+    const currentVal = (selectNewSchoolCategory ? selectNewSchoolCategory.value : 'STUDENT').toUpperCase();
+    const currentCats = currentVal.split(',').map(c => c.trim());
+    multiCatCheckboxes.forEach(cb => {
+      cb.checked = currentCats.includes(cb.value.toUpperCase());
+    });
+    adminMultiCatModal.style.display = 'flex';
+  }
+
+  function closeMultiCatModal() {
+    if (adminMultiCatModal) adminMultiCatModal.style.display = 'none';
+  }
+
+  if (selectNewSchoolCategoryTrigger) {
+    selectNewSchoolCategoryTrigger.addEventListener('click', openMultiCatModal);
+    selectNewSchoolCategoryTrigger.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openMultiCatModal();
+      }
+    });
+  }
+
+  if (btnCloseAdminMultiCatModal) {
+    btnCloseAdminMultiCatModal.addEventListener('click', closeMultiCatModal);
+  }
+
+  if (adminMultiCatModal) {
+    adminMultiCatModal.addEventListener('click', (e) => {
+      if (e.target === adminMultiCatModal) closeMultiCatModal();
+    });
+  }
+
+  if (btnApplyAdminMultiCat) {
+    btnApplyAdminMultiCat.addEventListener('click', () => {
+      const selected = Array.from(multiCatCheckboxes)
+        .filter(cb => cb.checked)
+        .map(cb => cb.value.toUpperCase());
+
+      if (selected.length === 0) {
+        showModalAlert('Please select at least one category.', { type: 'warning' });
+        return;
+      }
+
+      const combined = selected.join(', ');
+      if (selectNewSchoolCategory) selectNewSchoolCategory.value = combined;
+      if (selectedNewSchoolCategoryText) selectedNewSchoolCategoryText.textContent = combined;
+      closeMultiCatModal();
+    });
+  }
+
+  function resetNewSchoolForm() {
+    if (inputNewSchoolName) inputNewSchoolName.value = '';
+    if (selectNewSchoolCategory) selectNewSchoolCategory.value = 'STUDENT';
+    if (selectedNewSchoolCategoryText) selectedNewSchoolCategoryText.textContent = 'STUDENT';
+    multiCatCheckboxes.forEach(cb => {
+      cb.checked = cb.value.toUpperCase() === 'STUDENT';
+    });
   }
 
   if (formAddSchool) {
     formAddSchool.addEventListener('submit', async (e) => {
       e.preventDefault();
       const name = (inputNewSchoolName ? inputNewSchoolName.value : '').trim().toUpperCase();
-      const category = (selectNewSchoolCategory ? selectNewSchoolCategory.value : 'STUDENT').toUpperCase();
+      const category = (selectNewSchoolCategory ? selectNewSchoolCategory.value : 'STUDENT').trim();
 
       if (!name) {
         showModalAlert('Please enter the School / Chapter name.', { type: 'warning' });
@@ -538,10 +704,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       try {
         await CloudDB.addSchool(name, category);
-        if (inputNewSchoolName) inputNewSchoolName.value = '';
+        resetNewSchoolForm();
         allSchools = await CloudDB.loadSchools();
         renderSchoolsTable();
-        showModalAlert(`Successfully added "${name}" under category ${category}! Members will now see this in the ID card generator.`, {
+        showModalAlert(`Successfully added "${name}" under [${category}]! Members will now see this in the ID card generator.`, {
           title: 'School Added',
           type: 'success'
         });
