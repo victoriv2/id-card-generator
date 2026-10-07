@@ -253,7 +253,7 @@
             </p>
 
             <!-- Create New School Form -->
-            <form id="formAddSchool" class="admin-school-create-form">
+            <form id="formAddSchool" class="admin-school-create-form" onsubmit="return false;">
               <div class="admin-school-inputs-grid">
                 <div class="admin-school-input-wrap">
                   <label for="inputNewSchoolName">School / Chapter Name</label>
@@ -262,12 +262,12 @@
                 <div class="admin-school-input-wrap">
                   <label for="selectNewSchoolCategoryTrigger">Categories / Roles (Multi-Select)</label>
                   <div class="select-modal-trigger admin-modal-trigger" id="selectNewSchoolCategoryTrigger" role="button" tabindex="0">
-                    <span id="selectedNewSchoolCategoryText">STUDENT</span>
+                    <span id="selectedNewSchoolCategoryText" style="color: #94a3b8;">Select Category / Role...</span>
                     <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
                   </div>
-                  <input type="hidden" id="selectNewSchoolCategory" value="STUDENT">
+                  <input type="hidden" id="selectNewSchoolCategory" value="">
                 </div>
-                <button type="submit" id="btnAddSchool" class="btn-admin-action btn-add-school">
+                <button type="button" id="btnAddSchool" class="btn-admin-action btn-add-school">
                   <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
                   Add School / Chapter
                 </button>
@@ -354,7 +354,7 @@
         </p>
         <div class="admin-multi-cat-list" id="adminMultiCatOptionsList">
           <label class="admin-checkbox-item">
-            <input type="checkbox" value="STUDENT" checked>
+            <input type="checkbox" value="STUDENT">
             <span class="admin-checkbox-box"></span>
             <span class="admin-checkbox-label">STUDENT</span>
           </label>

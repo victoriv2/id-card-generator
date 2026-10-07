@@ -206,22 +206,20 @@
       const existingIdx = current.findIndex(s => s.name.toUpperCase() === cleanName);
       if (existingIdx >= 0) {
         const existing = current[existingIdx];
-        if (existing.category.toUpperCase() === cleanCat) {
-          throw new Error(`"${cleanName}" is already registered under ${cleanCat}`);
-        }
-        // Update category on existing school
-        existing.category = cleanCat;
-        this.saveLocalSchools(current);
-        try {
-          if (existing.id && !existing.id.startsWith('sch-')) {
-            await supabaseRequest(`schools?id=eq.${encodeURIComponent(existing.id)}`, {
-              method: 'PATCH',
-              headers: { 'Prefer': 'return=representation' },
-              body: JSON.stringify({ category: cleanCat })
-            });
+        if (existing.category.toUpperCase() !== cleanCat) {
+          existing.category = cleanCat;
+          this.saveLocalSchools(current);
+          try {
+            if (existing.id && !existing.id.startsWith('sch-')) {
+              await supabaseRequest(`schools?id=eq.${encodeURIComponent(existing.id)}`, {
+                method: 'PATCH',
+                headers: { 'Prefer': 'return=representation' },
+                body: JSON.stringify({ category: cleanCat })
+              });
+            }
+          } catch (err) {
+            console.warn('[CloudDB] Supabase school update deferred:', err);
           }
-        } catch (err) {
-          console.warn('[CloudDB] Supabase school update deferred:', err);
         }
         return existing;
       }

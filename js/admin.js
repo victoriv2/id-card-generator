@@ -154,21 +154,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       inputPrice.value = CloudDB.getPrice();
     }
 
-    // 2. Load cards from local + cloud
+    // 2. Load cards from local
     allCards = CloudDB.getLocalCards();
     updateStatsAndRender();
-    await loadSchoolsDirectory();
 
-    // Trigger background cloud sync
-    try {
-      if (syncStatus) syncStatus.textContent = '● Syncing with Cloud...';
-      allCards = await CloudDB.loadFromCloud();
-      if (syncStatus) syncStatus.textContent = '● Online & Synchronized';
-      updateStatsAndRender();
-      await loadSchoolsDirectory();
-    } catch (e) {
-      if (syncStatus) syncStatus.textContent = '● Offline / Local Storage';
-    }
+    // 3. Load schools directory immediately
+    loadSchoolsDirectory();
+
+    // 4. Trigger background cloud sync for cards & settings
+    CloudDB.loadFromCloud().then(cards => {
+      if (Array.isArray(cards)) {
+        allCards = cards;
+        updateStatsAndRender();
+      }
+    }).catch(e => console.warn('[CloudDB] Cards load deferred:', e));
   }
 
   function updateStatsAndRender() {
@@ -701,8 +700,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function openMultiCatModal() {
     if (!adminMultiCatModal) return;
-    const currentVal = (selectNewSchoolCategory ? selectNewSchoolCategory.value : 'STUDENT').toUpperCase();
-    const currentCats = currentVal.split(',').map(c => c.trim());
+    const currentVal = (selectNewSchoolCategory ? selectNewSchoolCategory.value : '').toUpperCase().trim();
+    const currentCats = currentVal ? currentVal.split(',').map(c => c.trim()) : [];
     multiCatCheckboxes.forEach(cb => {
       cb.checked = currentCats.includes(cb.value.toUpperCase());
     });
@@ -759,27 +758,39 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const combined = selected.join(', ');
       if (selectNewSchoolCategory) selectNewSchoolCategory.value = combined;
-      if (selectedNewSchoolCategoryText) selectedNewSchoolCategoryText.textContent = combined;
+      if (selectedNewSchoolCategoryText) {
+        selectedNewSchoolCategoryText.textContent = combined;
+        selectedNewSchoolCategoryText.style.color = '#0f172a';
+      }
       closeMultiCatModal();
     });
   }
 
   function resetNewSchoolForm() {
     if (inputNewSchoolName) inputNewSchoolName.value = '';
-    if (selectNewSchoolCategory) selectNewSchoolCategory.value = 'STUDENT';
-    if (selectedNewSchoolCategoryText) selectedNewSchoolCategoryText.textContent = 'STUDENT';
+    if (selectNewSchoolCategory) selectNewSchoolCategory.value = '';
+    if (selectedNewSchoolCategoryText) {
+      selectedNewSchoolCategoryText.textContent = 'Select Category / Role...';
+      selectedNewSchoolCategoryText.style.color = '#94a3b8';
+    }
     multiCatCheckboxes.forEach(cb => {
-      cb.checked = cb.value.toUpperCase() === 'STUDENT';
+      cb.checked = false;
     });
   }
 
   async function handleAddSchool() {
     const name = (inputNewSchoolName ? inputNewSchoolName.value : '').trim().toUpperCase();
-    const category = (selectNewSchoolCategory ? selectNewSchoolCategory.value : 'STUDENT').trim();
+    const category = (selectNewSchoolCategory ? selectNewSchoolCategory.value : '').trim();
 
     if (!name) {
       showModalAlert('Please enter the School / Chapter name.', { type: 'warning' });
       if (inputNewSchoolName) inputNewSchoolName.focus();
+      return;
+    }
+
+    if (!category) {
+      showModalAlert('Please select at least one Category / Role for this School / Chapter.', { type: 'warning' });
+      openMultiCatModal();
       return;
     }
 
