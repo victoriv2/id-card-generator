@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       } else {
         if (loginErrorMsg) {
           loginErrorMsg.style.display = 'block';
-          loginErrorMsg.textContent = 'Invalid username or password.';
+          loginErrorMsg.textContent = 'Invalid username or password. Default credentials: admin / admin123';
         }
       }
     });
@@ -196,7 +196,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (c.isPaid) {
         paidCount++;
-        revenueSum += (parseInt(c.amountPaid, 10) || CloudDB.getPrice());
+        const isFree = c.amountPaid === 0 || c.paymentRef === 'FREE_ISSUANCE';
+        const amt = isFree ? 0 : (c.amountPaid != null ? Number(c.amountPaid) : CloudDB.getPrice());
+        revenueSum += amt;
       }
     });
 
@@ -288,16 +290,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         : 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="%2394a3b8"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
 
       const isPaid = !!card.isPaid;
+      const isFree = isPaid && (card.amountPaid === 0 || card.paymentRef === 'FREE_ISSUANCE');
       const statusBadge = isPaid
-        ? `<span class="badge-paid"><svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> PAID</span>`
+        ? (isFree
+            ? `<span class="badge-paid" style="background: #e0f2fe; color: #0369a1; border-color: #bae6fd;"><svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> FREE</span>`
+            : `<span class="badge-paid"><svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> PAID</span>`)
         : `<span class="badge-pending"><svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg> UNPAID</span>`;
 
-      const paymentMeta = isPaid && card.paymentRef
+      const paymentMeta = isPaid && card.paymentRef && !isFree
         ? `<div style="font-size: 0.72rem; color: #64748b; margin-top: 3px;">Ref: ${card.paymentRef.substring(0, 14)}...</div>`
-        : '';
+        : (isFree ? `<div style="font-size: 0.72rem; color: #0284c7; margin-top: 3px;">Free Issuance</div>` : '');
 
       const amountDisplay = isPaid
-        ? `₦${formatNaira(card.amountPaid || CloudDB.getPrice())}`
+        ? (isFree ? '₦0' : `₦${formatNaira(card.amountPaid || CloudDB.getPrice())}`)
         : '—';
 
       tr.innerHTML = `
@@ -559,8 +564,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             'Category': (c.category || 'MEMBER').toUpperCase(),
             'State': c.state || 'N/A',
             'School / Chapter / Branch': c.school || 'N/A',
-            'Payment Status': c.isPaid ? 'PAID' : 'UNPAID',
-            'Amount Paid (₦)': c.isPaid ? (parseInt(c.amountPaid, 10) || CloudDB.getPrice()) : 0,
+            'Payment Status': c.isPaid ? ((c.amountPaid === 0 || c.paymentRef === 'FREE_ISSUANCE') ? 'FREE' : 'PAID') : 'UNPAID',
+            'Amount Paid (₦)': c.isPaid ? ((c.amountPaid === 0 || c.paymentRef === 'FREE_ISSUANCE') ? 0 : (c.amountPaid != null ? Number(c.amountPaid) : CloudDB.getPrice())) : 0,
             'Paystack Reference': c.paymentRef || 'N/A',
             'Payer Email': c.payerEmail || '',
             'Date Issued': c.dateIssued || c.savedAt || 'N/A'
@@ -603,8 +608,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         `"${(c.category || 'MEMBER').replace(/"/g, '""')}"`,
         `"${(c.state || '').replace(/"/g, '""')}"`,
         `"${(c.school || '').replace(/"/g, '""')}"`,
-        `"${c.isPaid ? 'PAID' : 'UNPAID'}"`,
-        `"${c.isPaid ? (c.amountPaid || CloudDB.getPrice()) : 0}"`,
+        `"${c.isPaid ? ((c.amountPaid === 0 || c.paymentRef === 'FREE_ISSUANCE') ? 'FREE' : 'PAID') : 'UNPAID'}"`,
+        `"${c.isPaid ? ((c.amountPaid === 0 || c.paymentRef === 'FREE_ISSUANCE') ? 0 : (c.amountPaid != null ? Number(c.amountPaid) : CloudDB.getPrice())) : 0}"`,
         `"${(c.paymentRef || 'N/A').replace(/"/g, '""')}"`,
         `"${(c.payerEmail || '').replace(/"/g, '""')}"`,
         `"${(c.dateIssued || c.savedAt || '').replace(/"/g, '""')}"`

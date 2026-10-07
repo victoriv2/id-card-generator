@@ -55,6 +55,25 @@
    * Convert client camelCase card record to Supabase snake_case row
    */
   function toRow(c) {
+    let savedIso = new Date().toISOString();
+    try {
+      if (c.savedAt || c.saved_at) {
+        const d = new Date(c.savedAt || c.saved_at);
+        if (!isNaN(d.getTime())) savedIso = d.toISOString();
+      }
+    } catch (e) {}
+
+    let paidIso = null;
+    try {
+      if (c.paidAt || c.paid_at) {
+        const d = new Date(c.paidAt || c.paid_at);
+        if (!isNaN(d.getTime())) paidIso = d.toISOString();
+      }
+    } catch (e) {}
+
+    const isFree = (c.amountPaid === 0 || c.paymentRef === 'FREE_ISSUANCE');
+    const amountVal = isFree ? 0 : (c.amountPaid != null ? Number(c.amountPaid) : DEFAULT_PRICE_NGN);
+
     return {
       id: c.id,
       name: c.name || 'UNKNOWN',
@@ -66,10 +85,10 @@
       photo: c.photo || '',
       is_paid: !!(c.isPaid || c.is_paid),
       payment_ref: c.paymentRef || c.payment_ref || null,
-      amount_paid: c.amountPaid != null ? Number(c.amountPaid) : DEFAULT_PRICE_NGN,
+      amount_paid: amountVal,
       payer_email: c.payerEmail || c.payer_email || null,
-      paid_at: c.paidAt || c.paid_at || null,
-      saved_at: c.savedAt ? new Date(c.savedAt).toISOString() : new Date().toISOString(),
+      paid_at: paidIso,
+      saved_at: savedIso,
       updated_at: new Date().toISOString()
     };
   }
@@ -78,6 +97,7 @@
    * Convert Supabase snake_case row to client camelCase card record
    */
   function fromRow(r) {
+    const isFree = (r.amount_paid === 0 || r.payment_ref === 'FREE_ISSUANCE');
     return {
       id: r.id,
       name: r.name,
@@ -89,7 +109,7 @@
       photo: r.photo || '',
       isPaid: !!r.is_paid,
       paymentRef: r.payment_ref || '',
-      amountPaid: r.amount_paid != null ? Number(r.amount_paid) : DEFAULT_PRICE_NGN,
+      amountPaid: isFree ? 0 : (r.amount_paid != null ? Number(r.amount_paid) : DEFAULT_PRICE_NGN),
       payerEmail: r.payer_email || '',
       paidAt: r.paid_at || '',
       savedAt: r.saved_at || r.created_at || new Date().toISOString()
@@ -376,16 +396,23 @@
       const cards = this.getLocalCards();
       const idx = cards.findIndex(c => c.id === record.id);
 
+      let savedRecord;
       if (idx >= 0) {
-        if (cards[idx].isPaid && !record.isPaid) {
+        const existing = cards[idx];
+        if (existing.isPaid) {
           record.isPaid = true;
-          record.paymentRef = cards[idx].paymentRef || record.paymentRef;
-          record.amountPaid = cards[idx].amountPaid || record.amountPaid;
-          record.paidAt = cards[idx].paidAt || record.paidAt;
+          if (!record.paymentRef) record.paymentRef = existing.paymentRef;
+          if (record.amountPaid === undefined || record.amountPaid === null) record.amountPaid = existing.amountPaid;
+          if (!record.paidAt) record.paidAt = existing.paidAt;
         }
-        cards[idx] = { ...cards[idx], ...record };
+        Object.keys(record).forEach(k => {
+          if (record[k] === undefined) delete record[k];
+        });
+        cards[idx] = { ...existing, ...record };
+        savedRecord = cards[idx];
       } else {
         cards.unshift(record);
+        savedRecord = record;
       }
 
       this.saveLocalCards(cards);
@@ -395,11 +422,12 @@
         await supabaseRequest('cards', {
           method: 'POST',
           headers: { 'Prefer': 'resolution=merge-duplicates,return=representation' },
-          body: JSON.stringify(toRow(record))
+          body: JSON.stringify(toRow(savedRecord))
         });
       } catch (err) {
         console.warn('[CloudDB] Supabase card save deferred:', err);
       }
+      return savedRecord;
     },
 
     /**
@@ -408,11 +436,12 @@
     async markCardPaid(id, paymentInfo = {}) {
       const cards = this.getLocalCards();
       const idx = cards.findIndex(c => c.id === id);
+      const nowIso = new Date().toISOString();
       const paidData = {
         isPaid: true,
         paymentRef: paymentInfo.reference || `PAY-${Date.now()}`,
-        amountPaid: paymentInfo.amount || this.getPrice(),
-        paidAt: new Date().toLocaleString(),
+        amountPaid: paymentInfo.amount != null ? Number(paymentInfo.amount) : this.getPrice(),
+        paidAt: nowIso,
         payerEmail: paymentInfo.email || ''
       };
 
@@ -424,7 +453,7 @@
         fullRecord = {
           id,
           ...paidData,
-          savedAt: new Date().toLocaleString()
+          savedAt: nowIso
         };
         cards.unshift(fullRecord);
       }

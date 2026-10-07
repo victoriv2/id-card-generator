@@ -1096,6 +1096,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const dateIssued = inputDateIssued ? inputDateIssued.value.trim() : '';
     const photo = hasPassport && passportImg ? passportImg.src : '';
 
+    const isPaywallActive = window.CloudDB && typeof CloudDB.isPaywallEnabled === 'function'
+      ? CloudDB.isPaywallEnabled()
+      : true;
+
+    const existingCard = window.CloudDB ? (CloudDB.getLocalCards() || []).find(c => c.id === id) : null;
+    const existingPaid = !!(existingCard && existingCard.isPaid);
+    const isFreeMode = !isPaywallActive;
+    const isPaid = existingPaid || isFreeMode;
+
+    let paymentRef = null;
+    let amountPaid = undefined;
+    let paidAt = null;
+
+    if (existingPaid) {
+      paymentRef = existingCard.paymentRef || null;
+      amountPaid = existingCard.amountPaid;
+      paidAt = existingCard.paidAt || null;
+    } else if (isFreeMode) {
+      paymentRef = 'FREE_ISSUANCE';
+      amountPaid = 0;
+      paidAt = new Date().toISOString();
+    }
+
     const record = {
       id: id || `SPA/ID/${Date.now()}`,
       name: name || 'UNKNOWN',
@@ -1105,7 +1128,11 @@ document.addEventListener('DOMContentLoaded', () => {
       dateIssued,
       status: 'ACTIVE',
       photo,
-      savedAt: new Date().toLocaleString()
+      isPaid: isPaid,
+      paymentRef: paymentRef,
+      amountPaid: amountPaid,
+      paidAt: paidAt,
+      savedAt: new Date().toISOString()
     };
 
     advanceCardSequenceIfCurrent(record.id);
