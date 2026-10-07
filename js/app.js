@@ -685,11 +685,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateAutoCredentials();
         syncOverlay();
         notify(`Category selected: ${cat}`);
-
-        // Automatically open the matching school selection modal for seamless experience
-        setTimeout(() => {
-          openSchoolModal();
-        }, 220);
       });
     });
   }
