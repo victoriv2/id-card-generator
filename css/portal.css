@@ -76,13 +76,13 @@
 }
 
 .portal-card:hover {
-  box-shadow: 0 12px 24px -6px rgba(11, 61, 35, 0.1);
   border-color: #0b3d23;
+  transform: none;
 }
 
 .portal-card.retrieve-card:hover {
   border-color: #b45309;
-  box-shadow: 0 12px 24px -6px rgba(180, 83, 9, 0.12);
+  transform: none;
 }
 
 .portal-card-icon {
@@ -272,7 +272,7 @@
 
 .portal-search-btn:hover {
   background: linear-gradient(135deg, #062b17 0%, #166534 100%);
-  box-shadow: 0 4px 12px rgba(11, 61, 35, 0.25);
+  transform: none;
 }
 
 .portal-search-btn:active {
@@ -422,4 +422,15 @@
 
 @keyframes portalSpin {
   to { transform: rotate(360deg); }
+}
+
+/* Prevent any upward float or transform movement on hover across portal */
+button:hover,
+a:hover,
+.portal-card:hover,
+.portal-btn:hover,
+.portal-search-btn:hover,
+.portal-record-btn:hover,
+.portal-record-item:hover {
+  transform: none !important;
 }

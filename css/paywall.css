@@ -118,7 +118,8 @@
 
 .btn-paystack-pay:hover {
   background: linear-gradient(135deg, #14532d 0%, #16a34a 100%);
-  box-shadow: 0 4px 18px rgba(11, 61, 35, 0.38);
+  box-shadow: 0 4px 16px rgba(11, 61, 35, 0.32);
+  transform: none;
 }
 
 .btn-paystack-pay:active {
@@ -205,4 +206,11 @@
 
 .paywall-free-banner svg {
   flex-shrink: 0;
+}
+
+/* Prevent any upward float or transform movement on hover */
+button:hover,
+a:hover,
+.btn-paystack-pay:hover {
+  transform: none !important;
 }

@@ -150,3 +150,8 @@
   outline: 3px solid rgba(212, 175, 55, 0.6);
   outline-offset: 2px;
 }
+
+/* Prevent any upward float or transform movement on hover */
+.spn-modal-alert-btn:hover {
+  transform: none !important;
+}

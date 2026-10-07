@@ -142,7 +142,8 @@ body {
   background: var(--gold-accent, #cda434);
   color: var(--primary-green-dark, #072a18);
   border-color: var(--gold-accent, #cda434);
-  box-shadow: 0 4px 12px rgba(205, 164, 52, 0.35);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transform: none;
 }
 
 /* Header Responsiveness */
@@ -1312,7 +1313,8 @@ body {
 
 .btn-paystack-pay:hover {
   background: linear-gradient(135deg, #14532d 0%, #16a34a 100%);
-  box-shadow: 0 4px 18px rgba(11, 61, 35, 0.38);
+  box-shadow: 0 4px 14px rgba(11, 61, 35, 0.3);
+  transform: none;
 }
 
 .paywall-verified-box {
@@ -1385,4 +1387,18 @@ body {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
+}
+
+/* Prevent any upward float or transform movement on hover */
+button:hover,
+a:hover,
+.btn-primary-action:hover,
+.btn-secondary-action:hover,
+.btn-gold-action:hover,
+.btn-jpeg-action:hover,
+.btn-jpeg-secondary:hover,
+.btn-header-action:hover,
+.btn-header-reset:hover,
+.btn-paystack-pay:hover {
+  transform: none !important;
 }
