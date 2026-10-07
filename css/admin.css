@@ -453,6 +453,11 @@ body.admin-body {
   color: #15803d;
 }
 
+.admin-header-icon.red {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
 .admin-cat-pills-list {
   display: flex;
   flex-wrap: wrap;
@@ -595,6 +600,49 @@ body.admin-body {
 
 .btn-admin-action:hover {
   background: #14532d;
+}
+
+/* Danger Zone Card & Buttons */
+.admin-panel-card-danger {
+  border: 1.5px solid #fecaca !important;
+  background: #fffafa !important;
+}
+
+.admin-panel-card-danger:hover {
+  border-color: #fca5a5 !important;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.08) !important;
+}
+
+.btn-admin-danger {
+  padding: 12px 20px;
+  border-radius: 10px;
+  background: #dc2626;
+  color: #ffffff;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-admin-danger:hover {
+  background: #b91c1c;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+  transform: translateY(-1px);
+}
+
+.btn-admin-danger:active {
+  transform: translateY(0);
+}
+
+.btn-admin-danger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 /* Export as Excel Button */

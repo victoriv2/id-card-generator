@@ -940,5 +940,115 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
   }
+
+  // -------------------------------------------------------------------------
+  // Factory Reset Danger Zone
+  // -------------------------------------------------------------------------
+  const btnOpenFactoryResetModal = document.getElementById('btnOpenFactoryResetModal');
+  const adminResetModal = document.getElementById('adminResetModal');
+  const btnCloseAdminResetModal = document.getElementById('btnCloseAdminResetModal');
+  const btnCancelFactoryReset = document.getElementById('btnCancelFactoryReset');
+  const btnConfirmFactoryReset = document.getElementById('btnConfirmFactoryReset');
+  const inputResetConfirmText = document.getElementById('inputResetConfirmText');
+
+  function openFactoryResetModal() {
+    if (inputResetConfirmText) {
+      inputResetConfirmText.value = '';
+    }
+    if (adminResetModal) {
+      adminResetModal.style.display = 'flex';
+    }
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => {
+      if (inputResetConfirmText) inputResetConfirmText.focus();
+    }, 100);
+  }
+
+  function closeFactoryResetModal() {
+    if (adminResetModal) {
+      adminResetModal.style.display = 'none';
+    }
+    document.body.style.overflow = '';
+  }
+
+  if (btnOpenFactoryResetModal) {
+    btnOpenFactoryResetModal.addEventListener('click', openFactoryResetModal);
+  }
+  if (btnCloseAdminResetModal) {
+    btnCloseAdminResetModal.addEventListener('click', closeFactoryResetModal);
+  }
+  if (btnCancelFactoryReset) {
+    btnCancelFactoryReset.addEventListener('click', closeFactoryResetModal);
+  }
+  if (adminResetModal) {
+    adminResetModal.addEventListener('click', (e) => {
+      if (e.target === adminResetModal) closeFactoryResetModal();
+    });
+  }
+
+  async function handleConfirmFactoryReset() {
+    const confirmVal = (inputResetConfirmText ? inputResetConfirmText.value : '').trim().toUpperCase();
+    if (confirmVal !== 'RESET') {
+      showModalAlert('Please type "RESET" into the confirmation box to proceed.', {
+        title: 'Confirmation Required',
+        type: 'warning'
+      });
+      if (inputResetConfirmText) inputResetConfirmText.focus();
+      return;
+    }
+
+    if (btnConfirmFactoryReset) {
+      btnConfirmFactoryReset.disabled = true;
+      btnConfirmFactoryReset.innerText = 'Resetting Data...';
+    }
+
+    try {
+      const resetResult = await CloudDB.factoryReset();
+
+      // Reset in-memory admin state
+      allCards = [];
+      allSchools = [];
+
+      // Reset UI controls
+      if (inputPrice) {
+        inputPrice.value = (resetResult.price || 1500).toString();
+      }
+
+      // Re-render UI components
+      updateStatsAndRender();
+      renderSchoolsTable();
+
+      closeFactoryResetModal();
+
+      showModalAlert('Factory reset complete! All registered cards, school directory entries, and system settings have been restored to initial defaults.', {
+        title: 'Factory Reset Complete',
+        type: 'success'
+      });
+    } catch (err) {
+      console.error('[Admin] Factory reset error:', err);
+      showModalAlert(err.message || 'An error occurred while resetting project data.', {
+        title: 'Reset Failed',
+        type: 'error'
+      });
+    } finally {
+      if (btnConfirmFactoryReset) {
+        btnConfirmFactoryReset.disabled = false;
+        btnConfirmFactoryReset.innerText = 'Confirm & Reset All Data';
+      }
+    }
+  }
+
+  if (btnConfirmFactoryReset) {
+    btnConfirmFactoryReset.addEventListener('click', handleConfirmFactoryReset);
+  }
+
+  if (inputResetConfirmText) {
+    inputResetConfirmText.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleConfirmFactoryReset();
+      }
+    });
+  }
 });
 

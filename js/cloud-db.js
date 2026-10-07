@@ -518,6 +518,52 @@
       }
 
       return this.getLocalCards();
+    },
+
+    /**
+     * Complete Factory Reset:
+     * - Clears all cards/members in LocalStorage and Supabase
+     * - Clears all schools/chapters/branches in LocalStorage and Supabase
+     * - Resets card counter in LocalStorage
+     * - Resets card price to DEFAULT_PRICE_NGN (1500) in LocalStorage and Supabase
+     */
+    async factoryReset() {
+      // 1. Wipe local storage
+      localStorage.removeItem(STORAGE_KEYS.RECORDS);
+      localStorage.removeItem(STORAGE_KEYS.SCHOOLS);
+      localStorage.removeItem('spa_card_counter');
+      localStorage.setItem(STORAGE_KEYS.PRICE, DEFAULT_PRICE_NGN.toString());
+
+      // 2. Wipe Supabase Cloud records
+      try {
+        await supabaseRequest('cards?id=not.is.null', { method: 'DELETE' });
+      } catch (err) {
+        console.warn('[CloudDB] Factory reset cards deletion error:', err);
+      }
+
+      try {
+        await supabaseRequest('schools?id=not.is.null', { method: 'DELETE' });
+      } catch (err) {
+        console.warn('[CloudDB] Factory reset schools deletion error:', err);
+      }
+
+      try {
+        await supabaseRequest('app_settings?key=eq.card_price_ngn', {
+          method: 'PATCH',
+          body: JSON.stringify({
+            value: DEFAULT_PRICE_NGN.toString(),
+            updated_at: new Date().toISOString()
+          })
+        });
+      } catch (err) {
+        console.warn('[CloudDB] Factory reset price update error:', err);
+      }
+
+      return {
+        cards: [],
+        schools: [],
+        price: DEFAULT_PRICE_NGN
+      };
     }
   };
 
