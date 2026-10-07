@@ -55,6 +55,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     sessionStorage.setItem('spn_admin_active_tab', targetTabId);
+
+    if (targetTabId === 'schools') {
+      loadSchoolsDirectory();
+    } else if (targetTabId === 'records') {
+      renderTable();
+    }
   }
 
   tabButtons.forEach(btn => {
@@ -569,12 +575,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   async function loadSchoolsDirectory() {
     if (!adminSchoolsTableBody) return;
-    try {
-      allSchools = await CloudDB.loadSchools();
-    } catch (e) {
-      allSchools = CloudDB.getLocalSchools();
-    }
+    // 1. Immediately render local schools so table is never blank
+    allSchools = CloudDB.getLocalSchools();
     renderSchoolsTable();
+
+    // 2. Fetch latest from cloud in background and re-render
+    try {
+      const cloudSchools = await CloudDB.loadSchools();
+      if (Array.isArray(cloudSchools)) {
+        allSchools = cloudSchools;
+        renderSchoolsTable();
+      }
+    } catch (e) {
+      console.warn('Could not refresh schools from cloud:', e);
+    }
   }
 
   function renderSchoolsTable() {
@@ -759,29 +773,59 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  async function handleAddSchool() {
+    const name = (inputNewSchoolName ? inputNewSchoolName.value : '').trim().toUpperCase();
+    const category = (selectNewSchoolCategory ? selectNewSchoolCategory.value : 'STUDENT').trim();
+
+    if (!name) {
+      showModalAlert('Please enter the School / Chapter name.', { type: 'warning' });
+      if (inputNewSchoolName) inputNewSchoolName.focus();
+      return;
+    }
+
+    try {
+      await CloudDB.addSchool(name, category);
+      resetNewSchoolForm();
+      allSchools = CloudDB.getLocalSchools();
+      renderSchoolsTable();
+
+      // Sync cloud in background and update real db ids
+      CloudDB.loadSchools().then(cloudList => {
+        if (Array.isArray(cloudList) && cloudList.length > 0) {
+          allSchools = cloudList;
+          renderSchoolsTable();
+        }
+      });
+
+      showModalAlert(`Successfully added "${name}" under [${category}]! Members will now see this in the ID card generator.`, {
+        title: 'School Added',
+        type: 'success'
+      });
+    } catch (err) {
+      showModalAlert(err.message || 'Error adding school', { type: 'error' });
+    }
+  }
+
   if (formAddSchool) {
-    formAddSchool.addEventListener('submit', async (e) => {
+    formAddSchool.addEventListener('submit', (e) => {
       e.preventDefault();
-      const name = (inputNewSchoolName ? inputNewSchoolName.value : '').trim().toUpperCase();
-      const category = (selectNewSchoolCategory ? selectNewSchoolCategory.value : 'STUDENT').trim();
+      handleAddSchool();
+    });
+  }
 
-      if (!name) {
-        showModalAlert('Please enter the School / Chapter name.', { type: 'warning' });
-        if (inputNewSchoolName) inputNewSchoolName.focus();
-        return;
-      }
+  const btnAddSchool = document.getElementById('btnAddSchool');
+  if (btnAddSchool) {
+    btnAddSchool.addEventListener('click', (e) => {
+      e.preventDefault();
+      handleAddSchool();
+    });
+  }
 
-      try {
-        await CloudDB.addSchool(name, category);
-        resetNewSchoolForm();
-        allSchools = await CloudDB.loadSchools();
-        renderSchoolsTable();
-        showModalAlert(`Successfully added "${name}" under [${category}]! Members will now see this in the ID card generator.`, {
-          title: 'School Added',
-          type: 'success'
-        });
-      } catch (err) {
-        showModalAlert(err.message || 'Error adding school', { type: 'error' });
+  if (inputNewSchoolName) {
+    inputNewSchoolName.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleAddSchool();
       }
     });
   }

@@ -139,7 +139,7 @@
         const stored = localStorage.getItem(STORAGE_KEYS.SCHOOLS);
         if (stored) {
           const parsed = JSON.parse(stored);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed)) return parsed;
         }
       } catch (e) {}
       return DEFAULT_SCHOOLS.slice();
@@ -163,14 +163,29 @@
       try {
         const res = await supabaseRequest('schools?select=*&order=name.asc');
         if (Array.isArray(res)) {
-          const mapped = res.map(r => ({
+          const cloudMapped = res.map(r => ({
             id: r.id,
             name: r.name,
             category: (r.category || 'STUDENT').toUpperCase(),
             createdAt: r.created_at
           }));
-          this.saveLocalSchools(mapped);
-          return mapped;
+
+          const local = this.getLocalSchools();
+          const mergedMap = new Map();
+
+          // Add cloud schools first
+          cloudMapped.forEach(s => mergedMap.set(s.name.toUpperCase(), s));
+
+          // Retain any locally added schools that have not synced yet
+          local.forEach(s => {
+            if (!mergedMap.has(s.name.toUpperCase())) {
+              mergedMap.set(s.name.toUpperCase(), s);
+            }
+          });
+
+          const finalSchools = Array.from(mergedMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+          this.saveLocalSchools(finalSchools);
+          return finalSchools;
         }
       } catch (err) {
         console.warn('[CloudDB] Supabase schools fetch deferred, using local cache:', err);
