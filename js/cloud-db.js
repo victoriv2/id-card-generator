@@ -170,22 +170,10 @@
             createdAt: r.created_at
           }));
 
-          const local = this.getLocalSchools();
-          const mergedMap = new Map();
-
-          // Add cloud schools first
-          cloudMapped.forEach(s => mergedMap.set(s.name.toUpperCase(), s));
-
-          // Retain any locally added schools that have not synced yet
-          local.forEach(s => {
-            if (!mergedMap.has(s.name.toUpperCase())) {
-              mergedMap.set(s.name.toUpperCase(), s);
-            }
-          });
-
-          const finalSchools = Array.from(mergedMap.values()).sort((a, b) => a.name.localeCompare(b.name));
-          this.saveLocalSchools(finalSchools);
-          return finalSchools;
+          // Cloud database is the authoritative source of truth.
+          // Directly overwrite local storage so deletions and factory resets take effect immediately.
+          this.saveLocalSchools(cloudMapped);
+          return cloudMapped;
         }
       } catch (err) {
         console.warn('[CloudDB] Supabase schools fetch deferred, using local cache:', err);
@@ -487,31 +475,8 @@
         const cloudRows = await supabaseRequest('cards?select=*&order=saved_at.desc');
         if (Array.isArray(cloudRows)) {
           const cloudCards = cloudRows.map(fromRow);
-          const localCards = this.getLocalCards();
-          const mergedMap = new Map();
-
-          // Add local first
-          localCards.forEach(c => mergedMap.set(c.id, c));
-
-          // Merge cloud (cloud takes authority on paid status and details)
-          cloudCards.forEach(c => {
-            if (!mergedMap.has(c.id)) {
-              mergedMap.set(c.id, c);
-            } else {
-              const existing = mergedMap.get(c.id);
-              mergedMap.set(c.id, {
-                ...c,
-                ...existing,
-                isPaid: existing.isPaid || c.isPaid,
-                paymentRef: existing.paymentRef || c.paymentRef,
-                photo: (existing.photo && !existing.photo.includes('[cached_locally]')) ? existing.photo : (c.photo || '')
-              });
-            }
-          });
-
-          const finalCards = Array.from(mergedMap.values());
-          this.saveLocalCards(finalCards);
-          return finalCards;
+          this.saveLocalCards(cloudCards);
+          return cloudCards;
         }
       } catch (err) {
         console.warn('[CloudDB] Supabase load deferred, using local cache:', err);
