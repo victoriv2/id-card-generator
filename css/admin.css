@@ -677,21 +677,23 @@ body.admin-body {
 .admin-toolbar {
   background: #ffffff;
   border-radius: 14px;
-  padding: 16px 20px;
+  padding: 18px 20px;
   border: 1px solid var(--admin-border);
   margin-bottom: 20px;
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
   gap: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.admin-toolbar-search-row {
+  width: 100%;
 }
 
 .admin-search-box {
   position: relative;
-  flex: 1 1 320px;
-  min-width: 260px;
-  height: 42px;
+  width: 100%;
+  height: 44px;
   display: flex;
   align-items: center;
 }
@@ -710,22 +712,32 @@ body.admin-body {
 
 .admin-search-box input {
   width: 100%;
-  height: 42px;
+  height: 44px;
   box-sizing: border-box;
-  padding: 0 14px 0 42px;
+  padding: 0 16px 0 44px;
   border: 1.5px solid #cbd5e1;
-  border-radius: 8px;
-  font-size: 0.9rem;
+  border-radius: 10px;
+  font-size: 0.92rem;
   font-family: inherit;
   outline: none;
-  background: #ffffff;
+  background: #f8fafc;
   color: #0f172a;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: all 0.2s ease;
 }
 
 .admin-search-box input:focus {
+  background: #ffffff;
   border-color: #0b3d23;
-  box-shadow: 0 0 0 3px rgba(11, 61, 35, 0.1);
+  box-shadow: 0 0 0 3px rgba(11, 61, 35, 0.12);
+}
+
+.admin-toolbar-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: 100%;
 }
 
 .admin-filters-group {
@@ -733,6 +745,7 @@ body.admin-body {
   align-items: center;
   flex-wrap: wrap;
   gap: 10px;
+  flex: 1 1 auto;
 }
 
 .admin-select {
@@ -889,32 +902,38 @@ body.admin-body {
     padding: 0 14px 40px;
   }
   .admin-toolbar {
+    padding: 14px 16px;
+    gap: 12px;
+  }
+  .admin-toolbar-actions-row {
     flex-direction: column;
     align-items: stretch;
     gap: 12px;
-  }
-  .admin-search-box {
-    flex: none;
     width: 100%;
-    height: 42px;
   }
   .admin-filters-group {
     width: 100%;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 10px;
   }
-  .admin-select,
-  .admin-select-trigger-wrap,
+  .admin-select-trigger-wrap {
+    flex: 1 1 140px;
+    min-width: 0;
+  }
+  .admin-modal-trigger {
+    width: 100%;
+  }
   .btn-admin-excel {
     width: 100%;
-    min-width: 0;
+    height: 44px;
   }
 }
 
 @media (max-width: 540px) {
-  .admin-filters-group {
-    grid-template-columns: 1fr;
+  .admin-select-trigger-wrap {
+    flex: 1 1 100%;
+    width: 100%;
   }
   .admin-price-control {
     flex-direction: column;
@@ -1269,13 +1288,20 @@ body.admin-body {
   color: #0f172a;
   font-size: 0.88rem;
   font-weight: 700;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
   cursor: pointer;
   user-select: none;
+  white-space: nowrap;
   transition: all 0.2s ease;
+}
+
+.admin-modal-trigger span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .admin-modal-trigger:hover,
@@ -1288,6 +1314,19 @@ body.admin-body {
 .admin-modal-trigger svg {
   color: #64748b;
   flex-shrink: 0;
+  margin-left: 6px;
+}
+
+#sortOrderTrigger {
+  min-width: 170px;
+}
+
+#filterCategoryTrigger {
+  min-width: 155px;
+}
+
+#filterPaymentTrigger {
+  min-width: 145px;
 }
 
 .admin-select-sm.admin-modal-trigger {
