@@ -135,11 +135,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const cat = inputCategory ? inputCategory.value.trim() : '';
 
     if (inputDateIssued) {
-      inputDateIssued.value = dateIssued;
+      if (activeVerifiedCard && normalizeField(activeVerifiedCard.category) === normalizeField(cat) && activeVerifiedCard.dateIssued) {
+        inputDateIssued.value = activeVerifiedCard.dateIssued;
+      } else {
+        inputDateIssued.value = dateIssued;
+      }
     }
 
     if (inputId) {
-      if (cat && CATEGORY_CODES[cat]) {
+      if (activeVerifiedCard && normalizeField(activeVerifiedCard.category) === normalizeField(cat) && activeVerifiedCard.id) {
+        inputId.value = activeVerifiedCard.id;
+      } else if (cat && CATEGORY_CODES[cat]) {
         const catCode = CATEGORY_CODES[cat];
         const seq = String(getCardSequenceNumber()).padStart(3, '0');
         inputId.value = `SPA/ID/${catCode}/${year2Digits}/${seq}`;
@@ -681,8 +687,14 @@ document.addEventListener('DOMContentLoaded', () => {
         simpleModalOptions.forEach(o => o.classList.remove('active'));
         opt.classList.add('active');
 
-        // Reset school if previous school category does not match
-        if (inputSchool && inputSchool.value) {
+        // Reset school or restore if switching back to verified card's registered category
+        if (activeVerifiedCard && normalizeField(activeVerifiedCard.category) === normalizeField(cat) && activeVerifiedCard.school) {
+          if (inputSchool) inputSchool.value = activeVerifiedCard.school;
+          if (selectedSchoolText) {
+            selectedSchoolText.textContent = activeVerifiedCard.school;
+            selectedSchoolText.classList.remove('placeholder-text');
+          }
+        } else if (inputSchool && inputSchool.value) {
           inputSchool.value = '';
           if (selectedSchoolText) {
             selectedSchoolText.textContent = `Select ${cat} School / Chapter`;
