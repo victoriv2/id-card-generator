@@ -211,6 +211,115 @@ body.admin-body {
 }
 
 /* ==========================================================================
+   Admin Navigation Tabs Bar
+   ========================================================================== */
+.admin-tabs-nav {
+  background: #ffffff;
+  border-bottom: 2px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+}
+
+.admin-tabs-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+}
+
+.admin-tabs-container::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}
+
+.admin-tab-btn {
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #64748b;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 700;
+  padding: 16px 18px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  position: relative;
+  outline: none;
+}
+
+.admin-tab-btn svg {
+  color: #94a3b8;
+  transition: color 0.2s;
+  flex-shrink: 0;
+}
+
+.admin-tab-btn:hover {
+  color: #0b3d23;
+  background: rgba(11, 61, 35, 0.03);
+}
+
+.admin-tab-btn:hover svg {
+  color: #0b3d23;
+}
+
+.admin-tab-btn.active {
+  color: #0b3d23;
+  border-bottom-color: #0b3d23;
+  font-weight: 800;
+}
+
+.admin-tab-btn.active svg {
+  color: #15803d;
+}
+
+.admin-tab-badge {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.admin-tab-btn.active .admin-tab-badge {
+  background: #dcfce7;
+  color: #166534;
+  border-color: #86efac;
+}
+
+/* Tab Panels */
+.admin-tab-panel {
+  display: none;
+  animation: fadeInAdminTab 0.25s ease forwards;
+}
+
+.admin-tab-panel.active {
+  display: block;
+}
+
+@keyframes fadeInAdminTab {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================================================
    Admin Container & Grid
    ========================================================================== */
 .admin-container {

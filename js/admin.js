@@ -38,6 +38,38 @@ document.addEventListener('DOMContentLoaded', async () => {
   const adminSchoolsTableBody = document.getElementById('adminSchoolsTableBody');
   const schoolDirectoryCount = document.getElementById('schoolDirectoryCount');
 
+  // Navigation Tabs Elements
+  const tabButtons = document.querySelectorAll('.admin-tab-btn[data-tab]');
+  const tabPanels = document.querySelectorAll('.admin-tab-panel');
+  const tabBadgeRecords = document.getElementById('tabBadgeRecords');
+  const tabBadgeSchools = document.getElementById('tabBadgeSchools');
+
+  function switchTab(targetTabId) {
+    tabButtons.forEach(btn => {
+      const isTarget = btn.getAttribute('data-tab') === targetTabId;
+      btn.classList.toggle('active', isTarget);
+      btn.setAttribute('aria-selected', isTarget ? 'true' : 'false');
+    });
+
+    tabPanels.forEach(panel => {
+      const isTarget = panel.id === `tabPanel-${targetTabId}`;
+      panel.classList.toggle('active', isTarget);
+    });
+
+    sessionStorage.setItem('spn_admin_active_tab', targetTabId);
+  }
+
+  tabButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetTab = btn.getAttribute('data-tab');
+      switchTab(targetTab);
+    });
+  });
+
+  // Restore active tab or default to overview
+  const savedTab = sessionStorage.getItem('spn_admin_active_tab') || 'overview';
+  switchTab(savedTab);
+
   // -------------------------------------------------------------------------
   // Authentication (admin / admin123)
   // -------------------------------------------------------------------------
@@ -149,6 +181,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (statTotalPaid) statTotalPaid.textContent = paidCount.toLocaleString();
     if (statTotalPending) statTotalPending.textContent = pendingCount.toLocaleString();
     if (statTotalRevenue) statTotalRevenue.textContent = '₦' + formatNaira(revenueSum);
+    if (tabBadgeRecords) tabBadgeRecords.textContent = total.toLocaleString();
 
     // Category Pills
     if (categoryPillsList) {
@@ -423,6 +456,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (schoolDirectoryCount) {
       schoolDirectoryCount.textContent = `${filtered.length} / ${allSchools.length} Total`;
+    }
+    if (tabBadgeSchools) {
+      tabBadgeSchools.textContent = allSchools.length.toString();
     }
 
     if (filtered.length === 0) {
