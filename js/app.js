@@ -1409,7 +1409,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const price = window.CloudDB ? CloudDB.getPrice() : 1000;
     const formattedPrice = new Intl.NumberFormat('en-NG').format(price);
 
-    let message = `Official payment of ₦${formattedPrice} is required before downloading or printing your ID card. Please click "Pay Now with Paystack" to complete issuance.`;
+    let message = `Official payment of ₦${formattedPrice} is required before downloading or printing your ID card. Please click "Pay Now" to complete issuance.`;
     if (auth.mismatch === 'name') {
       message = `Member details have been modified. Official payment of ₦${formattedPrice} is required to issue an ID card with modified details, or restore the original registered name to proceed.`;
     }
