@@ -353,6 +353,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 8. Dynamic QR Code
     renderQrCode();
+
+    // 9. Real-Time Payment Wall Authorization Sync
+    if (typeof updatePaywallState === 'function') {
+      updatePaywallState();
+    }
   }
 
   // Event listeners for inputs
@@ -863,6 +868,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (passportEmptyHint) passportEmptyHint.style.display = 'flex';
       if (photoAdjustBox) photoAdjustBox.style.display = 'none';
 
+      activeVerifiedCard = null;
+      try { sessionStorage.removeItem('spa_active_verified_card'); } catch (e) {}
+
       updateAutoCredentials();
       syncOverlay();
       notify('Form cleared.');
@@ -1087,8 +1095,91 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // -------------------------------------------------------------------------
-  // Card Record Persistence (Supports Retrieval on Main Portal)
+  // Card Record Persistence & Real-Time Verified Card State
   // -------------------------------------------------------------------------
+  let activeVerifiedCard = null;
+
+  try {
+    const rawActive = sessionStorage.getItem('spa_active_verified_card');
+    if (rawActive) {
+      activeVerifiedCard = JSON.parse(rawActive);
+    }
+  } catch (e) {}
+
+  function normalizeField(val) {
+    return (val || '').trim().replace(/\s+/g, ' ').toUpperCase();
+  }
+
+  function getActiveVerifiedCard() {
+    const currentId = getSanitizedId();
+    if (!currentId) return null;
+    const cleanId = currentId.toUpperCase();
+
+    if (activeVerifiedCard && activeVerifiedCard.id && activeVerifiedCard.id.trim().toUpperCase() === cleanId) {
+      return activeVerifiedCard;
+    }
+    if (window.CloudDB && typeof CloudDB.getCardById === 'function') {
+      const found = CloudDB.getCardById(cleanId);
+      if (found && (found.isPaid || found.paymentRef === 'FREE_ISSUANCE' || found.amountPaid === 0)) {
+        return found;
+      }
+    } else if (window.CloudDB && typeof CloudDB.getLocalCards === 'function') {
+      const cards = CloudDB.getLocalCards() || [];
+      const found = cards.find(c => c.id && c.id.trim().toUpperCase() === cleanId && (c.isPaid || c.paymentRef === 'FREE_ISSUANCE' || c.amountPaid === 0));
+      if (found) return found;
+    }
+    return null;
+  }
+
+  /**
+   * Evaluates if the current form card matches an authorized registered card.
+   * If any detail (e.g. removing 'l' from 'Daniel') is modified, authorization is revoked
+   * and the payment wall immediately returns until the exact registered data is restored.
+   */
+  function checkCardAuthorization() {
+    const isPaywallActive = window.CloudDB && typeof CloudDB.isPaywallEnabled === 'function'
+      ? CloudDB.isPaywallEnabled()
+      : true;
+
+    // When payment wall is globally disabled by Admin, issuance is free for all
+    if (!isPaywallActive) {
+      return { isAuthorized: true, isFreeMode: true, card: null };
+    }
+
+    const verifiedCard = getActiveVerifiedCard();
+    if (!verifiedCard) {
+      return { isAuthorized: false, isFreeMode: false, card: null };
+    }
+
+    const formName = normalizeField(inputName ? inputName.value : '');
+    const registeredName = normalizeField(verifiedCard.name);
+
+    if (!formName || formName !== registeredName) {
+      // Name was altered (e.g. Daniel -> Danie)! Re-lock behind paywall
+      return { isAuthorized: false, isFreeMode: false, card: verifiedCard, mismatch: 'name' };
+    }
+
+    const formCat = normalizeField(inputCategory ? inputCategory.value : '');
+    const registeredCat = normalizeField(verifiedCard.category);
+    if (registeredCat && formCat && formCat !== registeredCat) {
+      return { isAuthorized: false, isFreeMode: false, card: verifiedCard, mismatch: 'category' };
+    }
+
+    const formSchool = normalizeField(inputSchool ? inputSchool.value : '');
+    const registeredSchool = normalizeField(verifiedCard.school);
+    if (registeredSchool && formSchool && formSchool !== registeredSchool) {
+      return { isAuthorized: false, isFreeMode: false, card: verifiedCard, mismatch: 'school' };
+    }
+
+    const formState = normalizeField(inputState ? inputState.value : '');
+    const registeredState = normalizeField(verifiedCard.state);
+    if (registeredState && formState && formState !== registeredState) {
+      return { isAuthorized: false, isFreeMode: false, card: verifiedCard, mismatch: 'state' };
+    }
+
+    return { isAuthorized: true, isFreeMode: false, card: verifiedCard };
+  }
+
   function saveCardRecord() {
     const id = inputId ? inputId.value.trim() : '';
     const name = inputName ? inputName.value.trim() : '';
@@ -1104,8 +1195,8 @@ document.addEventListener('DOMContentLoaded', () => {
       ? CloudDB.isPaywallEnabled()
       : true;
 
-    const existingCard = window.CloudDB ? (CloudDB.getLocalCards() || []).find(c => c.id === id) : null;
-    const existingPaid = !!(existingCard && existingCard.isPaid);
+    const existingCard = getActiveVerifiedCard();
+    const existingPaid = !!(existingCard && (existingCard.isPaid || existingCard.paymentRef === 'FREE_ISSUANCE' || existingCard.amountPaid === 0));
     const isFreeMode = !isPaywallActive;
     const isPaid = existingPaid || isFreeMode;
 
@@ -1139,6 +1230,13 @@ document.addEventListener('DOMContentLoaded', () => {
       savedAt: new Date().toISOString()
     };
 
+    if (isPaid) {
+      activeVerifiedCard = { ...record };
+      try {
+        sessionStorage.setItem('spa_active_verified_card', JSON.stringify(record));
+      } catch (e) {}
+    }
+
     advanceCardSequenceIfCurrent(record.id);
 
     if (window.CloudDB) {
@@ -1166,6 +1264,25 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const card = JSON.parse(raw);
       sessionStorage.removeItem('spa_load_card');
+
+      const isFree = (card.amountPaid === 0 || card.paymentRef === 'FREE_ISSUANCE');
+      if (card.isPaid || isFree) {
+        card.isPaid = true;
+        if (isFree && !card.paymentRef) card.paymentRef = 'FREE_ISSUANCE';
+        activeVerifiedCard = { ...card };
+        try {
+          sessionStorage.setItem('spa_active_verified_card', JSON.stringify(card));
+        } catch (e) {}
+      }
+
+      if (window.CloudDB && typeof CloudDB.saveLocalCards === 'function') {
+        const local = CloudDB.getLocalCards() || [];
+        const idx = local.findIndex(c => c.id && c.id.toUpperCase() === card.id.toUpperCase());
+        if (idx >= 0) local[idx] = { ...local[idx], ...card };
+        else local.unshift(card);
+        CloudDB.saveLocalCards(local);
+      }
+
       if (card.name && inputName) inputName.value = card.name;
       if (card.school && inputSchool) inputSchool.value = card.school;
       if (card.category && inputCategory) {
@@ -1196,6 +1313,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (photoAdjustBox) photoAdjustBox.style.display = 'flex';
       }
       syncOverlay();
+      updatePaywallState();
       notify(`Loaded ID card: ${card.id || card.name}`);
     } catch (e) {
       console.warn('Error loading card from storage:', e);
@@ -1232,24 +1350,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (paywallFreeBanner) paywallFreeBanner.style.display = 'none';
 
-    const id = getSanitizedId();
-    const isPaid = window.CloudDB ? CloudDB.isCardPaid(id) : false;
+    const auth = checkCardAuthorization();
     const price = window.CloudDB ? CloudDB.getPrice() : 1000;
     const formattedPrice = new Intl.NumberFormat('en-NG').format(price);
 
     if (paywallAmountDisplay) paywallAmountDisplay.textContent = formattedPrice;
     if (btnPayAmountDisplay) btnPayAmountDisplay.textContent = `₦${formattedPrice}`;
 
-    if (isPaid) {
+    if (auth.isAuthorized) {
       if (paywallBox) paywallBox.style.display = 'none';
       if (downloadsLockBanner) downloadsLockBanner.style.display = 'none';
       if (paywallVerifiedBox) {
         paywallVerifiedBox.style.display = 'block';
-        const cards = window.CloudDB ? CloudDB.getLocalCards() : [];
-        const card = cards.find(c => c.id === id);
+        const card = auth.card;
         if (card) {
-          if (paywallVerifiedRef) paywallVerifiedRef.textContent = card.paymentRef || 'VERIFIED';
-          if (paywallVerifiedAmount) paywallVerifiedAmount.textContent = `₦${new Intl.NumberFormat('en-NG').format(card.amountPaid || price)}`;
+          const isFree = (card.amountPaid === 0 || card.paymentRef === 'FREE_ISSUANCE');
+          if (paywallVerifiedRef) {
+            paywallVerifiedRef.textContent = isFree ? 'FREE_ISSUANCE (Verified)' : (card.paymentRef || 'VERIFIED');
+          }
+          if (paywallVerifiedAmount) {
+            paywallVerifiedAmount.textContent = isFree ? '₦0 (Free Registration)' : `₦${new Intl.NumberFormat('en-NG').format(card.amountPaid || price)}`;
+          }
         }
       }
       if (exportButtonsGroup) exportButtonsGroup.classList.remove('downloads-locked');
@@ -1270,13 +1391,18 @@ document.addEventListener('DOMContentLoaded', () => {
       return true; // Payment wall disabled by Admin; allow immediate free download/print!
     }
 
-    const id = getSanitizedId();
-    const isPaid = window.CloudDB ? CloudDB.isCardPaid(id) : false;
-    if (isPaid) return true;
+    const auth = checkCardAuthorization();
+    if (auth.isAuthorized) return true;
 
     const price = window.CloudDB ? CloudDB.getPrice() : 1000;
     const formattedPrice = new Intl.NumberFormat('en-NG').format(price);
-    showModalAlert(`Official payment of ₦${formattedPrice} is required before downloading or printing your ID card. Please click "Pay Now with Paystack" to complete issuance.`, {
+
+    let message = `Official payment of ₦${formattedPrice} is required before downloading or printing your ID card. Please click "Pay Now with Paystack" to complete issuance.`;
+    if (auth.mismatch === 'name') {
+      message = `Member details have been modified. Official payment of ₦${formattedPrice} is required to issue an ID card with modified details, or restore the original registered name to proceed.`;
+    }
+
+    showModalAlert(message, {
       title: 'Payment Required',
       type: 'warning'
     });
@@ -1337,6 +1463,23 @@ document.addEventListener('DOMContentLoaded', () => {
               email: email
             });
           }
+          const verifiedRecord = {
+            id,
+            name,
+            school: inputSchool ? inputSchool.value.trim() : '',
+            category: inputCategory ? inputCategory.value.trim() : 'STUDENT',
+            state: inputState ? inputState.value.trim() : '',
+            dateIssued: inputDateIssued ? inputDateIssued.value.trim() : '',
+            isPaid: true,
+            paymentRef: response.reference,
+            amountPaid: price,
+            paidAt: new Date().toISOString()
+          };
+          activeVerifiedCard = verifiedRecord;
+          try {
+            sessionStorage.setItem('spa_active_verified_card', JSON.stringify(verifiedRecord));
+          } catch (e) {}
+
           updatePaywallState();
           const formattedPrice = new Intl.NumberFormat('en-NG').format(price);
           showModalAlert(`Official card issuance fee of ₦${formattedPrice} confirmed (Ref: ${response.reference}). Your ID card is now completely unlocked for unlimited high-resolution download and printing!`, {
@@ -1353,9 +1496,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Update paywall state whenever ID or Category changes
+  // Real-time synchronization for all form inputs
   if (inputId) inputId.addEventListener('input', updatePaywallState);
   if (inputCategory) inputCategory.addEventListener('change', updatePaywallState);
+  if (inputName) inputName.addEventListener('input', updatePaywallState);
+  if (inputSchool) inputSchool.addEventListener('input', updatePaywallState);
+  if (inputState) inputState.addEventListener('change', updatePaywallState);
 
   // --- Attach Direct Export Triggers (Guarded by Paywall) ---
 
@@ -1418,6 +1564,17 @@ document.addEventListener('DOMContentLoaded', () => {
   syncOverlay();
   loadCardFromStorage();
   updatePaywallState();
+
+  // If pre-filled card is not in local cache, perform background single-card cloud verification
+  const startupId = getSanitizedId();
+  if (startupId && !getActiveVerifiedCard() && window.CloudDB && typeof CloudDB.verifyCardFromCloud === 'function') {
+    CloudDB.verifyCardFromCloud(startupId).then(cloudCard => {
+      if (cloudCard && (cloudCard.isPaid || cloudCard.paymentRef === 'FREE_ISSUANCE' || cloudCard.amountPaid === 0)) {
+        activeVerifiedCard = cloudCard;
+        updatePaywallState();
+      }
+    }).catch(() => {});
+  }
 
   // Lightweight background settings sync (price & paywall status) - does NOT download full cards table
   if (window.CloudDB && typeof CloudDB.syncSettings === 'function') {

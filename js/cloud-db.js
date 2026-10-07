@@ -83,8 +83,8 @@
       date_issued: c.dateIssued || c.date_issued || '',
       status: c.status || 'ACTIVE',
       photo: c.photo || '',
-      is_paid: !!(c.isPaid || c.is_paid),
-      payment_ref: c.paymentRef || c.payment_ref || null,
+      is_paid: !!(c.isPaid || c.is_paid || isFree),
+      payment_ref: c.paymentRef || c.payment_ref || (isFree ? 'FREE_ISSUANCE' : null),
       amount_paid: amountVal,
       payer_email: c.payerEmail || c.payer_email || null,
       paid_at: paidIso,
@@ -107,8 +107,8 @@
       dateIssued: r.date_issued || '',
       status: r.status || 'ACTIVE',
       photo: r.photo || '',
-      isPaid: !!r.is_paid,
-      paymentRef: r.payment_ref || '',
+      isPaid: !!(r.is_paid || isFree),
+      paymentRef: r.payment_ref || (isFree ? 'FREE_ISSUANCE' : ''),
       amountPaid: isFree ? 0 : (r.amount_paid != null ? Number(r.amount_paid) : DEFAULT_PRICE_NGN),
       payerEmail: r.payer_email || '',
       paidAt: r.paid_at || '',
@@ -386,11 +386,64 @@
       localStorage.setItem(STORAGE_KEYS.RECORDS, JSON.stringify(cards));
     },
 
-    isCardPaid(id) {
+    isCardPaid(id, matchDetails) {
       if (!id) return false;
+      const cleanId = id.trim().toUpperCase();
       const cards = this.getLocalCards();
-      const card = cards.find(c => c.id === id);
-      return !!(card && card.isPaid);
+      const card = cards.find(c => c.id && c.id.trim().toUpperCase() === cleanId);
+      if (!card) return false;
+      const isPaid = !!(card.isPaid || card.paymentRef === 'FREE_ISSUANCE' || card.amountPaid === 0);
+      if (!isPaid) return false;
+
+      // Verify that the requested data matches the recorded card without tampering
+      if (matchDetails) {
+        const clean = s => (s || '').trim().replace(/\s+/g, ' ').toUpperCase();
+        if (matchDetails.name !== undefined) {
+          const curName = clean(matchDetails.name);
+          const cardName = clean(card.name);
+          if (!curName || curName !== cardName) return false;
+        }
+        if (matchDetails.category && card.category) {
+          if (clean(matchDetails.category) !== clean(card.category)) return false;
+        }
+        if (matchDetails.school && card.school) {
+          if (clean(matchDetails.school) !== clean(card.school)) return false;
+        }
+        if (matchDetails.state && card.state) {
+          if (clean(matchDetails.state) !== clean(card.state)) return false;
+        }
+      }
+      return true;
+    },
+
+    getCardById(id) {
+      if (!id) return null;
+      const cleanId = id.trim().toUpperCase();
+      const cards = this.getLocalCards();
+      return cards.find(c => c.id && c.id.trim().toUpperCase() === cleanId) || null;
+    },
+
+    /**
+     * Single-card cloud lookup (lightweight fallback if card is not cached locally)
+     */
+    async verifyCardFromCloud(id) {
+      if (!id) return null;
+      const cleanId = id.trim();
+      try {
+        const rows = await supabaseRequest(`cards?id=eq.${encodeURIComponent(cleanId)}&limit=1`);
+        if (Array.isArray(rows) && rows.length > 0) {
+          const card = fromRow(rows[0]);
+          const local = this.getLocalCards();
+          const idx = local.findIndex(l => l.id && l.id.toUpperCase() === card.id.toUpperCase());
+          if (idx >= 0) local[idx] = card;
+          else local.unshift(card);
+          this.saveLocalCards(local);
+          return card;
+        }
+      } catch (err) {
+        console.warn('[CloudDB] Single card verify deferred:', err);
+      }
+      return null;
     },
 
     /**
@@ -399,12 +452,15 @@
     async saveCard(record) {
       if (!record || !record.id) return;
       const cards = this.getLocalCards();
-      const idx = cards.findIndex(c => c.id === record.id);
+      const idx = cards.findIndex(c => c.id && c.id.trim().toUpperCase() === record.id.trim().toUpperCase());
 
       let savedRecord;
       if (idx >= 0) {
         const existing = cards[idx];
-        if (existing.isPaid) {
+        const clean = s => (s || '').trim().replace(/\s+/g, ' ').toUpperCase();
+        const sameName = clean(existing.name) === clean(record.name);
+
+        if (sameName && (existing.isPaid || existing.paymentRef === 'FREE_ISSUANCE' || existing.amountPaid === 0)) {
           record.isPaid = true;
           if (!record.paymentRef) record.paymentRef = existing.paymentRef;
           if (record.amountPaid === undefined || record.amountPaid === null) record.amountPaid = existing.amountPaid;
