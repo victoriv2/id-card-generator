@@ -1050,6 +1050,26 @@ body.admin-body {
 .admin-school-cat-badge.parent { background: #f3e8ff; color: #6b21a8; }
 .admin-school-cat-badge.official { background: #fee2e2; color: #991b1b; }
 
+.btn-edit-school {
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 700;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-edit-school:hover {
+  background: #2563eb;
+  color: #ffffff;
+}
+
 .btn-del-school {
   background: #fee2e2;
   color: #dc2626;

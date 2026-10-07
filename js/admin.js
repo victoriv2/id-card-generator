@@ -616,14 +616,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         <tr>
           <td style="font-weight: 700; color: #0f172a;">${escapeHtml(s.name)}</td>
           <td><div style="display: flex; flex-wrap: wrap; gap: 4px;">${badgesHtml}</div></td>
-          <td style="text-align: center;">
-            <button type="button" class="btn-del-school" data-school-id="${escapeHtml(idParam)}" data-school-name="${escapeHtml(s.name)}" title="Delete from directory">
-              Delete
-            </button>
+          <td style="text-align: center; white-space: nowrap;">
+            <div style="display: inline-flex; gap: 6px; align-items: center; justify-content: center;">
+              <button type="button" class="btn-edit-school" data-school-id="${escapeHtml(idParam)}" data-school-name="${escapeHtml(s.name)}" data-school-category="${escapeHtml(s.category || '')}" title="Edit school / chapter">
+                Edit
+              </button>
+              <button type="button" class="btn-del-school" data-school-id="${escapeHtml(idParam)}" data-school-name="${escapeHtml(s.name)}" title="Delete from directory">
+                Delete
+              </button>
+            </div>
           </td>
         </tr>
       `;
     }).join('');
+
+    // Attach edit listeners
+    adminSchoolsTableBody.querySelectorAll('.btn-edit-school').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-school-id');
+        const name = btn.getAttribute('data-school-name');
+        const cat = btn.getAttribute('data-school-category');
+        const target = allSchools.find(s => (s.id && s.id === id) || s.name === name) || { id, name, category: cat };
+        openEditSchoolModal(target);
+      });
+    });
 
     // Attach delete listeners
     adminSchoolsTableBody.querySelectorAll('.btn-del-school').forEach(btn => {
@@ -766,6 +782,106 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
       } catch (err) {
         showModalAlert(err.message || 'Error adding school', { type: 'error' });
+      }
+    });
+  }
+
+  // -------------------------------------------------------------------------
+  // Edit School / Chapter Modal Logic
+  // -------------------------------------------------------------------------
+  const adminEditSchoolModal = document.getElementById('adminEditSchoolModal');
+  const btnCloseAdminEditSchoolModal = document.getElementById('btnCloseAdminEditSchoolModal');
+  const btnCancelEditSchool = document.getElementById('btnCancelEditSchool');
+  const btnSaveEditSchool = document.getElementById('btnSaveEditSchool');
+  const inputEditSchoolName = document.getElementById('inputEditSchoolName');
+  const editSchoolId = document.getElementById('editSchoolId');
+  const editSchoolOldName = document.getElementById('editSchoolOldName');
+  const editSchoolMultiCatCheckboxes = document.querySelectorAll('#editSchoolMultiCatOptionsList input[type="checkbox"]');
+
+  function openEditSchoolModal(school) {
+    if (!adminEditSchoolModal) return;
+    const sId = school.id || school.name;
+    const sName = school.name || '';
+    const sCat = school.category || 'STUDENT';
+
+    if (editSchoolId) editSchoolId.value = sId;
+    if (editSchoolOldName) editSchoolOldName.value = sName;
+    if (inputEditSchoolName) inputEditSchoolName.value = sName;
+
+    const cats = sCat.toUpperCase().split(',').map(c => c.trim());
+    editSchoolMultiCatCheckboxes.forEach(cb => {
+      cb.checked = cats.includes(cb.value.toUpperCase());
+    });
+
+    adminEditSchoolModal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+
+    if (inputEditSchoolName) {
+      setTimeout(() => {
+        inputEditSchoolName.focus();
+        inputEditSchoolName.select();
+      }, 50);
+    }
+  }
+
+  function closeEditSchoolModal() {
+    if (adminEditSchoolModal) adminEditSchoolModal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  if (btnCloseAdminEditSchoolModal) {
+    btnCloseAdminEditSchoolModal.addEventListener('click', closeEditSchoolModal);
+  }
+  if (btnCancelEditSchool) {
+    btnCancelEditSchool.addEventListener('click', closeEditSchoolModal);
+  }
+  if (adminEditSchoolModal) {
+    adminEditSchoolModal.addEventListener('click', (e) => {
+      if (e.target === adminEditSchoolModal) closeEditSchoolModal();
+    });
+  }
+
+  async function handleSaveSchoolEdit() {
+    const sId = editSchoolId ? editSchoolId.value : '';
+    const oldName = editSchoolOldName ? editSchoolOldName.value : '';
+    const newName = (inputEditSchoolName ? inputEditSchoolName.value : '').trim().toUpperCase();
+
+    if (!newName) {
+      showModalAlert('Please enter the School / Chapter name.', { type: 'warning' });
+      if (inputEditSchoolName) inputEditSchoolName.focus();
+      return;
+    }
+
+    const selectedCats = Array.from(editSchoolMultiCatCheckboxes)
+      .filter(cb => cb.checked)
+      .map(cb => cb.value.toUpperCase());
+
+    if (selectedCats.length === 0) {
+      showModalAlert('Please select at least one category.', { type: 'warning' });
+      return;
+    }
+
+    try {
+      allSchools = await CloudDB.updateSchool(sId || oldName, newName, selectedCats);
+      closeEditSchoolModal();
+      renderSchoolsTable();
+      showModalAlert(`"${newName}" was successfully updated!`, {
+        title: 'School Updated',
+        type: 'success'
+      });
+    } catch (err) {
+      showModalAlert(err.message || 'Error updating school', { type: 'error' });
+    }
+  }
+
+  if (btnSaveEditSchool) {
+    btnSaveEditSchool.addEventListener('click', handleSaveSchoolEdit);
+  }
+  if (inputEditSchoolName) {
+    inputEditSchoolName.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleSaveSchoolEdit();
       }
     });
   }

@@ -246,6 +246,53 @@
       return tempItem;
     },
 
+    async updateSchool(idOrOldName, newName, categories) {
+      const cleanName = (newName || '').trim().toUpperCase();
+      let catsArray = Array.isArray(categories) ? categories : (categories ? String(categories).split(',') : ['STUDENT']);
+      catsArray = catsArray.map(c => c.trim().toUpperCase()).filter(Boolean);
+      if (catsArray.length === 0) catsArray = ['STUDENT'];
+      const cleanCat = catsArray.join(', ');
+
+      if (!cleanName) throw new Error('School/Chapter name cannot be empty');
+
+      let current = this.getLocalSchools();
+      const targetIdx = current.findIndex(s => s.id === idOrOldName || s.name.toUpperCase() === String(idOrOldName).toUpperCase());
+      if (targetIdx === -1) {
+        throw new Error('School/Chapter not found to update');
+      }
+
+      const nameConflict = current.find((s, idx) => idx !== targetIdx && s.name.toUpperCase() === cleanName);
+      if (nameConflict) {
+        throw new Error(`Another school/chapter with the name "${cleanName}" already exists.`);
+      }
+
+      const existing = current[targetIdx];
+      const oldSchoolName = existing.name;
+      existing.name = cleanName;
+      existing.category = cleanCat;
+      this.saveLocalSchools(current);
+
+      try {
+        if (existing.id && !existing.id.startsWith('sch-')) {
+          await supabaseRequest(`schools?id=eq.${encodeURIComponent(existing.id)}`, {
+            method: 'PATCH',
+            headers: { 'Prefer': 'return=representation' },
+            body: JSON.stringify({ name: cleanName, category: cleanCat })
+          });
+        } else {
+          await supabaseRequest(`schools?name=eq.${encodeURIComponent(oldSchoolName)}`, {
+            method: 'PATCH',
+            headers: { 'Prefer': 'return=representation' },
+            body: JSON.stringify({ name: cleanName, category: cleanCat })
+          });
+        }
+      } catch (err) {
+        console.warn('[CloudDB] Supabase school update deferred:', err);
+      }
+
+      return current;
+    },
+
     async deleteSchool(idOrName) {
       let current = this.getLocalSchools();
       const toDelete = current.find(s => s.id === idOrName || s.name === idOrName);
