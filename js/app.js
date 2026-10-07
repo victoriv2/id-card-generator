@@ -260,13 +260,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const bearerBlock = document.getElementById('bearerBlock');
     if (!bearerBlock || !viewName || !viewSchool) return;
 
-    // Both text sizes start identical
-    let textSize = 2.55;
+    const hasSchool = !!(viewSchool.textContent && viewSchool.textContent.trim().length > 0);
+    let nameSize = hasSchool ? 3.35 : 3.85;
+    let schoolSize = 2.35;
 
-    viewName.style.fontSize = `${textSize}cqw`;
-    viewName.style.lineHeight = '1.12';
-    viewSchool.style.fontSize = `${textSize}cqw`;
-    viewSchool.style.lineHeight = '1.12';
+    viewName.style.fontSize = `${nameSize}cqw`;
+    viewName.style.lineHeight = '1.1';
+    viewSchool.style.fontSize = `${schoolSize}cqw`;
+    viewSchool.style.lineHeight = '1.1';
 
     // Measure allocated bounds
     const maxH = bearerBlock.clientHeight;
@@ -278,18 +279,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Only shrink if there is actual physical overflow of container height or width
     let attempts = 0;
-    while (attempts < 25) {
-      const currentH = (viewName.offsetHeight || 0) + (viewSchool.offsetHeight || 0) + gap;
-      const currentW = Math.max(viewName.scrollWidth || 0, viewSchool.scrollWidth || 0);
+    while (attempts < 30) {
+      const currentH = (viewName.offsetHeight || 0) + (hasSchool ? (viewSchool.offsetHeight || 0) + gap : 0);
+      const currentW = Math.max(viewName.scrollWidth || 0, hasSchool ? (viewSchool.scrollWidth || 0) : 0);
 
       if (currentH <= maxH && currentW <= maxW) {
         break; // Fits inside boundary!
       }
 
-      if (textSize > 1.35) {
-        textSize -= 0.06;
-        viewName.style.fontSize = `${textSize.toFixed(2)}cqw`;
-        viewSchool.style.fontSize = `${textSize.toFixed(2)}cqw`;
+      if (nameSize > 1.8) {
+        nameSize -= 0.08;
+        viewName.style.fontSize = `${nameSize.toFixed(2)}cqw`;
+        if (hasSchool && schoolSize > 1.4) {
+          schoolSize -= 0.05;
+          viewSchool.style.fontSize = `${schoolSize.toFixed(2)}cqw`;
+        }
       } else {
         break;
       }
@@ -1230,7 +1234,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const id = getSanitizedId();
     const isPaid = window.CloudDB ? CloudDB.isCardPaid(id) : false;
-    const price = window.CloudDB ? CloudDB.getPrice() : 1500;
+    const price = window.CloudDB ? CloudDB.getPrice() : 1000;
     const formattedPrice = new Intl.NumberFormat('en-NG').format(price);
 
     if (paywallAmountDisplay) paywallAmountDisplay.textContent = formattedPrice;
@@ -1270,7 +1274,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const isPaid = window.CloudDB ? CloudDB.isCardPaid(id) : false;
     if (isPaid) return true;
 
-    const price = window.CloudDB ? CloudDB.getPrice() : 1500;
+    const price = window.CloudDB ? CloudDB.getPrice() : 1000;
     const formattedPrice = new Intl.NumberFormat('en-NG').format(price);
     showModalAlert(`Official payment of ₦${formattedPrice} is required before downloading or printing your ID card. Please click "Pay Now with Paystack" to complete issuance.`, {
       title: 'Payment Required',
@@ -1307,7 +1311,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      const price = window.CloudDB ? CloudDB.getPrice() : 1500;
+      const price = window.CloudDB ? CloudDB.getPrice() : 1000;
       const ref = 'SPN-' + id.replace(/[^a-zA-Z0-9]/g, '') + '-' + Date.now();
 
       const handler = PaystackPop.setup({
@@ -1415,10 +1419,10 @@ document.addEventListener('DOMContentLoaded', () => {
   loadCardFromStorage();
   updatePaywallState();
 
-  // Background sync with cloud to ensure latest pricing and paid statuses
-  if (window.CloudDB && typeof CloudDB.loadFromCloud === 'function') {
-    CloudDB.loadFromCloud().then(() => {
+  // Lightweight background settings sync (price & paywall status) - does NOT download full cards table
+  if (window.CloudDB && typeof CloudDB.syncSettings === 'function') {
+    CloudDB.syncSettings().then(() => {
       updatePaywallState();
-    }).catch(err => console.warn('[App] Background cloud sync deferred:', err));
+    }).catch(err => console.warn('[App] Settings sync deferred:', err));
   }
 });

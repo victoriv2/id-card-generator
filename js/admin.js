@@ -1075,7 +1075,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       // Reset UI controls
       if (inputPrice) {
-        inputPrice.value = (resetResult.price || 1500).toString();
+        inputPrice.value = (resetResult.price || 1000).toString();
       }
       updatePaywallToggleUI(true);
 

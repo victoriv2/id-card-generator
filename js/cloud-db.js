@@ -10,7 +10,7 @@
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlvb2FjeWh2dndxY3d2a2Z4bWp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzMTQ2MzIsImV4cCI6MjEwNjg5MDYzMn0.1vfrl4ZbdPIDlHqdi_PZxy-FGMOItKq91QFyMrbFXEs';
   const PAYSTACK_PUBLIC_KEY = 'pk_live_732d9b62cd035b8dad96e981d7f6982540342e80';
   const DEFAULT_PAYMENT_EMAIL = 'we.are.danithuga@gmail.com';
-  const DEFAULT_PRICE_NGN = 1500;
+  const DEFAULT_PRICE_NGN = 1000;
 
   const STORAGE_KEYS = {
     RECORDS: 'spa_card_records',
@@ -126,7 +126,12 @@
     getPrice() {
       const stored = localStorage.getItem(STORAGE_KEYS.PRICE);
       if (stored && !isNaN(stored)) {
-        return parseInt(stored, 10);
+        const val = parseInt(stored, 10);
+        if (val === 1500) {
+          localStorage.setItem(STORAGE_KEYS.PRICE, DEFAULT_PRICE_NGN.toString());
+          return DEFAULT_PRICE_NGN;
+        }
+        return val;
       }
       return DEFAULT_PRICE_NGN;
     },
@@ -518,11 +523,12 @@
     },
 
     /**
-     * Load latest cards and settings from Supabase and merge with LocalStorage
+     * Lightweight settings sync (Price & Paywall Gate)
+     * Extremely low bandwidth (<1KB) - DOES NOT fetch full cards table!
+     * Safe for frequent calls without exhausting Supabase free tier limits.
      */
-    async loadFromCloud() {
+    async syncSettings() {
       try {
-        // 1. Sync Settings (Price & Paywall Gate)
         const settingsRes = await supabaseRequest('app_settings?select=*').catch(() => null);
         if (Array.isArray(settingsRes)) {
           settingsRes.forEach(s => {
@@ -536,6 +542,57 @@
             }
           });
         }
+      } catch (err) {
+        console.warn('[CloudDB] Settings sync deferred:', err);
+      }
+    },
+
+    /**
+     * On-Demand Targeted Search on Supabase (Free-Tier Quota Optimized)
+     * Queries ONLY matching or similar records directly from Postgres
+     * Does NOT download the entire database or poll continuously
+     */
+    async searchCards(query) {
+      const q = (query || '').trim();
+      if (!q) return [];
+
+      const cleanQ = q.replace(/[%_*]/g, '').trim();
+      if (!cleanQ) return [];
+
+      try {
+        // Targeted Postgres ILIKE query: only matches are returned across the network
+        const endpoint = `cards?or=(name.ilike.*${encodeURIComponent(cleanQ)}*,id.ilike.*${encodeURIComponent(cleanQ)}*)&order=saved_at.desc&limit=25`;
+        const cloudRows = await supabaseRequest(endpoint);
+        if (Array.isArray(cloudRows) && cloudRows.length > 0) {
+          const mapped = cloudRows.map(fromRow);
+          // Cache retrieved cards locally so user can view/load without re-fetching
+          const local = this.getLocalCards();
+          mapped.forEach(c => {
+            const idx = local.findIndex(l => l.id === c.id);
+            if (idx >= 0) local[idx] = c;
+            else local.unshift(c);
+          });
+          this.saveLocalCards(local);
+          return mapped;
+        }
+      } catch (err) {
+        console.warn('[CloudDB] Remote search deferred, falling back to local:', err);
+      }
+
+      // Local storage fallback if offline or network glitch
+      const local = this.getLocalCards();
+      const qUpper = cleanQ.toUpperCase();
+      return local.filter(c => (c.name && c.name.toUpperCase().includes(qUpper)) || (c.id && c.id.toUpperCase().includes(qUpper)));
+    },
+
+    /**
+     * Load latest cards and settings from Supabase and merge with LocalStorage
+     * Used primarily by Admin Dashboard upon authorized sign-in
+     */
+    async loadFromCloud() {
+      try {
+        // 1. Sync Settings (Price & Paywall Gate)
+        await this.syncSettings();
 
         // 2. Fetch Cards from Supabase
         const cloudRows = await supabaseRequest('cards?select=*&order=saved_at.desc');
@@ -556,7 +613,7 @@
      * - Clears all cards/members in LocalStorage and Supabase
      * - Clears all schools/chapters/branches in LocalStorage and Supabase
      * - Resets card counter in LocalStorage
-     * - Resets card price to DEFAULT_PRICE_NGN (1500) in LocalStorage and Supabase
+     * - Resets card price to DEFAULT_PRICE_NGN (1000) in LocalStorage and Supabase
      * - Restores payment wall to enabled
      */
     async factoryReset() {

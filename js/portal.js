@@ -1,45 +1,52 @@
 /**
  * Students Parliament Nigeria - Portal Logic
- * Handles Card Retrieval and Navigation
+ * Handles Card Retrieval and Navigation (Free-Tier Supabase Quota Optimized)
  */
 
 document.addEventListener('DOMContentLoaded', () => {
   const btnShowRetrieve = document.getElementById('btnShowRetrieve');
-  const retrieveSection = document.getElementById('retrieveSection');
   const btnCloseRetrieve = document.getElementById('btnCloseRetrieve');
   const searchInput = document.getElementById('portalSearchInput');
+  const btnPortalSearch = document.getElementById('btnPortalSearch');
   const resultsContainer = document.getElementById('portalResultsList');
   const emptyState = document.getElementById('portalEmptyState');
+  const retrieveModal = document.getElementById('retrieveModal') || document.getElementById('retrieveSection');
 
-  function getRecords() {
-    if (window.CloudDB) {
-      return CloudDB.getLocalCards();
-    }
-    try {
-      return JSON.parse(localStorage.getItem('spa_card_records') || '[]');
-    } catch (e) {
-      return [];
-    }
+  function showInitialPrompt() {
+    if (!resultsContainer) return;
+    resultsContainer.innerHTML = `
+      <div style="text-align: center; padding: 42px 18px; color: #64748b;">
+        <svg width="46" height="46" fill="#94a3b8" viewBox="0 0 24 24" style="margin-bottom: 12px; display: inline-block;">
+          <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+        </svg>
+        <h4 style="color: #1e293b; font-size: 1.05rem; font-weight: 700; margin-bottom: 6px;">Search Issued ID Cards</h4>
+        <p style="font-size: 0.88rem; max-width: 360px; margin: 0 auto; line-height: 1.45; color: #64748b;">
+          Type a member's Full Name or ID Number above, then click <strong>Search</strong> or hit Enter to look up their record.
+        </p>
+      </div>
+    `;
+    if (emptyState) emptyState.style.display = 'none';
   }
 
-  function renderRecords(query = '') {
-    const records = getRecords();
-    const q = query.trim().toUpperCase();
-
-    const filtered = q
-      ? records.filter(r => (r.id && r.id.toUpperCase().includes(q)) || (r.name && r.name.toUpperCase().includes(q)))
-      : records;
-
+  function renderRecords(records = [], query = '', errorMsg = '') {
     if (!resultsContainer) return;
     resultsContainer.innerHTML = '';
 
-    if (filtered.length === 0) {
+    if (errorMsg) {
       if (emptyState) {
         emptyState.style.display = 'block';
-        if (q) {
-          emptyState.querySelector('p').textContent = `No cards found matching "${query}". Try searching by Full Name or ID Number.`;
+        emptyState.querySelector('p').textContent = errorMsg;
+      }
+      return;
+    }
+
+    if (!records || records.length === 0) {
+      if (emptyState) {
+        emptyState.style.display = 'block';
+        if (query) {
+          emptyState.querySelector('p').textContent = `No cards found matching "${query}". Check the spelling or ID Number and try again.`;
         } else {
-          emptyState.querySelector('p').textContent = 'No ID cards have been generated yet. Click "Generate New ID Card" to issue your first card.';
+          emptyState.querySelector('p').textContent = 'Please enter a name or ID number to search.';
         }
       }
       return;
@@ -47,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (emptyState) emptyState.style.display = 'none';
 
-    filtered.forEach(record => {
+    records.forEach(record => {
       const item = document.createElement('div');
       item.className = 'portal-record-item';
 
@@ -84,26 +91,66 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Retrieve Modal Controls
-  const retrieveModal = document.getElementById('retrieveModal') || document.getElementById('retrieveSection');
+  // Explicit On-Demand Search (Triggered ONLY when user clicks Search or presses Enter)
+  async function executeSearch() {
+    const q = (searchInput ? searchInput.value : '').trim();
+    if (!q) {
+      renderRecords([], '', 'Please type a Full Name or ID Number in the box above.');
+      if (searchInput) searchInput.focus();
+      return;
+    }
 
+    // Display targeted loading state
+    if (resultsContainer) {
+      resultsContainer.innerHTML = `
+        <div style="text-align: center; padding: 40px 16px; color: #475569;">
+          <div style="display: inline-block; width: 30px; height: 30px; border: 3px solid #cbd5e1; border-top-color: #0b3d23; border-radius: 50%; animation: portalSpin 0.7s linear infinite; margin-bottom: 12px;"></div>
+          <div style="font-weight: 700; color: #0f172a; font-size: 0.95rem;">Searching Database...</div>
+          <div style="font-size: 0.8rem; color: #64748b; margin-top: 4px;">Looking up records matching "${q}"</div>
+        </div>
+      `;
+    }
+    if (emptyState) emptyState.style.display = 'none';
+
+    if (btnPortalSearch) {
+      btnPortalSearch.disabled = true;
+      btnPortalSearch.innerHTML = 'Searching...';
+    }
+
+    try {
+      let records = [];
+      if (window.CloudDB && typeof CloudDB.searchCards === 'function') {
+        records = await CloudDB.searchCards(q);
+      } else {
+        const local = JSON.parse(localStorage.getItem('spa_card_records') || '[]');
+        const qUpper = q.toUpperCase();
+        records = local.filter(r => (r.id && r.id.toUpperCase().includes(qUpper)) || (r.name && r.name.toUpperCase().includes(qUpper)));
+      }
+
+      renderRecords(records, q);
+    } catch (err) {
+      console.warn('[Portal] Search query error:', err);
+      renderRecords([], q, 'Could not complete search. Please verify your connection and try again.');
+    } finally {
+      if (btnPortalSearch) {
+        btnPortalSearch.disabled = false;
+        btnPortalSearch.innerHTML = `
+          <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          Search
+        `;
+      }
+    }
+  }
+
+  // Retrieve Modal Controls
   function openRetrieveModal() {
     if (!retrieveModal) return;
-    renderRecords();
+    showInitialPrompt();
     retrieveModal.classList.add('is-open');
     document.body.style.overflow = 'hidden';
     if (searchInput) {
       searchInput.value = '';
       setTimeout(() => searchInput.focus(), 120);
-    }
-
-    // Refresh from cloud in background to pick up newly issued or verified cards
-    if (window.CloudDB && typeof CloudDB.loadFromCloud === 'function') {
-      CloudDB.loadFromCloud().then(() => {
-        if (retrieveModal.classList.contains('is-open')) {
-          renderRecords(searchInput ? searchInput.value : '');
-        }
-      }).catch(err => console.warn('[Portal] Cloud fetch deferred:', err));
     }
   }
 
@@ -139,9 +186,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Attach search triggers (Search button and Enter key) - NO real-time keystroke searching!
+  if (btnPortalSearch) {
+    btnPortalSearch.addEventListener('click', executeSearch);
+  }
+
   if (searchInput) {
-    searchInput.addEventListener('input', () => {
-      renderRecords(searchInput.value);
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        executeSearch();
+      }
     });
   }
 });

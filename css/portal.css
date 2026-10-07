@@ -253,6 +253,40 @@
   border-color: #b45309;
 }
 
+.portal-search-btn {
+  background: linear-gradient(135deg, #0b3d23 0%, #15803d 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 0 24px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.portal-search-btn:hover {
+  background: linear-gradient(135deg, #062b17 0%, #166534 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(11, 61, 35, 0.25);
+}
+
+.portal-search-btn:active {
+  transform: translateY(0);
+}
+
+.portal-search-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 .portal-results-list {
   display: flex;
   flex-direction: column;
@@ -385,4 +419,8 @@
   color: #64748b;
   font-size: 0.85rem;
   border-top: 1px solid #e2e8f0;
+}
+
+@keyframes portalSpin {
+  to { transform: rotate(360deg); }
 }
