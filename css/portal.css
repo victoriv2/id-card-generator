@@ -272,12 +272,11 @@
 
 .portal-search-btn:hover {
   background: linear-gradient(135deg, #062b17 0%, #166534 100%);
-  transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(11, 61, 35, 0.25);
 }
 
 .portal-search-btn:active {
-  transform: translateY(0);
+  opacity: 0.95;
 }
 
 .portal-search-btn:disabled {
