@@ -30,6 +30,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   const sortOrder = document.getElementById('sortOrder');
   const tableBody = document.getElementById('adminTableBody');
 
+  // School / Chapter Directory Elements
+  const formAddSchool = document.getElementById('formAddSchool');
+  const inputNewSchoolName = document.getElementById('inputNewSchoolName');
+  const selectNewSchoolCategory = document.getElementById('selectNewSchoolCategory');
+  const filterSchoolCat = document.getElementById('filterSchoolCat');
+  const adminSchoolsTableBody = document.getElementById('adminSchoolsTableBody');
+  const schoolDirectoryCount = document.getElementById('schoolDirectoryCount');
+
   // -------------------------------------------------------------------------
   // Authentication (admin / admin123)
   // -------------------------------------------------------------------------
@@ -85,6 +93,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     return new Intl.NumberFormat('en-NG').format(amount || 0);
   }
 
+  function escapeHtml(str) {
+    return String(str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
   let allCards = [];
 
   async function loadDashboard() {
@@ -96,6 +113,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 2. Load cards from local + cloud
     allCards = CloudDB.getLocalCards();
     updateStatsAndRender();
+    await loadSchoolsDirectory();
 
     // Trigger background cloud sync
     try {
@@ -103,6 +121,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       allCards = await CloudDB.loadFromCloud();
       if (syncStatus) syncStatus.textContent = '● Online & Synchronized';
       updateStatsAndRender();
+      await loadSchoolsDirectory();
     } catch (e) {
       if (syncStatus) syncStatus.textContent = '● Offline / Local Storage';
     }
@@ -378,4 +397,111 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.body.removeChild(link);
     });
   }
+
+  // -------------------------------------------------------------------------
+  // School / Chapter / Branch Directory Manager
+  // -------------------------------------------------------------------------
+  let allSchools = [];
+
+  async function loadSchoolsDirectory() {
+    if (!adminSchoolsTableBody) return;
+    try {
+      allSchools = await CloudDB.loadSchools();
+    } catch (e) {
+      allSchools = CloudDB.getLocalSchools();
+    }
+    renderSchoolsTable();
+  }
+
+  function renderSchoolsTable() {
+    if (!adminSchoolsTableBody) return;
+    const catFilter = filterSchoolCat ? filterSchoolCat.value : 'ALL';
+    const filtered = allSchools.filter(s => {
+      if (catFilter === 'ALL') return true;
+      return (s.category || '').toUpperCase() === catFilter.toUpperCase();
+    });
+
+    if (schoolDirectoryCount) {
+      schoolDirectoryCount.textContent = `${filtered.length} / ${allSchools.length} Total`;
+    }
+
+    if (filtered.length === 0) {
+      adminSchoolsTableBody.innerHTML = `
+        <tr>
+          <td colspan="3" style="text-align: center; color: #94a3b8; padding: 24px;">
+            No schools or chapters found for the selected category.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    adminSchoolsTableBody.innerHTML = filtered.map(s => {
+      const cat = (s.category || 'STUDENT').toUpperCase();
+      const badgeClass = cat.toLowerCase();
+      const idParam = s.id || s.name;
+      return `
+        <tr>
+          <td style="font-weight: 700; color: #0f172a;">${escapeHtml(s.name)}</td>
+          <td><span class="admin-school-cat-badge ${badgeClass}">${cat}</span></td>
+          <td style="text-align: center;">
+            <button type="button" class="btn-del-school" data-school-id="${escapeHtml(idParam)}" data-school-name="${escapeHtml(s.name)}" title="Delete from directory">
+              Delete
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    // Attach delete listeners
+    adminSchoolsTableBody.querySelectorAll('.btn-del-school').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.getAttribute('data-school-id');
+        const name = btn.getAttribute('data-school-name');
+        if (!confirm(`Are you sure you want to remove "${name}" from the directory?`)) {
+          return;
+        }
+
+        try {
+          allSchools = await CloudDB.deleteSchool(id);
+          renderSchoolsTable();
+          showModalAlert(`"${name}" was successfully removed from the directory.`, { type: 'success' });
+        } catch (err) {
+          showModalAlert('Could not delete school: ' + (err.message || String(err)), { type: 'error' });
+        }
+      });
+    });
+  }
+
+  if (filterSchoolCat) {
+    filterSchoolCat.addEventListener('change', renderSchoolsTable);
+  }
+
+  if (formAddSchool) {
+    formAddSchool.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = (inputNewSchoolName ? inputNewSchoolName.value : '').trim().toUpperCase();
+      const category = (selectNewSchoolCategory ? selectNewSchoolCategory.value : 'STUDENT').toUpperCase();
+
+      if (!name) {
+        showModalAlert('Please enter the School / Chapter name.', { type: 'warning' });
+        if (inputNewSchoolName) inputNewSchoolName.focus();
+        return;
+      }
+
+      try {
+        await CloudDB.addSchool(name, category);
+        if (inputNewSchoolName) inputNewSchoolName.value = '';
+        allSchools = await CloudDB.loadSchools();
+        renderSchoolsTable();
+        showModalAlert(`Successfully added "${name}" under category ${category}! Members will now see this in the ID card generator.`, {
+          title: 'School Added',
+          type: 'success'
+        });
+      } catch (err) {
+        showModalAlert(err.message || 'Error adding school', { type: 'error' });
+      }
+    });
+  }
 });
+

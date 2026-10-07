@@ -14,8 +14,22 @@
 
   const STORAGE_KEYS = {
     RECORDS: 'spa_card_records',
-    PRICE: 'spa_card_price_ngn'
+    PRICE: 'spa_card_price_ngn',
+    SCHOOLS: 'spa_schools_branches'
   };
+
+  const DEFAULT_SCHOOLS = [
+    { name: 'CSGS. GBERIGBE', category: 'STUDENT' },
+    { name: 'LAGOS STATE MODEL COLLEGE', category: 'STUDENT' },
+    { name: 'KING\'S COLLEGE LAGOS', category: 'STUDENT' },
+    { name: 'QUEEN\'S COLLEGE LAGOS', category: 'STUDENT' },
+    { name: 'FEDERAL GOVERNMENT COLLEGE', category: 'STUDENT' },
+    { name: 'NIGERIA UNION OF TEACHERS (NUT) CHAPTER', category: 'TEACHER' },
+    { name: 'ACADEMIC STAFF UNION OF UNIVERSITIES (ASUU)', category: 'TEACHER' },
+    { name: 'NATIONAL PARENT TEACHER ASSOCIATION (NPTA)', category: 'PARENT' },
+    { name: 'STATE PARLIAMENTARY EXECUTIVE COUNCIL', category: 'EXECUTIVE' },
+    { name: 'NATIONAL PARLIAMENTARY DIRECTORATE', category: 'OFFICIAL' }
+  ];
 
   /**
    * Universal Supabase REST helper using PostgREST endpoints
@@ -125,6 +139,120 @@
       }
 
       return p;
+    },
+
+    // -----------------------------------------------------------------------
+    // Schools / Chapters / Branches Management
+    // -----------------------------------------------------------------------
+    getLocalSchools() {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEYS.SCHOOLS);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) {}
+      return DEFAULT_SCHOOLS.slice();
+    },
+
+    saveLocalSchools(schools) {
+      localStorage.setItem(STORAGE_KEYS.SCHOOLS, JSON.stringify(schools));
+    },
+
+    async getSchoolsByCategory(category) {
+      const allSchools = await this.loadSchools();
+      if (!category || category === 'ALL') return allSchools;
+      const targetCat = category.toUpperCase();
+      return allSchools.filter(s => (s.category || '').toUpperCase() === targetCat);
+    },
+
+    async loadSchools() {
+      try {
+        const res = await supabaseRequest('schools?select=*&order=name.asc');
+        if (Array.isArray(res) && res.length > 0) {
+          const mapped = res.map(r => ({
+            id: r.id,
+            name: r.name,
+            category: (r.category || 'STUDENT').toUpperCase(),
+            createdAt: r.created_at
+          }));
+          this.saveLocalSchools(mapped);
+          return mapped;
+        }
+      } catch (err) {
+        console.warn('[CloudDB] Supabase schools fetch deferred, using local cache:', err);
+      }
+      return this.getLocalSchools();
+    },
+
+    async addSchool(name, category) {
+      const cleanName = (name || '').trim().toUpperCase();
+      const cleanCat = (category || 'STUDENT').trim().toUpperCase();
+      if (!cleanName) throw new Error('School/Chapter name is required');
+
+      let current = this.getLocalSchools();
+      // Avoid exact duplicate
+      const exists = current.some(s => s.name.toUpperCase() === cleanName && s.category.toUpperCase() === cleanCat);
+      if (exists) {
+        throw new Error(`"${cleanName}" already exists under ${cleanCat}`);
+      }
+
+      const tempItem = {
+        id: 'sch-' + Date.now(),
+        name: cleanName,
+        category: cleanCat,
+        createdAt: new Date().toISOString()
+      };
+
+      current.push(tempItem);
+      this.saveLocalSchools(current);
+
+      try {
+        const res = await supabaseRequest('schools', {
+          method: 'POST',
+          headers: { 'Prefer': 'return=representation' },
+          body: JSON.stringify({
+            name: cleanName,
+            category: cleanCat
+          })
+        });
+        if (Array.isArray(res) && res[0]) {
+          // Replace temp id with real db id
+          const idx = current.findIndex(s => s.id === tempItem.id);
+          if (idx >= 0) {
+            current[idx].id = res[0].id;
+            this.saveLocalSchools(current);
+          }
+          return res[0];
+        }
+      } catch (err) {
+        console.warn('[CloudDB] Supabase school creation deferred:', err);
+      }
+
+      return tempItem;
+    },
+
+    async deleteSchool(idOrName) {
+      let current = this.getLocalSchools();
+      const toDelete = current.find(s => s.id === idOrName || s.name === idOrName);
+      current = current.filter(s => s.id !== idOrName && s.name !== idOrName);
+      this.saveLocalSchools(current);
+
+      try {
+        if (toDelete && toDelete.id && !toDelete.id.startsWith('sch-')) {
+          await supabaseRequest(`schools?id=eq.${encodeURIComponent(toDelete.id)}`, {
+            method: 'DELETE'
+          });
+        } else if (toDelete) {
+          await supabaseRequest(`schools?name=eq.${encodeURIComponent(toDelete.name)}`, {
+            method: 'DELETE'
+          });
+        }
+      } catch (err) {
+        console.warn('[CloudDB] Supabase school deletion deferred:', err);
+      }
+
+      return current;
     },
 
     // Local Storage Helpers

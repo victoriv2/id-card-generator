@@ -21,6 +21,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnCloseCategoryModal = document.getElementById('btnCloseCategoryModal');
   const simpleModalOptions = document.querySelectorAll('.simple-modal-option[data-cat]');
 
+  // --- School / Chapter Modal Elements ---
+  const schoolTrigger = document.getElementById('schoolTrigger');
+  const selectedSchoolText = document.getElementById('selectedSchoolText');
+  const schoolModal = document.getElementById('schoolModal');
+  const schoolModalTitle = document.getElementById('schoolModalTitle');
+  const btnCloseSchoolModal = document.getElementById('btnCloseSchoolModal');
+  const schoolSearchInput = document.getElementById('schoolSearchInput');
+  const btnSchoolSearchClear = document.getElementById('btnSchoolSearchClear');
+  const schoolOptionsList = document.getElementById('schoolOptionsList');
+  const schoolEmptyState = document.getElementById('schoolEmptyState');
+
   // --- State Simple Modal Elements (with Search) ---
   const stateTrigger = document.getElementById('stateTrigger');
   const selectedStateText = document.getElementById('selectedStateText');
@@ -146,6 +157,15 @@ document.addEventListener('DOMContentLoaded', () => {
     toastNotice.textContent = text;
     toastNotice.classList.add('show');
     setTimeout(() => toastNotice.classList.remove('show'), 2600);
+  }
+
+  function escapeHtml(str) {
+    return String(str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
   }
 
   // -------------------------------------------------------------------------
@@ -425,11 +445,150 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // --- Simple School Modal Logic (Filtered by Category & Searchable) ---
+  let cachedSchoolsList = [];
+
+  async function openSchoolModal() {
+    if (!schoolModal) return;
+    const cat = inputCategory ? inputCategory.value.trim().toUpperCase() : '';
+    if (!cat) {
+      showModalAlert('Please select your Category / Role first before choosing your School / Chapter / Branch.', {
+        title: 'Select Category First',
+        type: 'warning'
+      });
+      openCategoryModal();
+      return;
+    }
+
+    if (schoolModalTitle) {
+      schoolModalTitle.textContent = `Select ${cat} School / Chapter`;
+    }
+
+    schoolModal.style.display = 'flex';
+    if (schoolSearchInput) {
+      schoolSearchInput.value = '';
+      setTimeout(() => schoolSearchInput.focus(), 60);
+    }
+    if (btnSchoolSearchClear) btnSchoolSearchClear.style.display = 'none';
+
+    // Fetch and filter schools for selected category
+    try {
+      if (window.CloudDB && typeof CloudDB.getSchoolsByCategory === 'function') {
+        cachedSchoolsList = await CloudDB.getSchoolsByCategory(cat);
+      } else {
+        cachedSchoolsList = [];
+      }
+    } catch (e) {
+      cachedSchoolsList = [];
+    }
+
+    renderSchoolOptions('');
+  }
+
+  function closeSchoolModal() {
+    if (!schoolModal) return;
+    schoolModal.style.display = 'none';
+  }
+
+  function renderSchoolOptions(query) {
+    if (!schoolOptionsList) return;
+    const cleanQ = (query || '').trim().toUpperCase();
+    const currentSelected = inputSchool ? inputSchool.value.trim().toUpperCase() : '';
+
+    const matches = cachedSchoolsList.filter(s => {
+      if (!cleanQ) return true;
+      return (s.name || '').toUpperCase().includes(cleanQ);
+    });
+
+    if (matches.length === 0) {
+      schoolOptionsList.innerHTML = '';
+      if (schoolEmptyState) {
+        schoolEmptyState.style.display = 'block';
+        schoolEmptyState.textContent = cleanQ 
+          ? `No school or chapter matching "${cleanQ}".`
+          : 'No schools or chapters registered under this category yet. Contact Admin.';
+      }
+      return;
+    }
+
+    if (schoolEmptyState) schoolEmptyState.style.display = 'none';
+
+    schoolOptionsList.innerHTML = matches.map(s => {
+      const isAct = currentSelected === (s.name || '').toUpperCase() ? 'active' : '';
+      return `<button type="button" class="simple-modal-option school-modal-option ${isAct}" data-school="${escapeHtml(s.name)}">${escapeHtml(s.name)}</button>`;
+    }).join('');
+
+    // Attach click handlers to rendered options
+    schoolOptionsList.querySelectorAll('.school-modal-option').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const schName = btn.getAttribute('data-school');
+        if (inputSchool) inputSchool.value = schName;
+        if (selectedSchoolText) {
+          selectedSchoolText.textContent = schName;
+          selectedSchoolText.classList.remove('placeholder-text');
+        }
+
+        schoolOptionsList.querySelectorAll('.school-modal-option').forEach(o => o.classList.remove('active'));
+        btn.classList.add('active');
+
+        closeSchoolModal();
+        syncOverlay();
+        notify(`Selected: ${schName}`);
+      });
+    });
+  }
+
+  if (schoolTrigger) {
+    schoolTrigger.addEventListener('click', openSchoolModal);
+    schoolTrigger.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openSchoolModal();
+      }
+    });
+  }
+
+  if (btnCloseSchoolModal) {
+    btnCloseSchoolModal.addEventListener('click', closeSchoolModal);
+  }
+
+  if (schoolModal) {
+    schoolModal.addEventListener('click', (e) => {
+      if (e.target === schoolModal) {
+        closeSchoolModal();
+      }
+    });
+  }
+
+  if (schoolSearchInput) {
+    schoolSearchInput.addEventListener('input', () => {
+      const q = schoolSearchInput.value.trim();
+      if (btnSchoolSearchClear) {
+        btnSchoolSearchClear.style.display = q.length > 0 ? 'flex' : 'none';
+      }
+      renderSchoolOptions(q);
+    });
+  }
+
+  if (btnSchoolSearchClear) {
+    btnSchoolSearchClear.addEventListener('click', () => {
+      if (schoolSearchInput) {
+        schoolSearchInput.value = '';
+        schoolSearchInput.focus();
+      }
+      btnSchoolSearchClear.style.display = 'none';
+      renderSchoolOptions('');
+    });
+  }
+
   // Global Escape key to dismiss active modal
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       if (categoryModal && categoryModal.style.display === 'flex') {
         closeCategoryModal();
+      }
+      if (schoolModal && schoolModal.style.display === 'flex') {
+        closeSchoolModal();
       }
       if (stateModal && stateModal.style.display === 'flex') {
         closeStateModal();
@@ -513,10 +672,24 @@ document.addEventListener('DOMContentLoaded', () => {
         simpleModalOptions.forEach(o => o.classList.remove('active'));
         opt.classList.add('active');
 
+        // Reset school if previous school category does not match
+        if (inputSchool && inputSchool.value) {
+          inputSchool.value = '';
+          if (selectedSchoolText) {
+            selectedSchoolText.textContent = `Select ${cat} School / Chapter`;
+            selectedSchoolText.classList.add('placeholder-text');
+          }
+        }
+
         closeCategoryModal();
         updateAutoCredentials();
         syncOverlay();
         notify(`Category selected: ${cat}`);
+
+        // Automatically open the matching school selection modal for seamless experience
+        setTimeout(() => {
+          openSchoolModal();
+        }, 220);
       });
     });
   }
@@ -660,6 +833,10 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (inputName) inputName.value = '';
       if (inputSchool) inputSchool.value = '';
+      if (selectedSchoolText) {
+        selectedSchoolText.textContent = 'Select School / Chapter / Branch';
+        selectedSchoolText.classList.add('placeholder-text');
+      }
       if (inputCategory) inputCategory.value = '';
       if (selectedCategoryText) {
         selectedCategoryText.textContent = 'Select Category';
