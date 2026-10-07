@@ -21,6 +21,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const inputPrice = document.getElementById('inputAdminPrice');
   const btnSavePrice = document.getElementById('btnSavePrice');
   const btnExportExcel = document.getElementById('btnExportExcel');
+  const btnTogglePaywall = document.getElementById('btnTogglePaywall');
+  const togglePaywallBtnLabel = document.getElementById('togglePaywallBtnLabel');
+  const paywallStatusPill = document.getElementById('paywallStatusPill');
+  const paywallStatusText = document.getElementById('paywallStatusText');
 
   const searchInput = document.getElementById('adminSearchInput');
   const filterCategory = document.getElementById('filterCategory');
@@ -154,10 +158,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   async function loadDashboard() {
-    // 1. Load current price
+    // 1. Load current price & paywall status
     if (inputPrice) {
       inputPrice.value = CloudDB.getPrice();
     }
+    updatePaywallToggleUI(CloudDB.isPaywallEnabled());
 
     // 2. Load cards from local
     allCards = CloudDB.getLocalCards();
@@ -172,6 +177,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         allCards = cards;
         updateStatsAndRender();
       }
+      if (inputPrice) {
+        inputPrice.value = CloudDB.getPrice();
+      }
+      updatePaywallToggleUI(CloudDB.isPaywallEnabled());
     }).catch(e => console.warn('[CloudDB] Cards load deferred:', e));
   }
 
@@ -458,6 +467,53 @@ document.addEventListener('DOMContentLoaded', async () => {
     optionsListId: 'adminSortList',
     onChange: () => renderTable()
   });
+
+  // -------------------------------------------------------------------------
+  // Paystack Payment Wall Gate (Enable / Disable)
+  // -------------------------------------------------------------------------
+  function updatePaywallToggleUI(isEnabled) {
+    if (!btnTogglePaywall) return;
+    btnTogglePaywall.setAttribute('data-enabled', isEnabled ? 'true' : 'false');
+
+    if (paywallStatusPill) {
+      paywallStatusPill.className = 'paywall-status-pill ' + (isEnabled ? 'active' : 'disabled');
+    }
+    if (paywallStatusText) {
+      const price = CloudDB.getPrice();
+      paywallStatusText.textContent = isEnabled 
+        ? `Payment Wall: ACTIVE (₦${formatNaira(price)} Required)` 
+        : 'Payment Wall: DISABLED (Free Downloads Unlocked)';
+    }
+    if (togglePaywallBtnLabel) {
+      togglePaywallBtnLabel.textContent = isEnabled ? 'Disable Payment Wall' : 'Enable Payment Wall';
+    }
+  }
+
+  if (btnTogglePaywall) {
+    btnTogglePaywall.addEventListener('click', async () => {
+      const current = btnTogglePaywall.getAttribute('data-enabled') === 'true';
+      const newState = !current;
+      btnTogglePaywall.disabled = true;
+
+      try {
+        await CloudDB.setPaywallEnabled(newState);
+        updatePaywallToggleUI(newState);
+        showModalAlert(
+          newState 
+            ? 'Paystack Payment Wall is now ENABLED. Members must pay the official fee before downloading or printing.' 
+            : 'Paystack Payment Wall is now DISABLED. All members can now download and print their ID cards for FREE!',
+          {
+            title: newState ? 'Payment Wall Enabled' : 'Payment Wall Disabled (Free Mode)',
+            type: newState ? 'info' : 'success'
+          }
+        );
+      } catch (err) {
+        showModalAlert('Error updating payment wall setting: ' + (err.message || String(err)), { type: 'error' });
+      } finally {
+        btnTogglePaywall.disabled = false;
+      }
+    });
+  }
 
   // -------------------------------------------------------------------------
   // Adjust Price
@@ -1016,6 +1072,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (inputPrice) {
         inputPrice.value = (resetResult.price || 1500).toString();
       }
+      updatePaywallToggleUI(true);
 
       // Re-render UI components
       updateStatsAndRender();

@@ -82,8 +82,8 @@
           <span class="admin-tab-badge" id="tabBadgeSchools">0</span>
         </button>
         <button type="button" class="admin-tab-btn" data-tab="settings">
-          <span style="font-size: 16px; font-weight: 900; line-height: 1;">₦</span>
-          <span>Card Issuance Fee</span>
+          <svg width="17" height="17" fill="currentColor" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+          <span>Fee &amp; Paywall Settings</span>
         </button>
       </div>
     </nav>
@@ -307,10 +307,38 @@
       </div>
 
       <!-- ============================================================
-           TAB 4: CARD ISSUANCE PRICING SETTINGS
+           TAB 4: CARD ISSUANCE PRICING & PAYMENT WALL SETTINGS
            ============================================================ -->
       <div class="admin-tab-panel" id="tabPanel-settings">
         <section class="admin-settings-row">
+          
+          <!-- Paystack Payment Wall Gate Toggle Card -->
+          <div class="admin-panel-card" style="max-width: 580px; margin-bottom: 24px;">
+            <div class="admin-section-header">
+              <h2>
+                <span class="admin-header-icon blue">
+                  <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                </span>
+                <span>Paystack Payment Wall Gate</span>
+              </h2>
+            </div>
+            <p>
+              Enable or disable the compulsory payment barrier on the ID Card Generator. When disabled, all members can immediately download and print their cards for free without paying through Paystack.
+            </p>
+            <div class="admin-paywall-control-box">
+              <div class="paywall-status-pill active" id="paywallStatusPill">
+                <span class="status-indicator-dot" id="paywallStatusDot"></span>
+                <span id="paywallStatusText">Payment Wall: ACTIVE (₦1,500 Required)</span>
+              </div>
+              <button type="button" id="btnTogglePaywall" class="btn-paywall-toggle" data-enabled="true">
+                <span class="toggle-switch-track">
+                  <span class="toggle-switch-thumb"></span>
+                </span>
+                <span class="toggle-btn-label" id="togglePaywallBtnLabel">Disable Payment Wall</span>
+              </button>
+            </div>
+          </div>
+
           <!-- Price Adjustment Card -->
           <div class="admin-panel-card" style="max-width: 580px;">
             <div class="admin-section-header">

@@ -1183,8 +1183,24 @@ document.addEventListener('DOMContentLoaded', () => {
   const paywallVerifiedRef = document.getElementById('paywallVerifiedRef');
   const paywallVerifiedAmount = document.getElementById('paywallVerifiedAmount');
   const downloadsLockBanner = document.getElementById('downloadsLockBanner');
+  const paywallFreeBanner = document.getElementById('paywallFreeBanner');
 
   function updatePaywallState() {
+    const isPaywallActive = window.CloudDB && typeof CloudDB.isPaywallEnabled === 'function'
+      ? CloudDB.isPaywallEnabled()
+      : true;
+
+    if (!isPaywallActive) {
+      if (paywallBox) paywallBox.style.display = 'none';
+      if (downloadsLockBanner) downloadsLockBanner.style.display = 'none';
+      if (paywallVerifiedBox) paywallVerifiedBox.style.display = 'none';
+      if (paywallFreeBanner) paywallFreeBanner.style.display = 'flex';
+      if (exportButtonsGroup) exportButtonsGroup.classList.remove('downloads-locked');
+      return;
+    }
+
+    if (paywallFreeBanner) paywallFreeBanner.style.display = 'none';
+
     const id = getSanitizedId();
     const isPaid = window.CloudDB ? CloudDB.isCardPaid(id) : false;
     const price = window.CloudDB ? CloudDB.getPrice() : 1500;
@@ -1215,6 +1231,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function requirePaymentGate() {
+    const isPaywallActive = window.CloudDB && typeof CloudDB.isPaywallEnabled === 'function'
+      ? CloudDB.isPaywallEnabled()
+      : true;
+
+    if (!isPaywallActive) {
+      return true; // Payment wall disabled by Admin; allow immediate free download/print!
+    }
+
     const id = getSanitizedId();
     const isPaid = window.CloudDB ? CloudDB.isCardPaid(id) : false;
     if (isPaid) return true;

@@ -15,6 +15,7 @@
   const STORAGE_KEYS = {
     RECORDS: 'spa_card_records',
     PRICE: 'spa_card_price_ngn',
+    PAYWALL_ENABLED: 'spa_paywall_enabled',
     SCHOOLS: 'spa_schools_branches'
   };
 
@@ -129,6 +130,36 @@
       }
 
       return p;
+    },
+
+    // Paywall Gate Settings (Enabled / Disabled)
+    isPaywallEnabled() {
+      const stored = localStorage.getItem(STORAGE_KEYS.PAYWALL_ENABLED);
+      if (stored !== null) {
+        return stored !== 'false';
+      }
+      return true; // Default: Enabled (compulsory fee)
+    },
+
+    async setPaywallEnabled(enabled) {
+      const isEnabled = !!enabled;
+      localStorage.setItem(STORAGE_KEYS.PAYWALL_ENABLED, isEnabled ? 'true' : 'false');
+
+      try {
+        await supabaseRequest('app_settings', {
+          method: 'POST',
+          headers: { 'Prefer': 'resolution=merge-duplicates,return=representation' },
+          body: JSON.stringify({
+            key: 'payment_wall_enabled',
+            value: isEnabled ? 'true' : 'false',
+            updated_at: new Date().toISOString()
+          })
+        });
+      } catch (err) {
+        console.warn('[CloudDB] Supabase paywall sync skipped/deferred:', err);
+      }
+
+      return isEnabled;
     },
 
     // -----------------------------------------------------------------------
@@ -462,13 +493,19 @@
      */
     async loadFromCloud() {
       try {
-        // 1. Sync Price
-        const settingsRes = await supabaseRequest('app_settings?key=eq.card_price_ngn&select=*').catch(() => null);
-        if (Array.isArray(settingsRes) && settingsRes.length > 0 && settingsRes[0].value) {
-          const cloudPrice = parseInt(settingsRes[0].value, 10);
-          if (!isNaN(cloudPrice)) {
-            localStorage.setItem(STORAGE_KEYS.PRICE, cloudPrice.toString());
-          }
+        // 1. Sync Settings (Price & Paywall Gate)
+        const settingsRes = await supabaseRequest('app_settings?select=*').catch(() => null);
+        if (Array.isArray(settingsRes)) {
+          settingsRes.forEach(s => {
+            if (s.key === 'card_price_ngn' && s.value) {
+              const cloudPrice = parseInt(s.value, 10);
+              if (!isNaN(cloudPrice)) {
+                localStorage.setItem(STORAGE_KEYS.PRICE, cloudPrice.toString());
+              }
+            } else if (s.key === 'payment_wall_enabled' && s.value !== undefined) {
+              localStorage.setItem(STORAGE_KEYS.PAYWALL_ENABLED, s.value === 'false' ? 'false' : 'true');
+            }
+          });
         }
 
         // 2. Fetch Cards from Supabase
@@ -491,6 +528,7 @@
      * - Clears all schools/chapters/branches in LocalStorage and Supabase
      * - Resets card counter in LocalStorage
      * - Resets card price to DEFAULT_PRICE_NGN (1500) in LocalStorage and Supabase
+     * - Restores payment wall to enabled
      */
     async factoryReset() {
       // 1. Wipe local storage
@@ -498,6 +536,7 @@
       localStorage.removeItem(STORAGE_KEYS.SCHOOLS);
       localStorage.removeItem('spa_card_counter');
       localStorage.setItem(STORAGE_KEYS.PRICE, DEFAULT_PRICE_NGN.toString());
+      localStorage.setItem(STORAGE_KEYS.PAYWALL_ENABLED, 'true');
 
       // 2. Wipe Supabase Cloud records
       try {
@@ -524,10 +563,23 @@
         console.warn('[CloudDB] Factory reset price update error:', err);
       }
 
+      try {
+        await supabaseRequest('app_settings?key=eq.payment_wall_enabled', {
+          method: 'PATCH',
+          body: JSON.stringify({
+            value: 'true',
+            updated_at: new Date().toISOString()
+          })
+        });
+      } catch (err) {
+        console.warn('[CloudDB] Factory reset paywall update error:', err);
+      }
+
       return {
         cards: [],
         schools: [],
-        price: DEFAULT_PRICE_NGN
+        price: DEFAULT_PRICE_NGN,
+        paywallEnabled: true
       };
     }
   };

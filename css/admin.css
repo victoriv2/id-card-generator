@@ -511,6 +511,126 @@ body.admin-body {
   flex-grow: 1;
 }
 
+/* Paystack Payment Wall Gate Toggle in Admin */
+.admin-paywall-control-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+  padding: 14px 18px;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.paywall-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.paywall-status-pill.active {
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.paywall-status-pill.disabled {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.status-indicator-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.paywall-status-pill.active .status-indicator-dot {
+  background: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+}
+
+.paywall-status-pill.disabled .status-indicator-dot {
+  background: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25);
+}
+
+.btn-paywall-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 18px;
+  border-radius: 10px;
+  border: 1.5px solid #cbd5e1;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-paywall-toggle:hover {
+  border-color: #94a3b8;
+  background: #f1f5f9;
+}
+
+.btn-paywall-toggle .toggle-switch-track {
+  width: 38px;
+  height: 22px;
+  background: #cbd5e1;
+  border-radius: 999px;
+  position: relative;
+  transition: background-color 0.2s ease;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.btn-paywall-toggle .toggle-switch-thumb {
+  width: 16px;
+  height: 16px;
+  background: #ffffff;
+  border-radius: 50%;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  transition: transform 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.btn-paywall-toggle[data-enabled="true"] .toggle-switch-track {
+  background: #10b981;
+}
+
+.btn-paywall-toggle[data-enabled="true"] .toggle-switch-thumb {
+  transform: translateX(16px);
+}
+
+.btn-paywall-toggle[data-enabled="false"] {
+  border-color: #fca5a5;
+  background: #fff5f5;
+  color: #b91c1c;
+}
+
+.btn-paywall-toggle[data-enabled="false"] .toggle-switch-track {
+  background: #ef4444;
+}
+
+.btn-paywall-toggle:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .admin-price-control {
   display: flex;
   align-items: center;
