@@ -642,6 +642,35 @@ body.admin-body {
   background: #14532d;
 }
 
+/* Export as Excel Button */
+.btn-admin-excel {
+  height: 42px;
+  padding: 0 16px;
+  border-radius: 8px;
+  background: #107c41; /* Microsoft Excel Brand Green */
+  color: #ffffff;
+  border: 1px solid #0b6a36;
+  font-size: 0.88rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(16, 124, 65, 0.2);
+}
+
+.btn-admin-excel:hover {
+  background: #0b6a36;
+  box-shadow: 0 4px 12px rgba(16, 124, 65, 0.35);
+}
+
+.btn-admin-excel svg {
+  flex-shrink: 0;
+}
+
 /* ==========================================================================
    Data Filter & Search Toolbar
    ========================================================================== */
@@ -876,7 +905,8 @@ body.admin-body {
     gap: 10px;
   }
   .admin-select,
-  .admin-select-trigger-wrap {
+  .admin-select-trigger-wrap,
+  .btn-admin-excel {
     width: 100%;
     min-width: 0;
   }

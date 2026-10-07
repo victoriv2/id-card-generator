@@ -20,9 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Controls Elements
   const inputPrice = document.getElementById('inputAdminPrice');
   const btnSavePrice = document.getElementById('btnSavePrice');
-  const btnManualSync = document.getElementById('btnManualSyncCloud');
-  const btnExportCSV = document.getElementById('btnExportCSV');
-  const syncStatus = document.getElementById('cloudSyncStatus');
+  const btnExportExcel = document.getElementById('btnExportExcel');
 
   const searchInput = document.getElementById('adminSearchInput');
   const filterCategory = document.getElementById('filterCategory');
@@ -472,55 +470,95 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // -------------------------------------------------------------------------
-  // Manual Cloud Sync
+  // Export Member Records to Excel Spreadsheet (.xlsx)
   // -------------------------------------------------------------------------
-  if (btnManualSync) {
-    btnManualSync.addEventListener('click', async () => {
-      if (syncStatus) syncStatus.textContent = '● Syncing now...';
-      try {
-        await CloudDB.saveToCloud();
-        allCards = await CloudDB.loadFromCloud();
-        updateStatsAndRender();
-        if (syncStatus) syncStatus.textContent = '● Online & Synchronized';
-        showModalAlert('Database synchronized successfully with Supabase Cloud Database!', { type: 'success' });
-      } catch (err) {
-        if (syncStatus) syncStatus.textContent = '● Sync error';
-        showModalAlert('Could not synchronize: ' + (err.message || String(err)), { type: 'error' });
-      }
-    });
-  }
-
-  // -------------------------------------------------------------------------
-  // Export to CSV
-  // -------------------------------------------------------------------------
-  if (btnExportCSV) {
-    btnExportCSV.addEventListener('click', () => {
-      if (allCards.length === 0) {
-        showModalAlert('No records available to export.', { type: 'warning' });
+  if (btnExportExcel) {
+    btnExportExcel.addEventListener('click', () => {
+      const records = getFilteredAndSortedCards();
+      if (!records || records.length === 0) {
+        showModalAlert('No member records available to export with the current filter settings.', { type: 'warning' });
         return;
       }
 
-      const headers = ['Full Name', 'ID Number', 'Category', 'State', 'School', 'Payment Status', 'Amount Paid', 'Paystack Ref', 'Date Issued'];
-      const rows = allCards.map(c => [
+      const timestamp = new Date().toISOString().slice(0, 10);
+      const filename = `SPN-Member-Records-${timestamp}.xlsx`;
+
+      // 1. Primary: SheetJS binary .xlsx export
+      if (window.XLSX) {
+        try {
+          const excelData = records.map((c, i) => ({
+            'S/N': i + 1,
+            'Full Name': c.name || 'Unnamed',
+            'ID Number': c.id || 'N/A',
+            'Category': (c.category || 'MEMBER').toUpperCase(),
+            'State': c.state || 'N/A',
+            'School / Chapter / Branch': c.school || 'N/A',
+            'Payment Status': c.isPaid ? 'PAID' : 'UNPAID',
+            'Amount Paid (₦)': c.isPaid ? (parseInt(c.amountPaid, 10) || CloudDB.getPrice()) : 0,
+            'Paystack Reference': c.paymentRef || 'N/A',
+            'Payer Email': c.payerEmail || '',
+            'Date Issued': c.dateIssued || c.savedAt || 'N/A'
+          }));
+
+          const worksheet = XLSX.utils.json_to_sheet(excelData);
+          worksheet['!cols'] = [
+            { wch: 6 },
+            { wch: 28 },
+            { wch: 18 },
+            { wch: 14 },
+            { wch: 16 },
+            { wch: 34 },
+            { wch: 16 },
+            { wch: 18 },
+            { wch: 24 },
+            { wch: 28 },
+            { wch: 20 }
+          ];
+
+          const workbook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(workbook, worksheet, 'Registered Members');
+          XLSX.writeFile(workbook, filename);
+          showModalAlert(`Successfully exported ${records.length} record(s) to Excel (.xlsx)!`, {
+            title: 'Export Successful',
+            type: 'success'
+          });
+          return;
+        } catch (err) {
+          console.warn('[ExportExcel] Error generating xlsx, falling back to CSV:', err);
+        }
+      }
+
+      // 2. High-fidelity CSV Fallback with UTF-8 BOM (Excel opens directly with proper formatting)
+      const headers = ['S/N', 'Full Name', 'ID Number', 'Category', 'State', 'School / Chapter / Branch', 'Payment Status', 'Amount Paid (NGN)', 'Paystack Reference', 'Payer Email', 'Date Issued'];
+      const rows = records.map((c, i) => [
+        i + 1,
         `"${(c.name || '').replace(/"/g, '""')}"`,
         `"${(c.id || '').replace(/"/g, '""')}"`,
         `"${(c.category || 'MEMBER').replace(/"/g, '""')}"`,
         `"${(c.state || '').replace(/"/g, '""')}"`,
         `"${(c.school || '').replace(/"/g, '""')}"`,
         `"${c.isPaid ? 'PAID' : 'UNPAID'}"`,
-        `"${c.amountPaid || ''}"`,
-        `"${(c.paymentRef || '').replace(/"/g, '""')}"`,
+        `"${c.isPaid ? (c.amountPaid || CloudDB.getPrice()) : 0}"`,
+        `"${(c.paymentRef || 'N/A').replace(/"/g, '""')}"`,
+        `"${(c.payerEmail || '').replace(/"/g, '""')}"`,
         `"${(c.dateIssued || c.savedAt || '').replace(/"/g, '""')}"`
       ]);
 
-      const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-      const encodedUri = encodeURI(csvContent);
+      const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.setAttribute('href', encodedUri);
-      link.setAttribute('download', `SPN-Card-Records-${new Date().toISOString().slice(0, 10)}.csv`);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `SPN-Member-Records-${timestamp}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      showModalAlert(`Successfully exported ${records.length} record(s) to Excel spreadsheet format!`, {
+        title: 'Export Successful',
+        type: 'success'
+      });
     });
   }
 

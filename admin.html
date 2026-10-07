@@ -82,8 +82,8 @@
           <span class="admin-tab-badge" id="tabBadgeSchools">0</span>
         </button>
         <button type="button" class="admin-tab-btn" data-tab="settings">
-          <svg width="17" height="17" fill="currentColor" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-          <span>Pricing &amp; Cloud Settings</span>
+          <span style="font-size: 16px; font-weight: 900; line-height: 1;">₦</span>
+          <span>Card Issuance Fee</span>
         </button>
       </div>
     </nav>
@@ -195,6 +195,12 @@
               </div>
               <input type="hidden" id="sortOrder" value="newest">
             </div>
+
+            <!-- Export as Excel Button -->
+            <button type="button" id="btnExportExcel" class="btn-admin-excel" title="Export member records to Excel spreadsheet">
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+              <span>Export as Excel</span>
+            </button>
           </div>
         </section>
 
@@ -297,12 +303,12 @@
       </div>
 
       <!-- ============================================================
-           TAB 4: PRICING & CLOUD DATABASE SETTINGS
+           TAB 4: CARD ISSUANCE PRICING SETTINGS
            ============================================================ -->
       <div class="admin-tab-panel" id="tabPanel-settings">
         <section class="admin-settings-row">
           <!-- Price Adjustment Card -->
-          <div class="admin-panel-card">
+          <div class="admin-panel-card" style="max-width: 580px;">
             <div class="admin-section-header">
               <h2>
                 <span class="admin-header-icon gold" aria-label="Naira Currency Symbol">₦</span>
@@ -318,34 +324,6 @@
                 <input type="number" id="inputAdminPrice" class="admin-price-input" min="100" step="100" value="1500" placeholder="1500">
               </div>
               <button type="button" id="btnSavePrice" class="btn-admin-action">Save New Price</button>
-            </div>
-          </div>
-
-          <!-- Cloud Sync & Data Backup -->
-          <div class="admin-panel-card">
-            <div class="admin-section-header">
-              <h2>
-                <span class="admin-header-icon blue">
-                  <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
-                </span>
-                <span>Cloud Sync &amp; Database Backup</span>
-              </h2>
-            </div>
-            <p>
-              Card records and pricing are securely synchronized with <strong>Supabase Cloud Database</strong> and cached locally for offline reliability.
-            </p>
-            <div class="admin-cloud-actions">
-              <button type="button" id="btnManualSyncCloud" class="btn-admin-action btn-cloud-sync">
-                <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
-                Sync with Cloud Now
-              </button>
-              <button type="button" id="btnExportCSV" class="btn-table-action btn-csv-export">
-                <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-                Export Records to CSV
-              </button>
-              <div class="admin-sync-status-wrap">
-                <span id="cloudSyncStatus" class="cloud-status-badge">● Online &amp; Synchronized</span>
-              </div>
             </div>
           </div>
         </section>
@@ -483,6 +461,7 @@
   </div>
 
   <!-- Shared Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="js/modal-alert.js"></script>
   <script src="js/cloud-db.js"></script>
   <script src="js/admin.js"></script>
