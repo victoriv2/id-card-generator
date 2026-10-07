@@ -374,10 +374,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function openModal() {
       modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
     }
 
     function closeModal() {
       modal.style.display = 'none';
+      document.body.style.overflow = '';
     }
 
     trigger.addEventListener('click', openModal);
@@ -637,11 +639,24 @@ document.addEventListener('DOMContentLoaded', async () => {
       cb.checked = currentCats.includes(cb.value.toUpperCase());
     });
     adminMultiCatModal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
   }
 
   function closeMultiCatModal() {
     if (adminMultiCatModal) adminMultiCatModal.style.display = 'none';
+    document.body.style.overflow = '';
   }
+
+  // Close modals on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const allAdminModals = document.querySelectorAll('.modal-backdrop');
+      allAdminModals.forEach(m => {
+        m.style.display = 'none';
+      });
+      document.body.style.overflow = '';
+    }
+  });
 
   if (selectNewSchoolCategoryTrigger) {
     selectNewSchoolCategoryTrigger.addEventListener('click', openMultiCatModal);
