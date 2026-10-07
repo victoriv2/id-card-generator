@@ -944,6 +944,14 @@ document.addEventListener('DOMContentLoaded', () => {
     return (inputId && inputId.value.trim() ? inputId.value.trim() : 'card').replace(/[\/\\]/g, '-');
   }
 
+  function getRawId() {
+    return inputId && inputId.value.trim() ? inputId.value.trim() : '';
+  }
+
+  function normalizeId(id) {
+    return (id || '').trim().toUpperCase().replace(/[-_]/g, '/');
+  }
+
   function getQualityParams(quality) {
     switch (quality) {
       case 'low':
@@ -1123,21 +1131,21 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function getActiveVerifiedCard() {
-    const currentId = getSanitizedId();
+    const currentId = getRawId();
     if (!currentId) return null;
-    const cleanId = currentId.toUpperCase();
+    const cleanId = normalizeId(currentId);
 
-    if (activeVerifiedCard && activeVerifiedCard.id && activeVerifiedCard.id.trim().toUpperCase() === cleanId) {
+    if (activeVerifiedCard && activeVerifiedCard.id && normalizeId(activeVerifiedCard.id) === cleanId) {
       return activeVerifiedCard;
     }
     if (window.CloudDB && typeof CloudDB.getCardById === 'function') {
       const found = CloudDB.getCardById(cleanId);
-      if (found && (found.isPaid || found.paymentRef === 'FREE_ISSUANCE' || found.amountPaid === 0)) {
+      if (found && (found.isPaid || found.paymentRef === 'FREE_ISSUANCE' || found.amountPaid === 0 || found.amountPaid === '0')) {
         return found;
       }
     } else if (window.CloudDB && typeof CloudDB.getLocalCards === 'function') {
       const cards = CloudDB.getLocalCards() || [];
-      const found = cards.find(c => c.id && c.id.trim().toUpperCase() === cleanId && (c.isPaid || c.paymentRef === 'FREE_ISSUANCE' || c.amountPaid === 0));
+      const found = cards.find(c => c.id && normalizeId(c.id) === cleanId && (c.isPaid || c.paymentRef === 'FREE_ISSUANCE' || c.amountPaid === 0 || c.amountPaid === '0'));
       if (found) return found;
     }
     return null;
@@ -1173,19 +1181,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const formCat = normalizeField(inputCategory ? inputCategory.value : '');
     const registeredCat = normalizeField(verifiedCard.category);
-    if (registeredCat && formCat && formCat !== registeredCat) {
+    if (formCat !== registeredCat) {
       return { isAuthorized: false, isFreeMode: false, card: verifiedCard, mismatch: 'category' };
     }
 
     const formSchool = normalizeField(inputSchool ? inputSchool.value : '');
     const registeredSchool = normalizeField(verifiedCard.school);
-    if (registeredSchool && formSchool && formSchool !== registeredSchool) {
+    if (formSchool !== registeredSchool) {
       return { isAuthorized: false, isFreeMode: false, card: verifiedCard, mismatch: 'school' };
     }
 
     const formState = normalizeField(inputState ? inputState.value : '');
     const registeredState = normalizeField(verifiedCard.state);
-    if (registeredState && formState && formState !== registeredState) {
+    if (formState !== registeredState) {
       return { isAuthorized: false, isFreeMode: false, card: verifiedCard, mismatch: 'state' };
     }
 
@@ -1208,7 +1216,7 @@ document.addEventListener('DOMContentLoaded', () => {
       : true;
 
     const existingCard = getActiveVerifiedCard();
-    const existingPaid = !!(existingCard && (existingCard.isPaid || existingCard.paymentRef === 'FREE_ISSUANCE' || existingCard.amountPaid === 0));
+    const existingPaid = !!(existingCard && (existingCard.isPaid || existingCard.paymentRef === 'FREE_ISSUANCE' || existingCard.amountPaid === 0 || existingCard.amountPaid === '0'));
     const isFreeMode = !isPaywallActive;
     const isPaid = existingPaid || isFreeMode;
 
@@ -1277,8 +1285,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const card = JSON.parse(raw);
       sessionStorage.removeItem('spa_load_card');
 
-      const isFree = (card.amountPaid === 0 || card.paymentRef === 'FREE_ISSUANCE');
-      if (card.isPaid || isFree) {
+      const isFree = (card.amountPaid === 0 || card.amountPaid === '0' || card.paymentRef === 'FREE_ISSUANCE');
+      const isPaid = (card.isPaid === true || card.isPaid === 'true' || card.isPaid === 1 || card.isPaid === '1' || isFree);
+      if (isPaid) {
         card.isPaid = true;
         if (isFree && !card.paymentRef) card.paymentRef = 'FREE_ISSUANCE';
         activeVerifiedCard = { ...card };
@@ -1289,26 +1298,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (window.CloudDB && typeof CloudDB.saveLocalCards === 'function') {
         const local = CloudDB.getLocalCards() || [];
-        const idx = local.findIndex(c => c.id && c.id.toUpperCase() === card.id.toUpperCase());
+        const targetNorm = normalizeId(card.id);
+        const idx = local.findIndex(c => c.id && normalizeId(c.id) === targetNorm);
         if (idx >= 0) local[idx] = { ...local[idx], ...card };
         else local.unshift(card);
         CloudDB.saveLocalCards(local);
       }
 
-      if (card.name && inputName) inputName.value = card.name;
-      if (card.school && inputSchool) inputSchool.value = card.school;
-      if (card.category && inputCategory) {
-        inputCategory.value = card.category;
-        if (selectedCategoryText) {
-          selectedCategoryText.textContent = card.category;
-          selectedCategoryText.classList.remove('placeholder-text');
+      if (card.name !== undefined && inputName) inputName.value = card.name || '';
+      if (card.school !== undefined && inputSchool) {
+        inputSchool.value = card.school || '';
+        if (selectedSchoolText) {
+          if (card.school) {
+            selectedSchoolText.textContent = card.school;
+            selectedSchoolText.classList.remove('placeholder-text');
+          } else {
+            selectedSchoolText.textContent = 'Select School / Chapter / Branch';
+            selectedSchoolText.classList.add('placeholder-text');
+          }
         }
       }
-      if (card.state && inputState) {
-        inputState.value = card.state;
+      if (card.category !== undefined && inputCategory) {
+        inputCategory.value = card.category || '';
+        if (selectedCategoryText) {
+          if (card.category) {
+            selectedCategoryText.textContent = card.category;
+            selectedCategoryText.classList.remove('placeholder-text');
+          } else {
+            selectedCategoryText.textContent = 'Select Category';
+            selectedCategoryText.classList.add('placeholder-text');
+          }
+        }
+      }
+      if (card.state !== undefined && inputState) {
+        inputState.value = card.state || '';
         if (selectedStateText) {
-          selectedStateText.textContent = card.state;
-          selectedStateText.classList.remove('placeholder-text');
+          if (card.state) {
+            selectedStateText.textContent = card.state;
+            selectedStateText.classList.remove('placeholder-text');
+          } else {
+            selectedStateText.textContent = 'Select State';
+            selectedStateText.classList.add('placeholder-text');
+          }
         }
       }
       if (card.id && inputId) inputId.value = card.id;
@@ -1376,7 +1407,7 @@ document.addEventListener('DOMContentLoaded', () => {
         paywallVerifiedBox.style.display = 'block';
         const card = auth.card;
         if (card) {
-          const isFree = (card.amountPaid === 0 || card.paymentRef === 'FREE_ISSUANCE');
+          const isFree = (card.amountPaid === 0 || card.amountPaid === '0' || card.paymentRef === 'FREE_ISSUANCE');
           if (paywallVerifiedRef) {
             paywallVerifiedRef.textContent = isFree ? 'FREE_ISSUANCE (Verified)' : (card.paymentRef || 'VERIFIED');
           }
@@ -1578,10 +1609,10 @@ document.addEventListener('DOMContentLoaded', () => {
   updatePaywallState();
 
   // If pre-filled card is not in local cache, perform background single-card cloud verification
-  const startupId = getSanitizedId();
+  const startupId = getRawId();
   if (startupId && !getActiveVerifiedCard() && window.CloudDB && typeof CloudDB.verifyCardFromCloud === 'function') {
     CloudDB.verifyCardFromCloud(startupId).then(cloudCard => {
-      if (cloudCard && (cloudCard.isPaid || cloudCard.paymentRef === 'FREE_ISSUANCE' || cloudCard.amountPaid === 0)) {
+      if (cloudCard && (cloudCard.isPaid || cloudCard.paymentRef === 'FREE_ISSUANCE' || cloudCard.amountPaid === 0 || cloudCard.amountPaid === '0')) {
         activeVerifiedCard = cloudCard;
         updatePaywallState();
       }

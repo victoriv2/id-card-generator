@@ -97,7 +97,8 @@
    * Convert Supabase snake_case row to client camelCase card record
    */
   function fromRow(r) {
-    const isFree = (r.amount_paid === 0 || r.payment_ref === 'FREE_ISSUANCE');
+    const isFree = (r.amount_paid === 0 || r.amount_paid === '0' || r.payment_ref === 'FREE_ISSUANCE');
+    const isPaidVal = (r.is_paid === true || r.is_paid === 'true' || r.is_paid === 1 || r.is_paid === '1' || isFree);
     return {
       id: r.id,
       name: r.name,
@@ -107,7 +108,7 @@
       dateIssued: r.date_issued || '',
       status: r.status || 'ACTIVE',
       photo: r.photo || '',
-      isPaid: !!(r.is_paid || isFree),
+      isPaid: !!isPaidVal,
       paymentRef: r.payment_ref || (isFree ? 'FREE_ISSUANCE' : ''),
       amountPaid: isFree ? 0 : (r.amount_paid != null ? Number(r.amount_paid) : DEFAULT_PRICE_NGN),
       payerEmail: r.payer_email || '',
@@ -388,11 +389,11 @@
 
     isCardPaid(id, matchDetails) {
       if (!id) return false;
-      const cleanId = id.trim().toUpperCase();
+      const cleanId = (id || '').trim().toUpperCase().replace(/[-_]/g, '/');
       const cards = this.getLocalCards();
-      const card = cards.find(c => c.id && c.id.trim().toUpperCase() === cleanId);
+      const card = cards.find(c => c.id && (c.id || '').trim().toUpperCase().replace(/[-_]/g, '/') === cleanId);
       if (!card) return false;
-      const isPaid = !!(card.isPaid || card.paymentRef === 'FREE_ISSUANCE' || card.amountPaid === 0);
+      const isPaid = !!(card.isPaid || card.paymentRef === 'FREE_ISSUANCE' || card.amountPaid === 0 || card.amountPaid === '0');
       if (!isPaid) return false;
 
       // Verify that the requested data matches the recorded card without tampering
@@ -406,10 +407,10 @@
         if (matchDetails.category && card.category) {
           if (clean(matchDetails.category) !== clean(card.category)) return false;
         }
-        if (matchDetails.school && card.school) {
+        if (matchDetails.school !== undefined && card.school !== undefined) {
           if (clean(matchDetails.school) !== clean(card.school)) return false;
         }
-        if (matchDetails.state && card.state) {
+        if (matchDetails.state !== undefined && card.state !== undefined) {
           if (clean(matchDetails.state) !== clean(card.state)) return false;
         }
       }
@@ -418,9 +419,9 @@
 
     getCardById(id) {
       if (!id) return null;
-      const cleanId = id.trim().toUpperCase();
+      const cleanId = (id || '').trim().toUpperCase().replace(/[-_]/g, '/');
       const cards = this.getLocalCards();
-      return cards.find(c => c.id && c.id.trim().toUpperCase() === cleanId) || null;
+      return cards.find(c => c.id && (c.id || '').trim().toUpperCase().replace(/[-_]/g, '/') === cleanId) || null;
     },
 
     /**
@@ -429,12 +430,14 @@
     async verifyCardFromCloud(id) {
       if (!id) return null;
       const cleanId = id.trim();
+      const altId = cleanId.includes('/') ? cleanId.replace(/\//g, '-') : cleanId.replace(/-/g, '/');
       try {
-        const rows = await supabaseRequest(`cards?id=eq.${encodeURIComponent(cleanId)}&limit=1`);
+        const rows = await supabaseRequest(`cards?or=(id.ilike.*${encodeURIComponent(cleanId)}*,id.ilike.*${encodeURIComponent(altId)}*)&limit=1`);
         if (Array.isArray(rows) && rows.length > 0) {
           const card = fromRow(rows[0]);
           const local = this.getLocalCards();
-          const idx = local.findIndex(l => l.id && l.id.toUpperCase() === card.id.toUpperCase());
+          const targetNorm = (card.id || '').trim().toUpperCase().replace(/[-_]/g, '/');
+          const idx = local.findIndex(l => (l.id || '').trim().toUpperCase().replace(/[-_]/g, '/') === targetNorm);
           if (idx >= 0) local[idx] = card;
           else local.unshift(card);
           this.saveLocalCards(local);
@@ -615,16 +618,30 @@
       const cleanQ = q.replace(/[%_*]/g, '').trim();
       if (!cleanQ) return [];
 
+      const slashQ = cleanQ.replace(/-/g, '/');
+      const dashQ = cleanQ.replace(/\//g, '-');
+
       try {
         // Targeted Postgres ILIKE query: only matches are returned across the network
-        const endpoint = `cards?or=(name.ilike.*${encodeURIComponent(cleanQ)}*,id.ilike.*${encodeURIComponent(cleanQ)}*)&order=saved_at.desc&limit=25`;
+        const orClauses = [
+          `name.ilike.*${encodeURIComponent(cleanQ)}*`,
+          `id.ilike.*${encodeURIComponent(cleanQ)}*`
+        ];
+        if (slashQ !== cleanQ) {
+          orClauses.push(`id.ilike.*${encodeURIComponent(slashQ)}*`);
+        }
+        if (dashQ !== cleanQ) {
+          orClauses.push(`id.ilike.*${encodeURIComponent(dashQ)}*`);
+        }
+        const endpoint = `cards?or=(${orClauses.join(',')})&order=saved_at.desc&limit=25`;
         const cloudRows = await supabaseRequest(endpoint);
         if (Array.isArray(cloudRows) && cloudRows.length > 0) {
           const mapped = cloudRows.map(fromRow);
           // Cache retrieved cards locally so user can view/load without re-fetching
           const local = this.getLocalCards();
           mapped.forEach(c => {
-            const idx = local.findIndex(l => l.id === c.id);
+            const normC = (c.id || '').trim().toUpperCase().replace(/[-_]/g, '/');
+            const idx = local.findIndex(l => (l.id || '').trim().toUpperCase().replace(/[-_]/g, '/') === normC);
             if (idx >= 0) local[idx] = c;
             else local.unshift(c);
           });

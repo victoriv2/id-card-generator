@@ -290,7 +290,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         : 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="%2394a3b8"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
 
       const isPaid = !!card.isPaid;
-      const isFree = isPaid && (card.amountPaid === 0 || card.paymentRef === 'FREE_ISSUANCE');
+      const isFree = isPaid && (card.amountPaid === 0 || card.amountPaid === '0' || card.paymentRef === 'FREE_ISSUANCE');
       const statusBadge = isPaid
         ? (isFree
             ? `<span class="badge-paid" style="background: #e0f2fe; color: #0369a1; border-color: #bae6fd;"><svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> FREE</span>`
