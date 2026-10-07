@@ -42,6 +42,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const tabBadgeRecords = document.getElementById('tabBadgeRecords');
   const tabBadgeSchools = document.getElementById('tabBadgeSchools');
 
+  // Application Data State
+  let allCards = [];
+  let allSchools = [];
+
   function switchTab(targetTabId) {
     tabButtons.forEach(btn => {
       const isTarget = btn.getAttribute('data-tab') === targetTabId;
@@ -56,10 +60,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     sessionStorage.setItem('spn_admin_active_tab', targetTabId);
 
-    if (targetTabId === 'schools') {
-      loadSchoolsDirectory();
-    } else if (targetTabId === 'records') {
-      renderTable();
+    if (isAuthenticated()) {
+      if (targetTabId === 'schools') {
+        loadSchoolsDirectory();
+      } else if (targetTabId === 'records') {
+        renderTable();
+      }
     }
   }
 
@@ -69,10 +75,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       switchTab(targetTab);
     });
   });
-
-  // Restore active tab or default to overview
-  const savedTab = sessionStorage.getItem('spn_admin_active_tab') || 'overview';
-  switchTab(savedTab);
 
   // -------------------------------------------------------------------------
   // Authentication (admin / admin123)
@@ -86,6 +88,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       sessionStorage.setItem('spn_admin_session', 'active');
       loginWrapper.style.display = 'none';
       dashboardWrapper.style.display = 'block';
+      const savedTab = sessionStorage.getItem('spn_admin_active_tab') || 'overview';
+      switchTab(savedTab);
       loadDashboard();
     } else {
       sessionStorage.removeItem('spn_admin_session');
@@ -97,14 +101,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (loginForm) {
     loginForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const u = document.getElementById('adminUsername').value.trim();
-      const p = document.getElementById('adminPassword').value.trim();
+      const u = (document.getElementById('adminUsername')?.value || '').trim();
+      const p = (document.getElementById('adminPassword')?.value || '').trim();
 
-      if (u === 'admin' && p === 'admin123') {
+      if (u.toLowerCase() === 'admin' && p === 'admin123') {
         if (loginErrorMsg) loginErrorMsg.style.display = 'none';
         setAuthenticated(true);
       } else {
-        if (loginErrorMsg) loginErrorMsg.style.display = 'block';
+        if (loginErrorMsg) {
+          loginErrorMsg.style.display = 'block';
+          loginErrorMsg.textContent = 'Invalid username or password.';
+        }
       }
     });
   }
@@ -145,8 +152,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;');
   }
-
-  let allCards = [];
 
   async function loadDashboard() {
     // 1. Load current price
@@ -570,8 +575,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   // -------------------------------------------------------------------------
   // School / Chapter / Branch Directory Manager
   // -------------------------------------------------------------------------
-  let allSchools = [];
-
   async function loadSchoolsDirectory() {
     if (!adminSchoolsTableBody) return;
     // 1. Immediately render local schools so table is never blank
