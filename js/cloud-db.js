@@ -18,18 +18,8 @@
     SCHOOLS: 'spa_schools_branches'
   };
 
-  const DEFAULT_SCHOOLS = [
-    { name: 'CSGS. GBERIGBE', category: 'STUDENT' },
-    { name: 'LAGOS STATE MODEL COLLEGE', category: 'STUDENT' },
-    { name: 'KING\'S COLLEGE LAGOS', category: 'STUDENT' },
-    { name: 'QUEEN\'S COLLEGE LAGOS', category: 'STUDENT' },
-    { name: 'FEDERAL GOVERNMENT COLLEGE', category: 'STUDENT' },
-    { name: 'NIGERIA UNION OF TEACHERS (NUT) CHAPTER', category: 'TEACHER' },
-    { name: 'ACADEMIC STAFF UNION OF UNIVERSITIES (ASUU)', category: 'TEACHER' },
-    { name: 'NATIONAL PARENT TEACHER ASSOCIATION (NPTA)', category: 'PARENT' },
-    { name: 'STATE PARLIAMENTARY EXECUTIVE COUNCIL', category: 'EXECUTIVE' },
-    { name: 'NATIONAL PARLIAMENTARY DIRECTORATE', category: 'OFFICIAL' }
-  ];
+  // No hardcoded ready-made schools. Only schools created by the Admin are shown.
+  const DEFAULT_SCHOOLS = [];
 
   /**
    * Universal Supabase REST helper using PostgREST endpoints
@@ -169,7 +159,7 @@
     async loadSchools() {
       try {
         const res = await supabaseRequest('schools?select=*&order=name.asc');
-        if (Array.isArray(res) && res.length > 0) {
+        if (Array.isArray(res)) {
           const mapped = res.map(r => ({
             id: r.id,
             name: r.name,

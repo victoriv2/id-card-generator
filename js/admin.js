@@ -106,8 +106,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   if (btnLogout) {
-    btnLogout.addEventListener('click', () => {
-      setAuthenticated(false);
+    btnLogout.addEventListener('click', async () => {
+      const ok = await showModalConfirm('Are you sure you want to sign out of the Admin Panel?', {
+        title: 'Sign Out',
+        confirmText: 'Yes, Sign Out',
+        cancelText: 'Stay',
+        type: 'warning'
+      });
+      if (ok) {
+        setAuthenticated(false);
+      }
     });
   }
 
@@ -494,9 +502,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       btn.addEventListener('click', async () => {
         const id = btn.getAttribute('data-school-id');
         const name = btn.getAttribute('data-school-name');
-        if (!confirm(`Are you sure you want to remove "${name}" from the directory?`)) {
-          return;
-        }
+        const ok = await showModalConfirm(`Are you sure you want to remove "${name}" from the directory?`, {
+          title: 'Delete School / Chapter',
+          confirmText: 'Yes, Remove',
+          type: 'warning'
+        });
+        if (!ok) return;
 
         try {
           allSchools = await CloudDB.deleteSchool(id);
