@@ -214,3 +214,64 @@ a:hover,
 .btn-paystack-pay:hover {
   transform: none !important;
 }
+
+/* ==========================================================================
+   UNPAID PREVIEW SECURITY WATERMARK OVERLAY
+   ========================================================================== */
+.card-watermark-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 25; /* Sits directly on top of template (1) and overlay data (2) */
+  pointer-events: none;
+  user-select: none;
+  overflow: hidden;
+  display: block;
+  /* Dense repeating diagonal bold watermark pattern across whole card */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'%3E%3Cg transform='rotate(-28 140 100)'%3E%3Ctext x='-80' y='32' font-family='sans-serif' font-size='14' font-weight='900' fill='rgba(185,28,28,0.32)' letter-spacing='2'%3EUNPAID PREVIEW • DO NOT COPY%3C/text%3E%3Ctext x='-80' y='82' font-family='sans-serif' font-size='13' font-weight='900' fill='rgba(15,23,42,0.28)' letter-spacing='2'%3ESTUDENTS PARLIAMENT NIGERIA%3C/text%3E%3Ctext x='-80' y='132' font-family='sans-serif' font-size='14' font-weight='900' fill='rgba(185,28,28,0.32)' letter-spacing='2'%3EUNPAID DRAFT • NOT FOR PRINT%3C/text%3E%3Ctext x='-80' y='182' font-family='sans-serif' font-size='13' font-weight='900' fill='rgba(15,23,42,0.28)' letter-spacing='2'%3EUNAUTHORIZED SCREENSHOT%3C/text%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 240px 170px;
+}
+
+.card-watermark-overlay.watermark-hidden {
+  display: none !important;
+}
+
+.watermark-center-badge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-30deg);
+  white-space: nowrap;
+  padding: 8px 20px;
+  background: rgba(254, 242, 242, 0.65);
+  backdrop-filter: blur(1.5px);
+  -webkit-backdrop-filter: blur(1.5px);
+  border: 2.5px dashed rgba(185, 28, 28, 0.65);
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(185, 28, 28, 0.18);
+  text-align: center;
+}
+
+.watermark-center-badge span {
+  display: block;
+  color: rgba(185, 28, 28, 0.85);
+  font-family: 'Cinzel', 'Montserrat', sans-serif, Arial;
+  font-weight: 900;
+  font-size: clamp(0.82rem, 3.2cqw, 1.25rem);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.watermark-sub-badge {
+  display: block;
+  margin-top: 3px;
+  color: rgba(15, 23, 42, 0.75) !important;
+  font-family: sans-serif !important;
+  font-weight: 800 !important;
+  font-size: clamp(0.55rem, 2.1cqw, 0.78rem) !important;
+  letter-spacing: 1px !important;
+}

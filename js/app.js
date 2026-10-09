@@ -1042,6 +1042,11 @@ document.addEventListener('DOMContentLoaded', () => {
       col.offsetHeight;
     }
 
+    // Suppress security watermark on exported high-res renders
+    const wm = stageElement.querySelector('.card-watermark-overlay');
+    const savedWmDisplay = wm ? wm.style.display : null;
+    if (wm) wm.style.display = 'none';
+
     try {
       const canvas = await html2canvas(stageElement, {
         scale: scale,
@@ -1052,6 +1057,9 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       return canvas;
     } finally {
+      if (wm && savedWmDisplay !== null) {
+        wm.style.display = savedWmDisplay;
+      }
       if (wasHidden && col) {
         Object.keys(savedStyles).forEach(prop => {
           col.style[prop] = savedStyles[prop];
@@ -1415,6 +1423,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const paywallVerifiedAmount = document.getElementById('paywallVerifiedAmount');
   const downloadsLockBanner = document.getElementById('downloadsLockBanner');
   const paywallFreeBanner = document.getElementById('paywallFreeBanner');
+  const watermarkFront = document.getElementById('watermarkFront');
+  const watermarkBack = document.getElementById('watermarkBack');
+
+  function setWatermarkVisible(visible) {
+    if (watermarkFront) {
+      if (visible) watermarkFront.classList.remove('watermark-hidden');
+      else watermarkFront.classList.add('watermark-hidden');
+    }
+    if (watermarkBack) {
+      if (visible) watermarkBack.classList.remove('watermark-hidden');
+      else watermarkBack.classList.add('watermark-hidden');
+    }
+  }
 
   function updatePaywallState() {
     const isPaywallActive = window.CloudDB && typeof CloudDB.isPaywallEnabled === 'function'
@@ -1427,6 +1448,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (paywallVerifiedBox) paywallVerifiedBox.style.display = 'none';
       if (paywallFreeBanner) paywallFreeBanner.style.display = 'flex';
       if (exportButtonsGroup) exportButtonsGroup.classList.remove('downloads-locked');
+      setWatermarkVisible(false);
       return;
     }
 
@@ -1456,11 +1478,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
       if (exportButtonsGroup) exportButtonsGroup.classList.remove('downloads-locked');
+      setWatermarkVisible(false);
     } else {
       if (paywallBox) paywallBox.style.display = 'block';
       if (downloadsLockBanner) downloadsLockBanner.style.display = 'flex';
       if (paywallVerifiedBox) paywallVerifiedBox.style.display = 'none';
       if (exportButtonsGroup) exportButtonsGroup.classList.add('downloads-locked');
+      setWatermarkVisible(true);
     }
   }
 
