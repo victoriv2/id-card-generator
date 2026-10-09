@@ -26,7 +26,7 @@
   // ---------------------------------------------------------------------------
   // Automated Client Storage Versioning & Full Storage Purge
   // ---------------------------------------------------------------------------
-  const CURRENT_STORAGE_BUILD = 'SPN_BUILD_2026_10_09_RESET_V2';
+  const CURRENT_STORAGE_BUILD = 'SPN_BUILD_2026_10_09_RESET_V3_PREVIEW';
   try {
     const activeBuild = localStorage.getItem('spa_build_revision');
     if (activeBuild !== CURRENT_STORAGE_BUILD) {
