@@ -452,6 +452,122 @@
     },
 
     /**
+     * Query all registered card IDs across cloud and local storage
+     */
+    async getAllRegisteredCardIds() {
+      const idSet = new Set();
+
+      const local = this.getLocalCards();
+      local.forEach(c => {
+        if (c.id) {
+          const norm = (c.id || '').trim().toUpperCase().replace(/[-_]/g, '/');
+          if (norm) idSet.add(norm);
+        }
+      });
+
+      try {
+        const rows = await supabaseRequest('cards?select=id,name');
+        if (Array.isArray(rows)) {
+          rows.forEach(r => {
+            if (r.id) {
+              const norm = (r.id || '').trim().toUpperCase().replace(/[-_]/g, '/');
+              if (norm) idSet.add(norm);
+            }
+          });
+        }
+      } catch (err) {
+        console.warn('[CloudDB] Registered card IDs query deferred:', err);
+      }
+
+      return Array.from(idSet);
+    },
+
+    /**
+     * Determine true next sequential number for a given category & year
+     * Returns 1 ('001') if database is empty (e.g. after a factory reset).
+     */
+    async getNextSequentialNumber(catCode, year2Digits) {
+      const registeredIds = await this.getAllRegisteredCardIds();
+      const codeUpper = (catCode || '').toUpperCase();
+      const yr = String(year2Digits || new Date().getFullYear()).slice(-2);
+
+      let maxSeq = 0;
+      registeredIds.forEach(id => {
+        const pattern = new RegExp(`^SPA/ID/${codeUpper}/${yr}/(\\d+)`, 'i');
+        const match = id.match(pattern);
+        if (match && match[1]) {
+          const num = parseInt(match[1], 10);
+          if (!isNaN(num) && num > maxSeq) {
+            maxSeq = num;
+          }
+        }
+      });
+
+      const nextSeq = maxSeq + 1;
+      localStorage.setItem('spa_card_counter', nextSeq.toString());
+      return nextSeq;
+    },
+
+    /**
+     * Real-Time Collision Resolution:
+     * Checks if desiredId is already claimed by another registered user.
+     * If taken, auto-adjusts to the next available unique ID to guarantee no duplicates.
+     */
+    async resolveUniqueCardId(desiredId, catCode, year2Digits, currentBearerName = '') {
+      const normDesired = (desiredId || '').trim().toUpperCase().replace(/[-_]/g, '/');
+      const yr = String(year2Digits || new Date().getFullYear()).slice(-2);
+      const codeUpper = (catCode || 'MEM').toUpperCase();
+      const cleanName = (s) => (s || '').trim().replace(/\s+/g, ' ').toUpperCase();
+      const curNameClean = cleanName(currentBearerName);
+
+      let isTakenBySomeoneElse = false;
+
+      // 1. Check Cloud
+      try {
+        const rows = await supabaseRequest('cards?select=id,name');
+        if (Array.isArray(rows)) {
+          const match = rows.find(r => {
+            const rNorm = (r.id || '').trim().toUpperCase().replace(/[-_]/g, '/');
+            return rNorm === normDesired;
+          });
+          if (match && cleanName(match.name) !== curNameClean) {
+            isTakenBySomeoneElse = true;
+          }
+        }
+      } catch (e) {
+        console.warn('[CloudDB] resolveUniqueCardId cloud check error:', e);
+      }
+
+      // 2. Check Local
+      if (!isTakenBySomeoneElse) {
+        const local = this.getLocalCards();
+        const localExisting = local.find(l => (l.id || '').trim().toUpperCase().replace(/[-_]/g, '/') === normDesired);
+        if (localExisting && cleanName(localExisting.name) !== curNameClean) {
+          isTakenBySomeoneElse = true;
+        }
+      }
+
+      if (!isTakenBySomeoneElse && normDesired) {
+        return { id: desiredId, wasAdjusted: false };
+      }
+
+      // ID is already taken or empty: dynamically compute the next available unique sequence
+      let nextSeq = await this.getNextSequentialNumber(codeUpper, yr);
+      let seqStr = String(nextSeq).padStart(3, '0');
+      let uniqueId = `SPA/ID/${codeUpper}/${yr}/${seqStr}`;
+
+      const allRegistered = await this.getAllRegisteredCardIds();
+      while (allRegistered.includes(uniqueId.toUpperCase())) {
+        nextSeq++;
+        seqStr = String(nextSeq).padStart(3, '0');
+        uniqueId = `SPA/ID/${codeUpper}/${yr}/${seqStr}`;
+      }
+
+      localStorage.setItem('spa_card_counter', nextSeq.toString());
+      return { id: uniqueId, wasAdjusted: true, sequence: nextSeq };
+    },
+
+    /**
      * Save or update a card record in LocalStorage and Supabase
      */
     async saveCard(record) {

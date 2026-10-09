@@ -111,6 +111,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function getCardSequenceNumber() {
+    if (window.CloudDB && typeof CloudDB.getLocalCards === 'function') {
+      const local = CloudDB.getLocalCards();
+      if (!Array.isArray(local) || local.length === 0) {
+        localStorage.setItem('spa_card_counter', '1');
+        return 1;
+      }
+    }
     const saved = localStorage.getItem('spa_card_counter');
     const num = saved ? parseInt(saved, 10) : 1;
     return isNaN(num) || num < 1 ? 1 : num;
@@ -127,6 +134,34 @@ document.addEventListener('DOMContentLoaded', () => {
     const currentSeqStr = String(getCardSequenceNumber()).padStart(3, '0');
     if (cardId.endsWith(`/${currentSeqStr}`)) {
       advanceCardSequence();
+    }
+  }
+
+  async function syncSequenceFromDatabase() {
+    if (activeVerifiedCard) return;
+    const cat = inputCategory ? inputCategory.value.trim() : '';
+    if (!cat || !CATEGORY_CODES[cat]) return;
+    const catCode = CATEGORY_CODES[cat];
+    const { year2Digits } = getSystemDates();
+
+    try {
+      if (window.CloudDB && typeof CloudDB.getNextSequentialNumber === 'function') {
+        const nextSeq = await CloudDB.getNextSequentialNumber(catCode, year2Digits);
+        const seqStr = String(nextSeq).padStart(3, '0');
+        const expectedId = `SPA/ID/${catCode}/${year2Digits}/${seqStr}`;
+
+        if (!activeVerifiedCard && inputId) {
+          const curVal = inputId.value.trim();
+          if (!curVal || /^SPA\/ID\/[A-Z0-9-]+\/\d+\/\d+$/i.test(curVal)) {
+            if (curVal !== expectedId) {
+              inputId.value = expectedId;
+              syncOverlay();
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('[Sync] Sequence sync from DB deferred:', e);
     }
   }
 
@@ -153,6 +188,8 @@ document.addEventListener('DOMContentLoaded', () => {
         inputId.value = '';
       }
     }
+
+    syncSequenceFromDatabase();
   }
 
   // -------------------------------------------------------------------------
@@ -1255,9 +1292,8 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         sessionStorage.setItem('spa_active_verified_card', JSON.stringify(record));
       } catch (e) {}
+      advanceCardSequenceIfCurrent(record.id);
     }
-
-    advanceCardSequenceIfCurrent(record.id);
 
     if (window.CloudDB) {
       CloudDB.saveCard(record);
@@ -1542,9 +1578,28 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isApproved) {
       sessionStorage.setItem('spa_last_processed_ref', merchantRef || globalPayRef);
 
+      // Post-Payment Re-verification & Collision Resolution:
+      // Guarantee that if multiple users checked out concurrently,
+      // this bearer's ID is verified and auto-corrected to an available unique ID.
+      let verifiedId = pendingCard.id;
+      if (window.CloudDB && typeof CloudDB.resolveUniqueCardId === 'function') {
+        try {
+          const catVal = pendingCard.category || 'MEMBER';
+          const catCode = CATEGORY_CODES[catVal] || 'MEM';
+          const { year2Digits } = getSystemDates();
+          const res = await CloudDB.resolveUniqueCardId(pendingCard.id, catCode, year2Digits, pendingCard.name);
+          if (res && res.id && res.id !== pendingCard.id) {
+            verifiedId = res.id;
+            pendingCard.id = verifiedId;
+          }
+        } catch (e) {
+          console.warn('[Payment Return] Post-payment collision check deferred:', e);
+        }
+      }
+
       // Restore card details into generator form
       if (pendingCard.name && inputName) inputName.value = pendingCard.name;
-      if (pendingCard.id && inputId) inputId.value = pendingCard.id;
+      if (verifiedId && inputId) inputId.value = verifiedId;
       if (pendingCard.category && inputCategory) {
         inputCategory.value = pendingCard.category;
         if (selectedCategoryText) {
@@ -1581,6 +1636,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const verifiedRecord = {
         ...pendingCard,
+        id: verifiedId,
         status: 'ACTIVE',
         isPaid: true,
         paymentRef: effectiveRef,
@@ -1601,9 +1657,11 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.removeItem('spa_globalpay_txn_ref');
       } catch (e) {}
 
+      advanceCardSequenceIfCurrent(verifiedRecord.id);
+
       if (window.CloudDB) {
         await CloudDB.saveCard(verifiedRecord);
-        await CloudDB.markCardPaid(pendingCard.id, {
+        await CloudDB.markCardPaid(verifiedRecord.id, {
           reference: effectiveRef,
           amount: price,
           email: email
@@ -1644,7 +1702,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (btnPaystackPayNow) {
     btnPaystackPayNow.addEventListener('click', async () => {
-      const id = getRawId();
+      let id = getRawId();
       const name = inputName ? inputName.value.trim() : '';
       if (!name) {
         showModalAlert('Please enter the Full Name on the card before proceeding with payment.', {
@@ -1653,6 +1711,25 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         if (inputName) inputName.focus();
         return;
+      }
+
+      const catVal = inputCategory ? inputCategory.value.trim() : 'MEMBER';
+      const catCode = CATEGORY_CODES[catVal] || 'MEM';
+      const { year2Digits } = getSystemDates();
+
+      // Pre-Payment Collision Check & Smart Auto-Correction:
+      // Verify ID is unique before checkout; auto-adjust if taken by another user
+      if (window.CloudDB && typeof CloudDB.resolveUniqueCardId === 'function') {
+        try {
+          const res = await CloudDB.resolveUniqueCardId(id, catCode, year2Digits, name);
+          if (res && res.id && res.id !== id) {
+            id = res.id;
+            if (inputId) inputId.value = id;
+            syncOverlay();
+          }
+        } catch (e) {
+          console.warn('[Pay] Pre-payment collision check deferred:', e);
+        }
       }
 
       const email = (window.CloudDB && CloudDB.defaultPaymentEmail) ? CloudDB.defaultPaymentEmail : 'we.are.danithuga@gmail.com';
