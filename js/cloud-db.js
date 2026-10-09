@@ -681,9 +681,13 @@
 
       const slashQ = cleanQ.replace(/-/g, '/');
       const dashQ = cleanQ.replace(/\//g, '-');
+      const qUpper = cleanQ.toUpperCase();
 
+      const dedupeMap = new Map();
+      const normKeyOf = (id) => (id || '').trim().toUpperCase().replace(/[-_]/g, '/');
+
+      // 1. Try fetching from Cloud Database (Supabase)
       try {
-        // Targeted Postgres ILIKE query: only matches are returned across the network
         const orClauses = [
           `name.ilike.*${encodeURIComponent(cleanQ)}*`,
           `id.ilike.*${encodeURIComponent(cleanQ)}*`
@@ -696,27 +700,55 @@
         }
         const endpoint = `cards?or=(${orClauses.join(',')})&order=saved_at.desc&limit=25`;
         const cloudRows = await supabaseRequest(endpoint);
-        if (Array.isArray(cloudRows) && cloudRows.length > 0) {
-          const mapped = cloudRows.map(fromRow);
-          // Cache retrieved cards locally so user can view/load without re-fetching
-          const local = this.getLocalCards();
-          mapped.forEach(c => {
-            const normC = (c.id || '').trim().toUpperCase().replace(/[-_]/g, '/');
-            const idx = local.findIndex(l => (l.id || '').trim().toUpperCase().replace(/[-_]/g, '/') === normC);
-            if (idx >= 0) local[idx] = c;
-            else local.unshift(c);
+        if (Array.isArray(cloudRows)) {
+          const cloudMapped = cloudRows.map(fromRow);
+          cloudMapped.forEach(c => {
+            const key = normKeyOf(c.id);
+            if (key) dedupeMap.set(key, c);
           });
-          this.saveLocalCards(local);
-          return mapped;
         }
       } catch (err) {
-        console.warn('[CloudDB] Remote search deferred, falling back to local:', err);
+        console.warn('[CloudDB] Remote search deferred, falling back to local storage:', err);
       }
 
-      // Local storage fallback if offline or network glitch
+      // 2. Seamlessly merge local storage records (guarantees offline support & immediate access)
       const local = this.getLocalCards();
-      const qUpper = cleanQ.toUpperCase();
-      return local.filter(c => (c.name && c.name.toUpperCase().includes(qUpper)) || (c.id && c.id.toUpperCase().includes(qUpper)));
+      const localMatches = local.filter(c => 
+        (c.name && c.name.toUpperCase().includes(qUpper)) || 
+        (c.id && c.id.toUpperCase().includes(qUpper))
+      );
+
+      localMatches.forEach(l => {
+        const key = normKeyOf(l.id);
+        if (!key) return;
+
+        if (!dedupeMap.has(key)) {
+          dedupeMap.set(key, l);
+        } else {
+          // If cloud has it, keep the cloud entry but enrich with local photo/payment if cloud is missing them
+          const existing = dedupeMap.get(key);
+          if (!existing.photo && l.photo) existing.photo = l.photo;
+          if (!existing.isPaid && l.isPaid) {
+            existing.isPaid = true;
+            existing.paymentRef = l.paymentRef;
+            existing.amountPaid = l.amountPaid;
+          }
+        }
+      });
+
+      // Update local storage cache with any newly retrieved cloud entries
+      const mergedResults = Array.from(dedupeMap.values());
+      if (mergedResults.length > 0) {
+        mergedResults.forEach(c => {
+          const key = normKeyOf(c.id);
+          const idx = local.findIndex(l => normKeyOf(l.id) === key);
+          if (idx >= 0) local[idx] = { ...local[idx], ...c };
+          else local.unshift(c);
+        });
+        this.saveLocalCards(local);
+      }
+
+      return mergedResults;
     },
 
     /**
@@ -755,6 +787,17 @@
       localStorage.removeItem(STORAGE_KEYS.RECORDS);
       localStorage.removeItem(STORAGE_KEYS.SCHOOLS);
       localStorage.removeItem('spa_card_counter');
+      localStorage.removeItem('spa_active_verified_card');
+      localStorage.removeItem('spa_last_paid_card');
+      localStorage.removeItem('spa_load_card');
+      localStorage.removeItem('spa_pending_payment_card');
+      localStorage.removeItem('spa_pending_payment_ref');
+      localStorage.removeItem('spa_globalpay_txn_ref');
+      sessionStorage.removeItem('spa_active_verified_card');
+      sessionStorage.removeItem('spa_load_card');
+      sessionStorage.removeItem('spa_pending_payment_card');
+      sessionStorage.removeItem('spa_pending_payment_ref');
+      sessionStorage.removeItem('spa_globalpay_txn_ref');
       localStorage.setItem(STORAGE_KEYS.PRICE, DEFAULT_PRICE_NGN.toString());
       localStorage.setItem(STORAGE_KEYS.PAYWALL_ENABLED, 'true');
 
