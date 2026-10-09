@@ -1402,3 +1402,29 @@ a:hover,
 .btn-paystack-pay:hover {
   transform: none !important;
 }
+
+/* Payment Unlock Highlighting & Download Pulsing */
+@keyframes paymentUnlockGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7);
+    border-color: #16a34a;
+  }
+  50% {
+    box-shadow: 0 0 0 14px rgba(22, 163, 74, 0);
+    border-color: #22c55e;
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(22, 163, 74, 0);
+    border-color: #16a34a;
+  }
+}
+
+.payment-unlocked-pulse {
+  animation: paymentUnlockGlow 1.2s ease-in-out 3;
+  border: 2px solid #16a34a !important;
+  border-radius: 12px !important;
+  padding: 10px !important;
+  background: rgba(240, 253, 244, 0.6) !important;
+  transition: all 0.3s ease;
+}
+

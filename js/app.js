@@ -1456,9 +1456,127 @@ document.addEventListener('DOMContentLoaded', () => {
     return false;
   }
 
+  function scrollToDownloadsAndHighlight() {
+    const target = exportButtonsGroup || document.getElementById('exportButtonsGroup');
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      target.classList.add('payment-unlocked-pulse');
+      setTimeout(() => {
+        target.classList.remove('payment-unlocked-pulse');
+      }, 4500);
+    }
+  }
+
+  function handlePaymentRedirectReturn() {
+    let urlParams;
+    try {
+      urlParams = new URLSearchParams(window.location.search);
+    } catch (e) {
+      return;
+    }
+    const paymentRef = urlParams.get('reference') || urlParams.get('trxref');
+    if (!paymentRef) return;
+
+    // Retrieve pending card state saved prior to redirect
+    let pendingCard = null;
+    try {
+      const rawPending = sessionStorage.getItem('spa_pending_payment_card') || localStorage.getItem('spa_pending_payment_card');
+      if (rawPending) {
+        pendingCard = JSON.parse(rawPending);
+      }
+    } catch (e) {}
+
+    if (!pendingCard && window.CloudDB && typeof CloudDB.getLocalCards === 'function') {
+      const local = CloudDB.getLocalCards() || [];
+      pendingCard = local.find(c => c.paymentRef === paymentRef || (c.id && paymentRef.includes(c.id.replace(/[^a-zA-Z0-9]/g, ''))));
+    }
+
+    const price = window.CloudDB ? CloudDB.getPrice() : 1000;
+    const email = (window.CloudDB && CloudDB.defaultPaymentEmail) ? CloudDB.defaultPaymentEmail : 'we.are.danithuga@gmail.com';
+
+    if (pendingCard) {
+      // Restore card details into generator form
+      if (pendingCard.name && inputName) inputName.value = pendingCard.name;
+      if (pendingCard.id && inputId) inputId.value = pendingCard.id;
+      if (pendingCard.category && inputCategory) {
+        inputCategory.value = pendingCard.category;
+        if (selectedCategoryText) {
+          selectedCategoryText.textContent = pendingCard.category;
+          selectedCategoryText.classList.remove('placeholder-text');
+        }
+      }
+      if (pendingCard.school !== undefined && inputSchool) {
+        inputSchool.value = pendingCard.school;
+        if (selectedSchoolText) {
+          selectedSchoolText.textContent = pendingCard.school || 'Select School / Chapter / Branch';
+          if (pendingCard.school) selectedSchoolText.classList.remove('placeholder-text');
+        }
+      }
+      if (pendingCard.state && inputState) {
+        inputState.value = pendingCard.state;
+        if (selectedStateText) {
+          selectedStateText.textContent = pendingCard.state;
+          selectedStateText.classList.remove('placeholder-text');
+        }
+      }
+      if (pendingCard.dateIssued && inputDateIssued) inputDateIssued.value = pendingCard.dateIssued;
+      if (pendingCard.photo && passportImg && !pendingCard.photo.includes('[cached_locally]')) {
+        passportImg.onload = () => {
+          fitPassportImage(passportImg);
+          resetPhotoFraming();
+        };
+        passportImg.src = pendingCard.photo;
+        passportImg.style.display = 'block';
+        if (passportEmptyHint) passportEmptyHint.style.display = 'none';
+        hasPassport = true;
+        if (photoAdjustBox) photoAdjustBox.style.display = 'flex';
+      }
+
+      const verifiedRecord = {
+        ...pendingCard,
+        isPaid: true,
+        paymentRef: paymentRef,
+        amountPaid: price,
+        paidAt: new Date().toISOString()
+      };
+      activeVerifiedCard = verifiedRecord;
+      try {
+        sessionStorage.setItem('spa_active_verified_card', JSON.stringify(verifiedRecord));
+        sessionStorage.removeItem('spa_pending_payment_card');
+        localStorage.removeItem('spa_pending_payment_card');
+      } catch (e) {}
+
+      if (window.CloudDB) {
+        CloudDB.markCardPaid(pendingCard.id, {
+          reference: paymentRef,
+          amount: price,
+          email: email
+        });
+      }
+
+      syncOverlay();
+      updatePaywallState();
+
+      // Clean query parameters from URL without page reload
+      try {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } catch (e) {}
+
+      setTimeout(async () => {
+        scrollToDownloadsAndHighlight();
+        await showModalAlert(`Official card issuance fee confirmed (Ref: ${paymentRef}). Your ID card is officially unlocked! You can now continue and download your high-resolution card files or print below.`, {
+          title: 'Payment Successful!',
+          btnText: 'Continue & Download Card',
+          type: 'success'
+        });
+        scrollToDownloadsAndHighlight();
+      }, 350);
+    }
+  }
+
   if (btnPaystackPayNow) {
     btnPaystackPayNow.addEventListener('click', () => {
-      const id = getSanitizedId();
+      const id = getRawId();
       const name = inputName ? inputName.value.trim() : '';
       if (!name) {
         showModalAlert('Please enter the Full Name on the card before proceeding with payment.', {
@@ -1483,12 +1601,30 @@ document.addEventListener('DOMContentLoaded', () => {
       const price = window.CloudDB ? CloudDB.getPrice() : 1000;
       const ref = 'SPN-' + id.replace(/[^a-zA-Z0-9]/g, '') + '-' + Date.now();
 
+      // Persist full current card state before opening Paystack gateway
+      saveCardRecord();
+      const currentCardData = {
+        id: id || (inputId ? inputId.value.trim() : ''),
+        name: name,
+        school: inputSchool ? inputSchool.value.trim() : '',
+        category: inputCategory ? inputCategory.value.trim() : 'STUDENT',
+        state: inputState ? inputState.value.trim() : '',
+        dateIssued: inputDateIssued ? inputDateIssued.value.trim() : '',
+        photo: hasPassport && passportImg ? passportImg.src : ''
+      };
+      try {
+        sessionStorage.setItem('spa_pending_payment_card', JSON.stringify(currentCardData));
+        sessionStorage.setItem('spa_pending_payment_ref', ref);
+        localStorage.setItem('spa_pending_payment_card', JSON.stringify(currentCardData));
+      } catch (e) {}
+
       const handler = PaystackPop.setup({
         key: window.CloudDB ? CloudDB.paystackPublicKey : 'pk_live_732d9b62cd035b8dad96e981d7f6982540342e80',
         email: email,
         amount: price * 100, // Paystack amount is in Kobo
         currency: 'NGN',
         ref: ref,
+        callback_url: window.location.origin + window.location.pathname,
         metadata: {
           custom_fields: [
             { display_name: 'Member Name', variable_name: 'member_name', value: name },
@@ -1513,6 +1649,7 @@ document.addEventListener('DOMContentLoaded', () => {
             category: inputCategory ? inputCategory.value.trim() : 'STUDENT',
             state: inputState ? inputState.value.trim() : '',
             dateIssued: inputDateIssued ? inputDateIssued.value.trim() : '',
+            photo: hasPassport && passportImg ? passportImg.src : '',
             isPaid: true,
             paymentRef: response.reference,
             amountPaid: price,
@@ -1521,14 +1658,24 @@ document.addEventListener('DOMContentLoaded', () => {
           activeVerifiedCard = verifiedRecord;
           try {
             sessionStorage.setItem('spa_active_verified_card', JSON.stringify(verifiedRecord));
+            sessionStorage.removeItem('spa_pending_payment_card');
+            localStorage.removeItem('spa_pending_payment_card');
           } catch (e) {}
 
           updatePaywallState();
           const formattedPrice = new Intl.NumberFormat('en-NG').format(price);
-          showModalAlert(`Official card issuance fee of ₦${formattedPrice} confirmed (Ref: ${response.reference}). Your ID card is now completely unlocked for unlimited high-resolution download and printing!`, {
+
+          // Scroll immediately to unlocked download actions
+          scrollToDownloadsAndHighlight();
+
+          await showModalAlert(`Official card issuance fee of ₦${formattedPrice} confirmed (Ref: ${response.reference}). Your ID card is officially unlocked! You can now continue and download your high-resolution cards or print below.`, {
             title: 'Payment Successful!',
+            btnText: 'Continue & Download Card',
             type: 'success'
           });
+
+          // Ensure download buttons remain clearly in view with animation
+          scrollToDownloadsAndHighlight();
         },
         onClose: function () {
           notify('Payment window closed.');
@@ -1602,10 +1749,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Initialize auto credentials, real-time sync, check for retrieval payload, and update paywall state
+  // Initialize auto credentials, real-time sync, check for retrieval payload, check for payment returns, and update paywall state
   updateAutoCredentials();
   syncOverlay();
   loadCardFromStorage();
+  handlePaymentRedirectReturn();
   updatePaywallState();
 
   // If pre-filled card is not in local cache, perform background single-card cloud verification
