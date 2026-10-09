@@ -84,6 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const btnLoad = item.querySelector('.portal-record-btn-load');
       btnLoad.addEventListener('click', () => {
         sessionStorage.setItem('spa_load_card', JSON.stringify(record));
+        localStorage.setItem('spa_load_card', JSON.stringify(record));
         window.location.href = 'generator.html';
       });
 
@@ -198,5 +199,10 @@ document.addEventListener('DOMContentLoaded', () => {
         executeSearch();
       }
     });
+  }
+
+  // Auto-open retrieval modal if linked directly with #retrieve or ?retrieve=1
+  if (window.location.hash === '#retrieve' || new URLSearchParams(window.location.search).get('retrieve') === '1') {
+    setTimeout(openRetrieveModal, 150);
   }
 });

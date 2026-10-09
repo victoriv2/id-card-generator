@@ -1120,7 +1120,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let activeVerifiedCard = null;
 
   try {
-    const rawActive = sessionStorage.getItem('spa_active_verified_card');
+    const rawActive = sessionStorage.getItem('spa_active_verified_card') || localStorage.getItem('spa_active_verified_card') || localStorage.getItem('spa_last_paid_card');
     if (rawActive) {
       activeVerifiedCard = JSON.parse(rawActive);
     }
@@ -1279,11 +1279,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function loadCardFromStorage() {
-    const raw = sessionStorage.getItem('spa_load_card');
+    const raw = sessionStorage.getItem('spa_load_card') || localStorage.getItem('spa_load_card');
     if (!raw) return;
     try {
       const card = JSON.parse(raw);
       sessionStorage.removeItem('spa_load_card');
+      localStorage.removeItem('spa_load_card');
 
       const isFree = (card.amountPaid === 0 || card.amountPaid === '0' || card.paymentRef === 'FREE_ISSUANCE');
       const isPaid = (card.isPaid === true || card.isPaid === 'true' || card.isPaid === 1 || card.isPaid === '1' || isFree);
@@ -1293,6 +1294,8 @@ document.addEventListener('DOMContentLoaded', () => {
         activeVerifiedCard = { ...card };
         try {
           sessionStorage.setItem('spa_active_verified_card', JSON.stringify(card));
+          localStorage.setItem('spa_active_verified_card', JSON.stringify(card));
+          localStorage.setItem('spa_last_paid_card', JSON.stringify(card));
         } catch (e) {}
       }
 
@@ -1578,14 +1581,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const verifiedRecord = {
         ...pendingCard,
+        status: 'ACTIVE',
         isPaid: true,
         paymentRef: effectiveRef,
         amountPaid: price,
-        paidAt: new Date().toISOString()
+        paidAt: new Date().toISOString(),
+        savedAt: new Date().toISOString()
       };
       activeVerifiedCard = verifiedRecord;
       try {
         sessionStorage.setItem('spa_active_verified_card', JSON.stringify(verifiedRecord));
+        localStorage.setItem('spa_active_verified_card', JSON.stringify(verifiedRecord));
+        localStorage.setItem('spa_last_paid_card', JSON.stringify(verifiedRecord));
         sessionStorage.removeItem('spa_pending_payment_card');
         sessionStorage.removeItem('spa_pending_payment_ref');
         sessionStorage.removeItem('spa_globalpay_txn_ref');
@@ -1595,11 +1602,12 @@ document.addEventListener('DOMContentLoaded', () => {
       } catch (e) {}
 
       if (window.CloudDB) {
-        CloudDB.markCardPaid(pendingCard.id, {
+        await CloudDB.saveCard(verifiedRecord);
+        await CloudDB.markCardPaid(pendingCard.id, {
           reference: effectiveRef,
           amount: price,
           email: email
-        });
+        }, verifiedRecord);
       }
 
       syncOverlay();

@@ -497,11 +497,12 @@
     },
 
     /**
-     * Mark a card as paid after Paystack success
+     * Mark a card as paid and ensure complete member details are stored locally and in cloud
      */
-    async markCardPaid(id, paymentInfo = {}) {
+    async markCardPaid(id, paymentInfo = {}, cardDetails = null) {
       const cards = this.getLocalCards();
-      const idx = cards.findIndex(c => c.id === id);
+      const cleanId = (id || '').trim().toUpperCase().replace(/[-_]/g, '/');
+      const idx = cards.findIndex(c => c.id && (c.id || '').trim().toUpperCase().replace(/[-_]/g, '/') === cleanId);
       const nowIso = new Date().toISOString();
       const paidData = {
         isPaid: true,
@@ -512,7 +513,21 @@
       };
 
       let fullRecord;
-      if (idx >= 0) {
+      if (cardDetails) {
+        const base = idx >= 0 ? cards[idx] : {};
+        fullRecord = {
+          ...base,
+          ...cardDetails,
+          ...paidData,
+          id: id || cardDetails.id,
+          savedAt: cardDetails.savedAt || (base && base.savedAt) || nowIso
+        };
+        if (idx >= 0) {
+          cards[idx] = fullRecord;
+        } else {
+          cards.unshift(fullRecord);
+        }
+      } else if (idx >= 0) {
         cards[idx] = { ...cards[idx], ...paidData };
         fullRecord = cards[idx];
       } else {
