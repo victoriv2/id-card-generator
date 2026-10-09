@@ -178,4 +178,9 @@
   window.alert = function (message) {
     return showModalAlert(message);
   };
+
+  // Silently disable right-click / context menu across the entire platform
+  document.addEventListener('contextmenu', function (e) {
+    e.preventDefault();
+  }, true);
 })();

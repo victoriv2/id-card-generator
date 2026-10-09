@@ -2,6 +2,11 @@
    Students Parliament Nigeria - Global Modal Alert & Dialog System
    ========================================================================== */
 
+/* Disable mobile callout / long-touch context menus */
+html, body {
+  -webkit-touch-callout: none;
+}
+
 .spn-modal-alert-backdrop {
   position: fixed;
   inset: 0;
