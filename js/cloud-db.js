@@ -8,9 +8,7 @@
 
   const SUPABASE_URL = 'https://iooacyhvvwqcwvkfxmjt.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlvb2FjeWh2dndxY3d2a2Z4bWp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzMTQ2MzIsImV4cCI6MjEwNjg5MDYzMn0.1vfrl4ZbdPIDlHqdi_PZxy-FGMOItKq91QFyMrbFXEs';
-  const GLOBALPAY_API_KEY = '9L47F15LBXX3LI0X';
-  const GLOBALPAY_SECRET_KEY = 'U18II05KPA9FUR5Q';
-  const GLOBALPAY_BASE_URL = 'https://paygw.globalpay.com.ng/globalpay-paymentgateway/api';
+  const GLOBALPAY_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/globalpay`;
   const PAYSTACK_PUBLIC_KEY = 'pk_live_732d9b62cd035b8dad96e981d7f6982540342e80';
   const DEFAULT_PAYMENT_EMAIL = 'we.are.danithuga@gmail.com';
   const DEFAULT_PRICE_NGN = 1000;
@@ -123,9 +121,7 @@
   const CloudDB = {
     supabaseUrl: SUPABASE_URL,
     supabaseAnonKey: SUPABASE_ANON_KEY,
-    globalPayApiKey: GLOBALPAY_API_KEY,
-    globalPaySecretKey: GLOBALPAY_SECRET_KEY,
-    globalPayBaseUrl: GLOBALPAY_BASE_URL,
+    globalPayFunctionUrl: GLOBALPAY_FUNCTION_URL,
     paystackPublicKey: PAYSTACK_PUBLIC_KEY,
     defaultPaymentEmail: DEFAULT_PAYMENT_EMAIL,
 
@@ -552,65 +548,46 @@
     },
 
     /**
-     * Generate GlobalPay Checkout Link
+     * Generate GlobalPay Checkout Link via Secure Serverless Edge Function
+     * (Zero API keys or credentials exposed to the client or browser)
      */
     async generateGlobalPayLink(params) {
-      const url = `${GLOBALPAY_BASE_URL}/paymentgateway/generate-payment-link`;
-      const headers = {
-        'apikey': GLOBALPAY_API_KEY,
-        'language': 'en',
-        'Content-Type': 'application/json'
-      };
-      const res = await fetch(url, {
+      const res = await fetch(GLOBALPAY_FUNCTION_URL, {
         method: 'POST',
-        headers,
-        body: JSON.stringify(params)
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          action: 'generate-link',
+          payload: params
+        })
       });
       return await res.json();
     },
 
     /**
-     * Query GlobalPay transaction status by Merchant Ref or GlobalPay Ref
+     * Query GlobalPay transaction status securely via Serverless Edge Function
      */
     async queryGlobalPayTransaction(merchantRef, globalPayRef) {
-      const headers = {
-        'apikey': GLOBALPAY_API_KEY,
-        'language': 'en',
-        'Content-Type': 'application/json'
-      };
-
-      // 1. Try querying by GlobalPay Ref if available
-      if (globalPayRef) {
-        try {
-          const res = await fetch(`${GLOBALPAY_BASE_URL}/paymentgateway/query-single-transaction/${encodeURIComponent(globalPayRef)}`, {
-            method: 'GET',
-            headers
-          });
-          const json = await res.json();
-          if (json && json.isSuccessful && json.data) {
-            return json.data;
-          }
-        } catch (e) {
-          console.warn('[GlobalPay] Direct ref query failed:', e);
+      try {
+        const res = await fetch(GLOBALPAY_FUNCTION_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            action: 'query-transaction',
+            merchantRef: merchantRef || '',
+            globalPayRef: globalPayRef || ''
+          })
+        });
+        const json = await res.json();
+        if (json && json.isSuccessful && json.data) {
+          return json.data;
         }
+      } catch (err) {
+        console.warn('[GlobalPay] Secure transaction query deferred:', err);
       }
-
-      // 2. Query by Merchant Transaction Reference
-      if (merchantRef) {
-        try {
-          const res = await fetch(`${GLOBALPAY_BASE_URL}/paymentgateway/query-single-transaction-by-merchant-reference/${encodeURIComponent(merchantRef)}`, {
-            method: 'GET',
-            headers
-          });
-          const json = await res.json();
-          if (json && json.isSuccessful && json.data) {
-            return Array.isArray(json.data) ? json.data[0] : json.data;
-          }
-        } catch (e) {
-          console.warn('[GlobalPay] Merchant ref query failed:', e);
-        }
-      }
-
       return null;
     },
 
