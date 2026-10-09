@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const inputPrice = document.getElementById('inputAdminPrice');
   const btnSavePrice = document.getElementById('btnSavePrice');
   const btnExportExcel = document.getElementById('btnExportExcel');
+  const btnPurgeUnpaidCards = document.getElementById('btnPurgeUnpaidCards');
   const btnTogglePaywall = document.getElementById('btnTogglePaywall');
   const togglePaywallBtnLabel = document.getElementById('togglePaywallBtnLabel');
   const paywallStatusPill = document.getElementById('paywallStatusPill');
@@ -158,6 +159,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   async function loadDashboard() {
+    // 0. Auto-purge expired unpaid cards
+    if (window.CloudDB && typeof CloudDB.purgeExpiredUnpaidCards === 'function') {
+      await CloudDB.purgeExpiredUnpaidCards().catch(() => {});
+    }
+
     // 1. Load current price & paywall status
     if (inputPrice) {
       inputPrice.value = CloudDB.getPrice();
@@ -630,6 +636,38 @@ document.addEventListener('DOMContentLoaded', async () => {
         title: 'Export Successful',
         type: 'success'
       });
+    });
+  }
+
+  // -------------------------------------------------------------------------
+  // Purge All Unpaid / Abandoned Member Records
+  // -------------------------------------------------------------------------
+  if (btnPurgeUnpaidCards) {
+    btnPurgeUnpaidCards.addEventListener('click', async () => {
+      const ok = await showModalConfirm('Are you sure you want to purge all unpaid card drafts? This will permanently delete any abandoned registration attempts from the database and local storage.', {
+        title: 'Purge Unpaid Cards',
+        confirmText: 'Yes, Purge Unpaid',
+        cancelText: 'Cancel'
+      });
+      if (!ok) return;
+
+      const originalHtml = btnPurgeUnpaidCards.innerHTML;
+      btnPurgeUnpaidCards.disabled = true;
+      btnPurgeUnpaidCards.innerHTML = '<span>Purging...</span>';
+
+      try {
+        if (window.CloudDB && typeof CloudDB.purgeAllUnpaidCards === 'function') {
+          await CloudDB.purgeAllUnpaidCards();
+          allCards = CloudDB.getLocalCards();
+          updateStatsAndRender();
+          notify('All unpaid and abandoned card drafts have been purged.');
+        }
+      } catch (err) {
+        showModalAlert('Could not purge unpaid cards: ' + (err.message || String(err)), { type: 'error' });
+      } finally {
+        btnPurgeUnpaidCards.disabled = false;
+        btnPurgeUnpaidCards.innerHTML = originalHtml;
+      }
     });
   }
 

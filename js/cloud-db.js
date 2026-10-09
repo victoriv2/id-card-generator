@@ -23,6 +23,36 @@
   // No hardcoded ready-made schools. Only schools created by the Admin are shown.
   const DEFAULT_SCHOOLS = [];
 
+  // ---------------------------------------------------------------------------
+  // Automated Client Storage Versioning & Full Storage Purge
+  // ---------------------------------------------------------------------------
+  const CURRENT_STORAGE_BUILD = 'SPN_BUILD_2026_10_09_RESET_V2';
+  try {
+    const activeBuild = localStorage.getItem('spa_build_revision');
+    if (activeBuild !== CURRENT_STORAGE_BUILD) {
+      const keysToClear = [
+        'spa_card_records',
+        'spa_card_counter',
+        'spa_active_verified_card',
+        'spa_last_paid_card',
+        'spa_load_card',
+        'spa_pending_payment_card',
+        'spa_pending_payment_ref',
+        'spa_globalpay_txn_ref',
+        'spa_last_processed_ref'
+      ];
+      keysToClear.forEach(k => {
+        try { localStorage.removeItem(k); } catch (e) {}
+        try { sessionStorage.removeItem(k); } catch (e) {}
+      });
+      localStorage.setItem('spa_card_counter', '1');
+      localStorage.setItem('spa_build_revision', CURRENT_STORAGE_BUILD);
+      console.log('[CloudDB] Client storage purged and upgraded to build revision:', CURRENT_STORAGE_BUILD);
+    }
+  } catch (e) {
+    console.warn('[CloudDB] Storage purge check error:', e);
+  }
+
   /**
    * Universal Supabase REST helper using PostgREST endpoints
    */
@@ -452,24 +482,29 @@
     },
 
     /**
-     * Query all registered card IDs across cloud and local storage
+     * Query all registered PAID card IDs across cloud and local storage
+     * Unpaid drafts do NOT claim sequence numbers.
      */
     async getAllRegisteredCardIds() {
       const idSet = new Set();
+      const isCardPaid = (c) => {
+        if (!c) return false;
+        return c.isPaid === true || c.is_paid === true || c.paymentRef === 'FREE_ISSUANCE' || c.payment_ref === 'FREE_ISSUANCE' || c.amountPaid === 0 || c.amount_paid === 0;
+      };
 
       const local = this.getLocalCards();
       local.forEach(c => {
-        if (c.id) {
+        if (c.id && isCardPaid(c)) {
           const norm = (c.id || '').trim().toUpperCase().replace(/[-_]/g, '/');
           if (norm) idSet.add(norm);
         }
       });
 
       try {
-        const rows = await supabaseRequest('cards?select=id,name');
+        const rows = await supabaseRequest('cards?select=id,name,is_paid,payment_ref,amount_paid');
         if (Array.isArray(rows)) {
           rows.forEach(r => {
-            if (r.id) {
+            if (r.id && isCardPaid(r)) {
               const norm = (r.id || '').trim().toUpperCase().replace(/[-_]/g, '/');
               if (norm) idSet.add(norm);
             }
@@ -484,7 +519,7 @@
 
     /**
      * Determine true next sequential number for a given category & year
-     * Returns 1 ('001') if database is empty (e.g. after a factory reset).
+     * Returns 1 ('001') if database has no paid cards (e.g. after a factory reset).
      */
     async getNextSequentialNumber(catCode, year2Digits) {
       const registeredIds = await this.getAllRegisteredCardIds();
@@ -510,7 +545,7 @@
 
     /**
      * Real-Time Collision Resolution:
-     * Checks if desiredId is already claimed by another registered user.
+     * Checks if desiredId is already claimed by another registered user who has PAID.
      * If taken, auto-adjusts to the next available unique ID to guarantee no duplicates.
      */
     async resolveUniqueCardId(desiredId, catCode, year2Digits, currentBearerName = '') {
@@ -519,18 +554,22 @@
       const codeUpper = (catCode || 'MEM').toUpperCase();
       const cleanName = (s) => (s || '').trim().replace(/\s+/g, ' ').toUpperCase();
       const curNameClean = cleanName(currentBearerName);
+      const isCardPaid = (c) => {
+        if (!c) return false;
+        return c.isPaid === true || c.is_paid === true || c.paymentRef === 'FREE_ISSUANCE' || c.payment_ref === 'FREE_ISSUANCE' || c.amountPaid === 0 || c.amount_paid === 0;
+      };
 
       let isTakenBySomeoneElse = false;
 
       // 1. Check Cloud
       try {
-        const rows = await supabaseRequest('cards?select=id,name');
+        const rows = await supabaseRequest('cards?select=id,name,is_paid,payment_ref,amount_paid');
         if (Array.isArray(rows)) {
           const match = rows.find(r => {
             const rNorm = (r.id || '').trim().toUpperCase().replace(/[-_]/g, '/');
             return rNorm === normDesired;
           });
-          if (match && cleanName(match.name) !== curNameClean) {
+          if (match && cleanName(match.name) !== curNameClean && isCardPaid(match)) {
             isTakenBySomeoneElse = true;
           }
         }
@@ -542,7 +581,7 @@
       if (!isTakenBySomeoneElse) {
         const local = this.getLocalCards();
         const localExisting = local.find(l => (l.id || '').trim().toUpperCase().replace(/[-_]/g, '/') === normDesired);
-        if (localExisting && cleanName(localExisting.name) !== curNameClean) {
+        if (localExisting && cleanName(localExisting.name) !== curNameClean && isCardPaid(localExisting)) {
           isTakenBySomeoneElse = true;
         }
       }
@@ -873,6 +912,9 @@
      */
     async loadFromCloud() {
       try {
+        // 0. Auto-purge expired unpaid cards
+        await this.purgeExpiredUnpaidCards().catch(() => {});
+
         // 1. Sync Settings (Price & Paywall Gate)
         await this.syncSettings();
 
@@ -887,6 +929,87 @@
         console.warn('[CloudDB] Supabase load deferred, using local cache:', err);
       }
 
+      return this.getLocalCards();
+    },
+
+    /**
+     * Auto-Purge Timer for Unpaid Cards:
+     * Removes any card record that has remained UNPAID for longer than maxAgeMs (default: 10 minutes).
+     * If maxAgeMs === 0, purges ALL unpaid card records immediately.
+     */
+    async purgeExpiredUnpaidCards(maxAgeMs = 10 * 60 * 1000) {
+      const now = Date.now();
+      const isCardPaid = (c) => {
+        if (!c) return false;
+        return c.isPaid === true || c.is_paid === true || c.paymentRef === 'FREE_ISSUANCE' || c.payment_ref === 'FREE_ISSUANCE' || c.amountPaid === 0 || c.amount_paid === 0;
+      };
+
+      // 1. Purge from LocalStorage
+      let localCards = this.getLocalCards();
+      let localChanged = false;
+      localCards = localCards.filter(c => {
+        if (isCardPaid(c)) return true;
+        const savedTime = new Date(c.savedAt || c.saved_at || 0).getTime();
+        const age = now - savedTime;
+        if (maxAgeMs === 0 || isNaN(savedTime) || savedTime === 0 || age >= maxAgeMs) {
+          localChanged = true;
+          return false;
+        }
+        return true;
+      });
+
+      if (localChanged) {
+        this.saveLocalCards(localCards);
+        console.log('[CloudDB] Purged expired unpaid cards from local storage.');
+      }
+
+      // Purge pending payment draft in localStorage/sessionStorage if expired
+      try {
+        const pending = localStorage.getItem('spa_pending_payment_card');
+        if (pending) {
+          const parsed = JSON.parse(pending);
+          const savedTime = new Date(parsed.savedAt || parsed.saved_at || 0).getTime();
+          if (maxAgeMs === 0 || isNaN(savedTime) || (now - savedTime) >= maxAgeMs) {
+            localStorage.removeItem('spa_pending_payment_card');
+            localStorage.removeItem('spa_pending_payment_ref');
+            sessionStorage.removeItem('spa_pending_payment_card');
+            sessionStorage.removeItem('spa_pending_payment_ref');
+          }
+        }
+      } catch (e) {}
+
+      // 2. Purge from Supabase Cloud Database
+      try {
+        const rows = await supabaseRequest('cards?is_paid=eq.false&select=id,saved_at,created_at,is_paid,payment_ref,amount_paid');
+        if (Array.isArray(rows) && rows.length > 0) {
+          for (const row of rows) {
+            if (isCardPaid(row)) continue;
+            const savedTime = new Date(row.saved_at || row.created_at || 0).getTime();
+            const age = now - savedTime;
+            if (maxAgeMs === 0 || isNaN(savedTime) || savedTime === 0 || age >= maxAgeMs) {
+              await supabaseRequest(`cards?id=eq.${encodeURIComponent(row.id)}`, {
+                method: 'DELETE'
+              }).catch(() => {});
+              console.log('[CloudDB] Purged expired unpaid card from Supabase:', row.id);
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('[CloudDB] Cloud unpaid purge deferred:', err);
+      }
+
+      // If no cards exist anywhere, ensure sequence counter resets to 1
+      const allIds = await this.getAllRegisteredCardIds();
+      if (allIds.length === 0) {
+        localStorage.setItem('spa_card_counter', '1');
+      }
+    },
+
+    /**
+     * Instant Manual Purge of ALL Unpaid Cards
+     */
+    async purgeAllUnpaidCards() {
+      await this.purgeExpiredUnpaidCards(0);
       return this.getLocalCards();
     },
 
@@ -964,4 +1087,20 @@
   };
 
   window.CloudDB = CloudDB;
+
+  // Background Unpaid Cards Expiration Timer:
+  // Runs immediately on startup and every 60 seconds
+  if (typeof window !== 'undefined') {
+    setTimeout(() => {
+      if (window.CloudDB && typeof CloudDB.purgeExpiredUnpaidCards === 'function') {
+        CloudDB.purgeExpiredUnpaidCards().catch(() => {});
+      }
+    }, 1500);
+
+    setInterval(() => {
+      if (window.CloudDB && typeof CloudDB.purgeExpiredUnpaidCards === 'function') {
+        CloudDB.purgeExpiredUnpaidCards().catch(() => {});
+      }
+    }, 60000);
+  }
 })();

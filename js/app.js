@@ -1888,11 +1888,15 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Initialize auto credentials, real-time sync, check for retrieval payload, check for payment returns, and update paywall state
+  if (window.CloudDB && typeof CloudDB.purgeExpiredUnpaidCards === 'function') {
+    CloudDB.purgeExpiredUnpaidCards().catch(() => {});
+  }
   updateAutoCredentials();
   syncOverlay();
   loadCardFromStorage();
   handlePaymentRedirectReturn();
   updatePaywallState();
+  syncSequenceFromDatabase();
 
   // If pre-filled card is not in local cache, perform background single-card cloud verification
   const startupId = getRawId();
