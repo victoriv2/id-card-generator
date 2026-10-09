@@ -505,8 +505,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         updatePaywallToggleUI(newState);
         showModalAlert(
           newState 
-            ? 'Paystack Payment Wall is now ENABLED. Members must pay the official fee before downloading or printing.' 
-            : 'Paystack Payment Wall is now DISABLED. All members can now download and print their ID cards for FREE!',
+            ? 'GlobalPay Payment Wall is now ENABLED. Members must pay the official fee before downloading or printing.' 
+            : 'GlobalPay Payment Wall is now DISABLED. All members can now download and print their ID cards for FREE!',
           {
             title: newState ? 'Payment Wall Enabled' : 'Payment Wall Disabled (Free Mode)',
             type: newState ? 'info' : 'success'
@@ -566,7 +566,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             'School / Chapter / Branch': c.school || 'N/A',
             'Payment Status': c.isPaid ? ((c.amountPaid === 0 || c.paymentRef === 'FREE_ISSUANCE') ? 'FREE' : 'PAID') : 'UNPAID',
             'Amount Paid (₦)': c.isPaid ? ((c.amountPaid === 0 || c.paymentRef === 'FREE_ISSUANCE') ? 0 : (c.amountPaid != null ? Number(c.amountPaid) : CloudDB.getPrice())) : 0,
-            'Paystack Reference': c.paymentRef || 'N/A',
+            'Payment Reference': c.paymentRef || 'N/A',
             'Payer Email': c.payerEmail || '',
             'Date Issued': c.dateIssued || c.savedAt || 'N/A'
           }));
@@ -600,7 +600,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
       // 2. High-fidelity CSV Fallback with UTF-8 BOM (Excel opens directly with proper formatting)
-      const headers = ['S/N', 'Full Name', 'ID Number', 'Category', 'State', 'School / Chapter / Branch', 'Payment Status', 'Amount Paid (NGN)', 'Paystack Reference', 'Payer Email', 'Date Issued'];
+      const headers = ['S/N', 'Full Name', 'ID Number', 'Category', 'State', 'School / Chapter / Branch', 'Payment Status', 'Amount Paid (NGN)', 'Payment Reference', 'Payer Email', 'Date Issued'];
       const rows = records.map((c, i) => [
         i + 1,
         `"${(c.name || '').replace(/"/g, '""')}"`,
