@@ -1014,6 +1014,48 @@
     },
 
     /**
+     * Reset Member Records Only:
+     * - Deletes all member card records from LocalStorage and Supabase
+     * - Resets the card counter back to 1 (001)
+     * - Clears temporary / session pending card caches
+     * - PRESERVES all schools, chapters, and branch directories intact!
+     * - PRESERVES card pricing and payment settings intact!
+     */
+    async resetMemberRecordsOnly() {
+      // 1. Wipe local card records and cache
+      localStorage.removeItem(STORAGE_KEYS.RECORDS);
+      localStorage.removeItem('spa_card_counter');
+      localStorage.removeItem('spa_active_verified_card');
+      localStorage.removeItem('spa_last_paid_card');
+      localStorage.removeItem('spa_load_card');
+      localStorage.removeItem('spa_pending_payment_card');
+      localStorage.removeItem('spa_pending_payment_ref');
+      localStorage.removeItem('spa_globalpay_txn_ref');
+      localStorage.removeItem('spa_last_processed_ref');
+
+      sessionStorage.removeItem('spa_active_verified_card');
+      sessionStorage.removeItem('spa_load_card');
+      sessionStorage.removeItem('spa_pending_payment_card');
+      sessionStorage.removeItem('spa_pending_payment_ref');
+      sessionStorage.removeItem('spa_globalpay_txn_ref');
+
+      localStorage.setItem('spa_card_counter', '1');
+
+      // 2. Wipe Supabase cards table only (does NOT touch schools or settings)
+      try {
+        await supabaseRequest('cards?id=not.is.null', { method: 'DELETE' });
+        console.log('[CloudDB] All member cards cleared from Supabase. Schools and settings preserved.');
+      } catch (err) {
+        console.warn('[CloudDB] Cloud cards reset error:', err);
+      }
+
+      return {
+        cards: [],
+        counter: 1
+      };
+    },
+
+    /**
      * Complete Factory Reset:
      * - Clears all cards/members in LocalStorage and Supabase
      * - Clears all schools/chapters/branches in LocalStorage and Supabase

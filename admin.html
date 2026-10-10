@@ -212,6 +212,12 @@
               <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M15 16h4v2h-4zm0-8h7v2h-7zm0 4h6v2h-6zM3 18c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V8H3v10zM14 5h-3l-1-1H6L5 5H2v2h12V5z"/></svg>
               <span>Purge Unpaid</span>
             </button>
+
+            <!-- Reset Member Records Button (Keeps Schools Safe) -->
+            <button type="button" id="btnToolbarResetMembers" class="btn-admin-excel" style="background: #fef2f2; border-color: #fca5a5; color: #b91c1c;" title="Clear all registered member cards and restart ID numbering from 001 (Preserves Schools)">
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+              <span>Reset Members Data</span>
+            </button>
           </div>
         </section>
 
@@ -363,6 +369,28 @@
                 <input type="number" id="inputAdminPrice" class="admin-price-input" min="100" step="100" value="1000" placeholder="1000">
               </div>
               <button type="button" id="btnSavePrice" class="btn-admin-action">Save New Price</button>
+            </div>
+          </div>
+
+          <!-- Safe Reset: Member Records Only (Preserves Schools & Settings) -->
+          <div class="admin-panel-card" style="max-width: 580px; margin-top: 24px; border: 1.5px solid #f59e0b; background: #fffdf5;">
+            <div class="admin-section-header">
+              <h2>
+                <span class="admin-header-icon gold">
+                  <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                </span>
+                <span>Reset Member Records Only</span>
+              </h2>
+            </div>
+            <p style="color: #78350f; font-size: 0.88rem; line-height: 1.5;">
+              Wipe all registered member card records and restart ID numbering from <strong>001</strong>.
+              <br><strong style="color: #065f46; display: inline-block; margin-top: 6px;">✓ All Schools, Chapters, Directory entries, Pricing, and Settings will remain 100% SAFE and untouched.</strong>
+            </p>
+            <div style="margin-top: 14px;">
+              <button type="button" id="btnOpenResetMembersModal" class="btn-admin-action" style="background: linear-gradient(135deg, #d97706 0%, #b45309 100%);">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                <span>Reset Member Records (Keep Schools)</span>
+              </button>
             </div>
           </div>
 
@@ -619,6 +647,46 @@
         </button>
         <button type="button" id="btnConfirmFactoryReset" class="btn-admin-danger" style="padding: 10px 20px;">
           Confirm & Reset All Data
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. Reset Member Records Only Confirmation Modal (Keeps Schools) -->
+  <div class="modal-backdrop" id="adminResetMembersModal" style="display: none;">
+    <div class="modal-dialog-simple" style="max-width: 480px;">
+      <div class="modal-header-simple" style="border-bottom-color: #fed7aa; background: #fffaf0;">
+        <span style="color: #b45309; display: flex; align-items: center; gap: 8px; font-weight: 800;">
+          <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          Reset Member Records Only
+        </span>
+        <button type="button" class="btn-modal-close" id="btnCloseAdminResetMembersModal" title="Close">
+          <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
+      <div class="admin-modal-multi-body" style="padding: 20px;">
+        <div style="background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 10px; padding: 14px; margin-bottom: 16px;">
+          <p style="margin: 0; color: #92400e; font-size: 0.88rem; line-height: 1.5; font-weight: 700;">
+            This will only delete member cards & data:
+          </p>
+          <ul style="margin: 8px 0 0 18px; padding: 0; color: #78350f; font-size: 0.82rem; line-height: 1.6;">
+            <li>All registered member card records will be deleted from the database.</li>
+            <li>Card serial numbering will restart clean from 0001.</li>
+            <li style="color: #065f46; font-weight: 700;">✓ All 160+ Schools and branch directory entries will NOT be touched.</li>
+            <li style="color: #065f46; font-weight: 700;">✓ Card issuance fee and payment settings will remain unchanged.</li>
+          </ul>
+        </div>
+        <p style="margin: 0 0 10px; font-size: 0.84rem; color: #475569; font-weight: 600; text-align: left;">
+          To proceed, type <span style="font-family: monospace; font-weight: 800; color: #b45309; background: #fef3c7; padding: 2px 6px; border-radius: 4px;">CLEAR</span> in the box below:
+        </p>
+        <input type="text" id="inputResetMembersConfirmText" style="width: 100%; box-sizing: border-box; height: 42px; padding: 0 14px; border: 2px solid #cbd5e1; border-radius: 8px; font-weight: 800; font-size: 0.95rem; text-align: center; letter-spacing: 2px; color: #0f172a;" placeholder="CLEAR" autocomplete="off">
+      </div>
+      <div class="admin-modal-actions-bar" style="display: flex; gap: 10px; justify-content: flex-end; padding: 14px 20px; border-top: 1px solid #f1f5f9; background: #f8fafc;">
+        <button type="button" id="btnCancelResetMembers" style="padding: 10px 18px; border-radius: 8px; border: 1.5px solid #cbd5e1; background: #ffffff; color: #475569; font-weight: 700; cursor: pointer; font-size: 0.88rem;">
+          Cancel
+        </button>
+        <button type="button" id="btnConfirmResetMembers" class="btn-admin-action" style="background: linear-gradient(135deg, #d97706 0%, #b45309 100%); padding: 10px 20px;">
+          Confirm & Reset Members
         </button>
       </div>
     </div>

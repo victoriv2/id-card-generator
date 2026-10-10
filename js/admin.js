@@ -1044,6 +1044,113 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // -------------------------------------------------------------------------
+  // Reset Member Records Only (Preserves Schools & Settings)
+  // -------------------------------------------------------------------------
+  const btnOpenResetMembersModal = document.getElementById('btnOpenResetMembersModal');
+  const btnToolbarResetMembers = document.getElementById('btnToolbarResetMembers');
+  const adminResetMembersModal = document.getElementById('adminResetMembersModal');
+  const btnCloseAdminResetMembersModal = document.getElementById('btnCloseAdminResetMembersModal');
+  const btnCancelResetMembers = document.getElementById('btnCancelResetMembers');
+  const btnConfirmResetMembers = document.getElementById('btnConfirmResetMembers');
+  const inputResetMembersConfirmText = document.getElementById('inputResetMembersConfirmText');
+
+  function openResetMembersModal() {
+    if (inputResetMembersConfirmText) {
+      inputResetMembersConfirmText.value = '';
+    }
+    if (adminResetMembersModal) {
+      adminResetMembersModal.style.display = 'flex';
+    }
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => {
+      if (inputResetMembersConfirmText) inputResetMembersConfirmText.focus();
+    }, 100);
+  }
+
+  function closeResetMembersModal() {
+    if (adminResetMembersModal) {
+      adminResetMembersModal.style.display = 'none';
+    }
+    document.body.style.overflow = '';
+  }
+
+  if (btnOpenResetMembersModal) {
+    btnOpenResetMembersModal.addEventListener('click', openResetMembersModal);
+  }
+  if (btnToolbarResetMembers) {
+    btnToolbarResetMembers.addEventListener('click', openResetMembersModal);
+  }
+  if (btnCloseAdminResetMembersModal) {
+    btnCloseAdminResetMembersModal.addEventListener('click', closeResetMembersModal);
+  }
+  if (btnCancelResetMembers) {
+    btnCancelResetMembers.addEventListener('click', closeResetMembersModal);
+  }
+  if (adminResetMembersModal) {
+    adminResetMembersModal.addEventListener('click', (e) => {
+      if (e.target === adminResetMembersModal) closeResetMembersModal();
+    });
+  }
+
+  async function handleConfirmResetMembers() {
+    const confirmVal = (inputResetMembersConfirmText ? inputResetMembersConfirmText.value : '').trim().toUpperCase();
+    if (confirmVal !== 'CLEAR') {
+      showModalAlert('Please type "CLEAR" into the confirmation box to proceed.', {
+        title: 'Confirmation Required',
+        type: 'warning'
+      });
+      if (inputResetMembersConfirmText) inputResetMembersConfirmText.focus();
+      return;
+    }
+
+    if (btnConfirmResetMembers) {
+      btnConfirmResetMembers.disabled = true;
+      btnConfirmResetMembers.innerText = 'Resetting Members...';
+    }
+
+    try {
+      await CloudDB.resetMemberRecordsOnly();
+
+      // Clear in-memory cards only (Schools remain untouched!)
+      allCards = [];
+
+      // Re-render cards table and stats
+      updateStatsAndRender();
+
+      closeResetMembersModal();
+
+      showModalAlert(`All member records have been successfully wiped, and ID serial numbering has restarted from 0001!\n\nAll ${allSchools.length} schools and directory settings remain completely safe and untouched.`, {
+        title: 'Member Records Cleared',
+        type: 'success'
+      });
+    } catch (err) {
+      console.error('[Admin] Reset members error:', err);
+      showModalAlert(err.message || 'An error occurred while resetting member records.', {
+        title: 'Reset Failed',
+        type: 'error'
+      });
+    } finally {
+      if (btnConfirmResetMembers) {
+        btnConfirmResetMembers.disabled = false;
+        btnConfirmResetMembers.innerText = 'Confirm & Reset Members';
+      }
+    }
+  }
+
+  if (btnConfirmResetMembers) {
+    btnConfirmResetMembers.addEventListener('click', handleConfirmResetMembers);
+  }
+
+  if (inputResetMembersConfirmText) {
+    inputResetMembersConfirmText.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleConfirmResetMembers();
+      }
+    });
+  }
+
+  // -------------------------------------------------------------------------
   // Factory Reset Danger Zone
   // -------------------------------------------------------------------------
   const btnOpenFactoryResetModal = document.getElementById('btnOpenFactoryResetModal');
