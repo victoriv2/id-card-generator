@@ -789,7 +789,90 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function processUploadedImage(file) {
+  /**
+   * Automatically compresses an uploaded image file in-memory before display or upload.
+   * Guarantees the resulting JPEG Base64 is strictly <= 300 KB.
+   */
+  function compressImageToMax300KB(file, maxDimension = 900, maxBytes = 300 * 1024) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error('Failed to read image file'));
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onerror = () => reject(new Error('Failed to load image in memory'));
+        img.onload = () => {
+          try {
+            let width = img.naturalWidth || img.width;
+            let height = img.naturalHeight || img.height;
+
+            // Maintain exact aspect ratio while constraining to maxDimension
+            if (width > maxDimension || height > maxDimension) {
+              if (width > height) {
+                height = Math.round((height * maxDimension) / width);
+                width = maxDimension;
+              } else {
+                width = Math.round((width * maxDimension) / height);
+                height = maxDimension;
+              }
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+
+            // Draw white background in case source is a transparent PNG or WEBP
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, width, height);
+            ctx.drawImage(img, 0, 0, width, height);
+
+            function getByteLength(dUrl) {
+              const b64 = (dUrl.split(',')[1] || '').replace(/=+$/, '');
+              return Math.floor((b64.length * 3) / 4);
+            }
+
+            let quality = 0.88;
+            let dataUrl = canvas.toDataURL('image/jpeg', quality);
+            let currentBytes = getByteLength(dataUrl);
+
+            // Iterative quality reduction to stay strictly <= maxBytes (300KB)
+            while (currentBytes > maxBytes && quality > 0.35) {
+              quality -= 0.08;
+              dataUrl = canvas.toDataURL('image/jpeg', quality);
+              currentBytes = getByteLength(dataUrl);
+            }
+
+            // If still > 300KB, scale down dimensions further
+            if (currentBytes > maxBytes) {
+              let scaleDown = 0.8;
+              while (currentBytes > maxBytes && scaleDown >= 0.4) {
+                const scaledCanvas = document.createElement('canvas');
+                scaledCanvas.width = Math.max(300, Math.round(width * scaleDown));
+                scaledCanvas.height = Math.max(300, Math.round(height * scaleDown));
+                const sCtx = scaledCanvas.getContext('2d');
+                sCtx.fillStyle = '#ffffff';
+                sCtx.fillRect(0, 0, scaledCanvas.width, scaledCanvas.height);
+                sCtx.drawImage(canvas, 0, 0, scaledCanvas.width, scaledCanvas.height);
+
+                dataUrl = scaledCanvas.toDataURL('image/jpeg', 0.72);
+                currentBytes = getByteLength(dataUrl);
+                scaleDown -= 0.15;
+              }
+            }
+
+            console.log(`[Auto-Compressor] ${(file.size / 1024).toFixed(1)}KB -> ${(currentBytes / 1024).toFixed(1)}KB (${width}x${height}, Quality: ${quality.toFixed(2)})`);
+            resolve(dataUrl);
+          } catch (err) {
+            reject(err);
+          }
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function processUploadedImage(file) {
     if (!file.type.startsWith('image/')) {
       showModalAlert('Please upload a valid image file (JPG, PNG, WEBP).', {
         title: 'Invalid File Type',
@@ -798,22 +881,34 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
+    try {
+      if (file.size > 1024 * 1024) {
+        notify(`Optimizing photo (${(file.size / (1024 * 1024)).toFixed(1)}MB)...`);
+      }
+
+      // Auto-compress in-memory BEFORE displaying on the card or saving to database
+      const compressedDataUrl = await compressImageToMax300KB(file, 900, 300 * 1024);
+
+      // ONLY display and record after compression is complete
       passportImg.onload = () => {
         fitPassportImage(passportImg);
         resetPhotoFraming();
       };
-      passportImg.src = e.target.result;
+      passportImg.src = compressedDataUrl;
       passportImg.style.display = 'block';
       if (passportEmptyHint) passportEmptyHint.style.display = 'none';
 
       hasPassport = true;
       if (photoAdjustBox) photoAdjustBox.style.display = 'flex';
 
-      notify('Passport photo added to card!');
-    };
-    reader.readAsDataURL(file);
+      notify('Passport photo added and optimized (<300KB)!');
+    } catch (err) {
+      console.error('[Image Compression Error]', err);
+      showModalAlert('Could not process this image. Please select a standard JPG or PNG photo.', {
+        title: 'Image Processing Error',
+        type: 'error'
+      });
+    }
   }
 
   // Zoom & Pan Sliders
