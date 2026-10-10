@@ -791,9 +791,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /**
    * Automatically compresses an uploaded image file in-memory before display or upload.
-   * Guarantees the resulting JPEG Base64 is strictly <= 300 KB.
+   * Guarantees the resulting JPEG Base64 is strictly <= 100 KB.
    */
-  function compressImageToMax300KB(file, maxDimension = 900, maxBytes = 300 * 1024) {
+  function compressImageToMax100KB(file, maxDimension = 650, maxBytes = 100 * 1024) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onerror = () => reject(new Error('Failed to read image file'));
@@ -805,7 +805,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let width = img.naturalWidth || img.width;
             let height = img.naturalHeight || img.height;
 
-            // Maintain exact aspect ratio while constraining to maxDimension
+            // Maintain exact aspect ratio while constraining to maxDimension (650px)
             if (width > maxDimension || height > maxDimension) {
               if (width > height) {
                 height = Math.round((height * maxDimension) / width);
@@ -831,30 +831,30 @@ document.addEventListener('DOMContentLoaded', () => {
               return Math.floor((b64.length * 3) / 4);
             }
 
-            let quality = 0.88;
+            let quality = 0.82;
             let dataUrl = canvas.toDataURL('image/jpeg', quality);
             let currentBytes = getByteLength(dataUrl);
 
-            // Iterative quality reduction to stay strictly <= maxBytes (300KB)
+            // Iterative quality reduction to stay strictly <= maxBytes (100KB)
             while (currentBytes > maxBytes && quality > 0.35) {
-              quality -= 0.08;
+              quality -= 0.07;
               dataUrl = canvas.toDataURL('image/jpeg', quality);
               currentBytes = getByteLength(dataUrl);
             }
 
-            // If still > 300KB, scale down dimensions further
+            // If still > 100KB, scale down dimensions further
             if (currentBytes > maxBytes) {
               let scaleDown = 0.8;
               while (currentBytes > maxBytes && scaleDown >= 0.4) {
                 const scaledCanvas = document.createElement('canvas');
-                scaledCanvas.width = Math.max(300, Math.round(width * scaleDown));
-                scaledCanvas.height = Math.max(300, Math.round(height * scaleDown));
+                scaledCanvas.width = Math.max(260, Math.round(width * scaleDown));
+                scaledCanvas.height = Math.max(260, Math.round(height * scaleDown));
                 const sCtx = scaledCanvas.getContext('2d');
                 sCtx.fillStyle = '#ffffff';
                 sCtx.fillRect(0, 0, scaledCanvas.width, scaledCanvas.height);
                 sCtx.drawImage(canvas, 0, 0, scaledCanvas.width, scaledCanvas.height);
 
-                dataUrl = scaledCanvas.toDataURL('image/jpeg', 0.72);
+                dataUrl = scaledCanvas.toDataURL('image/jpeg', 0.70);
                 currentBytes = getByteLength(dataUrl);
                 scaleDown -= 0.15;
               }
@@ -887,7 +887,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // Auto-compress in-memory BEFORE displaying on the card or saving to database
-      const compressedDataUrl = await compressImageToMax300KB(file, 900, 300 * 1024);
+      const compressedDataUrl = await compressImageToMax100KB(file, 650, 100 * 1024);
 
       // ONLY display and record after compression is complete
       passportImg.onload = () => {
@@ -901,7 +901,7 @@ document.addEventListener('DOMContentLoaded', () => {
       hasPassport = true;
       if (photoAdjustBox) photoAdjustBox.style.display = 'flex';
 
-      notify('Passport photo added and optimized (<300KB)!');
+      notify('Passport photo optimized and added (<100KB)!');
     } catch (err) {
       console.error('[Image Compression Error]', err);
       showModalAlert('Could not process this image. Please select a standard JPG or PNG photo.', {
