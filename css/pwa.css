@@ -342,6 +342,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  white-space: nowrap;
   transition: all 0.2s ease;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
@@ -363,6 +364,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  white-space: nowrap;
   transition: all 0.2s ease;
 }
 
@@ -389,17 +391,31 @@
   }
 
   .portal-pwa-card {
-    padding: 20px 18px;
+    padding: 20px 16px;
   }
 
   .portal-pwa-buttons {
     width: 100%;
+    gap: 8px;
+    flex-wrap: nowrap;
   }
 
   .btn-pwa-portal-install,
   .btn-pwa-portal-share {
     flex: 1 1 0;
+    min-width: 0;
     justify-content: center;
+    white-space: nowrap;
+    padding: 11px 10px;
+    font-size: 0.85rem;
+    gap: 6px;
+    box-sizing: border-box;
+  }
+
+  .btn-pwa-portal-install svg,
+  .btn-pwa-portal-share svg {
+    flex-shrink: 0;
   }
 }
+
 
