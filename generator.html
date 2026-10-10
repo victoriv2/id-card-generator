@@ -10,10 +10,21 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   
+  <!-- Progressive Web App (PWA) & iOS Support -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#0b3d23">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SPN Portal">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="favicon.png">
+
   <!-- Styles -->
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/modal-alert.css">
   <link rel="stylesheet" href="css/paywall.css">
+  <link rel="stylesheet" href="css/pwa.css">
 
   <!-- Embedded High-Definition Card Templates (Base64 for zero-taint offline exports) -->
   <script src="js/templates-data.js?v=20261010_front2"></script>
@@ -31,6 +42,16 @@
         </div>
       </div>
       <div class="header-actions">
+        <button type="button" class="btn-pwa-action btn-pwa-share" id="btnPwaShareHeader" title="Share generator with members or chapters">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8m-4-6l-4-4m0 0L8 6m4-4v12"/></svg>
+          <span class="btn-label-desktop">Share App</span>
+          <span class="btn-label-mobile">Share</span>
+        </button>
+        <button type="button" class="btn-pwa-action btn-pwa-install" id="btnPwaInstallHeader" title="Install on phone or desktop" style="display: none;">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          <span class="btn-label-desktop">Install App</span>
+          <span class="btn-label-mobile">Install</span>
+        </button>
         <a href="index.html" class="btn-header-reset" title="Back to Home Portal">
           <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
           <span class="btn-label-desktop">Home Portal</span>
@@ -586,5 +607,6 @@
   <script src="js/modal-alert.js?v=20261010_50"></script>
   <script src="js/cloud-db.js?v=20261010_50"></script>
   <script src="js/app.js?v=20261010_50"></script>
+  <script src="js/pwa.js?v=20261010_pwa"></script>
 </body>
 </html>

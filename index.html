@@ -10,10 +10,21 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   
+  <!-- Progressive Web App (PWA) & iOS Support -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#0b3d23">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SPN Portal">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="favicon.png">
+  
   <!-- Stylesheets -->
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/modal-alert.css">
   <link rel="stylesheet" href="css/portal.css">
+  <link rel="stylesheet" href="css/pwa.css">
 </head>
 <body class="portal-body">
 
@@ -28,9 +39,20 @@
         </div>
       </div>
       <div class="header-actions">
+        <button type="button" class="btn-pwa-action btn-pwa-share" id="btnPwaShareHeader" title="Share portal with members or chapters">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8m-4-6l-4-4m0 0L8 6m4-4v12"/></svg>
+          <span class="btn-label-desktop">Share App</span>
+          <span class="btn-label-mobile">Share</span>
+        </button>
+        <button type="button" class="btn-pwa-action btn-pwa-install" id="btnPwaInstallHeader" style="display: none;" title="Install SPN App on your phone">
+          <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
+          <span class="btn-label-desktop">Install App</span>
+          <span class="btn-label-mobile">Install</span>
+        </button>
         <a href="generator.html" class="btn-header-action" title="Issue a new ID Card">
           <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-          New ID Card
+          <span class="btn-label-desktop">New ID Card</span>
+          <span class="btn-label-mobile">New Card</span>
         </a>
       </div>
     </div>
@@ -120,5 +142,6 @@
   <script src="js/modal-alert.js?v=20261010_50"></script>
   <script src="js/cloud-db.js?v=20261010_50"></script>
   <script src="js/portal.js?v=20261010_50"></script>
+  <script src="js/pwa.js?v=20261010_pwa"></script>
 </body>
 </html>
