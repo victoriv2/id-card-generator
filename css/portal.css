@@ -165,7 +165,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 16px;
+  box-sizing: border-box;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1),
@@ -180,7 +181,7 @@
 .portal-retrieve-box {
   background: #ffffff;
   border-radius: 18px;
-  padding: 28px 24px;
+  padding: 24px 20px;
   border: 2px solid #b45309;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45),
               0 0 0 1px rgba(180, 83, 9, 0.15);
@@ -192,6 +193,7 @@
   transform: scale(0.93) translateY(16px);
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .portal-retrieve-backdrop.is-open .portal-retrieve-box {
@@ -202,7 +204,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
 .portal-retrieve-header h3 {
@@ -233,20 +235,26 @@
 
 .portal-search-bar {
   display: flex;
-  gap: 10px;
-  margin-bottom: 24px;
+  align-items: stretch;
+  gap: 8px;
+  margin-bottom: 20px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .portal-search-input {
-  flex-grow: 1;
-  padding: 14px 18px;
+  flex: 1 1 0%;
+  min-width: 0;
+  width: 0;
+  padding: 12px 14px;
   border: 2px solid #cbd5e1;
   border-radius: 10px;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 600;
   color: #0f172a;
   outline: none;
   transition: border-color 0.2s ease;
+  box-sizing: border-box;
 }
 
 .portal-search-input:focus {
@@ -258,16 +266,18 @@
   color: #ffffff;
   border: none;
   border-radius: 10px;
-  padding: 0 24px;
-  font-size: 0.95rem;
+  padding: 0 20px;
+  font-size: 0.92rem;
   font-weight: 700;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .portal-search-btn:hover {
@@ -434,3 +444,57 @@ a:hover,
 .portal-record-item:hover {
   transform: none !important;
 }
+
+/* Mobile Responsiveness for Retrieve Modal & Search */
+@media (max-width: 540px) {
+  .portal-retrieve-backdrop {
+    padding: 10px;
+  }
+
+  .portal-retrieve-box {
+    padding: 18px 14px;
+    border-radius: 14px;
+    max-height: 90vh;
+  }
+
+  .portal-retrieve-header {
+    margin-bottom: 14px;
+  }
+
+  .portal-retrieve-header h3 {
+    font-size: 1.05rem;
+  }
+
+  .portal-search-bar {
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+
+  .portal-search-input {
+    padding: 10px 12px;
+    font-size: 0.88rem;
+  }
+
+  .portal-search-btn {
+    padding: 0 14px;
+    font-size: 0.85rem;
+    gap: 4px;
+  }
+
+  .portal-record-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .portal-record-actions {
+    width: 100%;
+  }
+
+  .portal-record-actions .portal-record-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
