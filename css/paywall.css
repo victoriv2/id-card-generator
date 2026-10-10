@@ -47,21 +47,25 @@
 }
 
 .paywall-price-wrap {
-  display: flex;
-  align-items: baseline;
+  display: inline-flex;
+  align-items: center;
   color: #0b3d23;
   font-weight: 900;
+  line-height: 1;
 }
 
 .paywall-price-currency {
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   margin-right: 2px;
+  line-height: 1;
+  font-family: inherit;
 }
 
 .paywall-price-val {
   font-size: 1.75rem;
   font-family: 'Cinzel', serif;
   letter-spacing: 0.5px;
+  line-height: 1;
 }
 
 .paywall-desc {
@@ -100,20 +104,71 @@
 
 .btn-paystack-pay {
   width: 100%;
-  padding: 14px 20px;
+  box-sizing: border-box;
+  padding: 13px 16px;
   border-radius: 10px;
   background: linear-gradient(135deg, #0b3d23 0%, #15803d 100%);
   color: #ffffff;
   border: 1.5px solid #cda434;
-  font-size: 1rem;
+  font-size: 0.96rem;
   font-weight: 800;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 9px;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 4px 16px rgba(11, 61, 35, 0.32);
+  line-height: 1.25;
+}
+
+.btn-paystack-pay svg {
+  flex-shrink: 0;
+}
+
+.btn-pay-content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+
+.btn-pay-title {
+  white-space: nowrap;
+  letter-spacing: 0.2px;
+}
+
+.btn-pay-divider {
+  opacity: 0.75;
+  font-size: 0.85em;
+  display: inline-block;
+}
+
+.btn-pay-amount {
+  color: #fef08a;
+  font-weight: 900;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+@media (max-width: 420px) {
+  .btn-paystack-pay {
+    padding: 12px 10px;
+    font-size: 0.88rem;
+    gap: 7px;
+  }
+
+  .btn-pay-content {
+    gap: 5px;
+  }
+}
+
+@media (max-width: 350px) {
+  .btn-paystack-pay {
+    padding: 11px 8px;
+    font-size: 0.82rem;
+  }
 }
 
 .btn-paystack-pay:hover {
