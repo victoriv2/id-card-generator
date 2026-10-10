@@ -263,3 +263,143 @@
 .btn-ios-got-it:hover {
   background: #15803d;
 }
+
+/* ==========================================================================
+   PWA Portal Card & Mobile Responsive Controls
+   ========================================================================== */
+
+.portal-pwa-card {
+  max-width: 900px;
+  width: calc(100% - 40px);
+  margin: 0 auto 40px;
+  background: linear-gradient(135deg, #072a18 0%, #0b3d23 50%, #0d4a2b 100%);
+  border: 1.5px solid var(--gold-accent, #cda434);
+  border-radius: 18px;
+  padding: 24px 28px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+  color: #ffffff;
+}
+
+.portal-pwa-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(205, 164, 52, 0.2);
+  color: #fef08a;
+  border: 1px solid rgba(205, 164, 52, 0.4);
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+}
+
+.portal-pwa-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.portal-pwa-info {
+  flex: 1 1 300px;
+}
+
+.portal-pwa-info h3 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 0 0 6px 0;
+  color: #ffffff;
+}
+
+.portal-pwa-info p {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: #e2e8f0;
+  margin: 0;
+}
+
+.portal-pwa-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-pwa-portal-install {
+  background: var(--gold-accent, #cda434);
+  color: #072a18;
+  border: 1px solid #fef08a;
+  padding: 11px 20px;
+  border-radius: 10px;
+  font-size: 0.92rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-pwa-portal-install:hover {
+  background: #dfb743;
+  transform: translateY(-1px);
+}
+
+.btn-pwa-portal-share {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-pwa-portal-share:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: #ffffff;
+}
+
+/* Responsive adjustment for mobile header actions */
+@media (max-width: 768px) {
+  .header-actions .btn-pwa-action {
+    flex: 1 1 0;
+    min-width: 0;
+    justify-content: center;
+    text-align: center;
+    padding: 0.45rem 0.25rem;
+    font-size: 0.78rem;
+    gap: 0.25rem;
+  }
+
+  /* On generator page header, hide install button on mobile to avoid overcrowding; the floating banner handles it */
+  body:not(.portal-body) .header-actions #btnPwaInstallHeader {
+    display: none !important;
+  }
+
+  .portal-pwa-card {
+    padding: 20px 18px;
+  }
+
+  .portal-pwa-buttons {
+    width: 100%;
+  }
+
+  .btn-pwa-portal-install,
+  .btn-pwa-portal-share {
+    flex: 1 1 0;
+    justify-content: center;
+  }
+}
+
