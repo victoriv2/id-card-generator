@@ -110,17 +110,19 @@ document.addEventListener('DOMContentLoaded', () => {
     return { dateIssued, year2Digits };
   }
 
+  const BASE_ID_SEQUENCE = 50;
+
   function getCardSequenceNumber() {
     if (window.CloudDB && typeof CloudDB.getLocalCards === 'function') {
       const local = CloudDB.getLocalCards();
       if (!Array.isArray(local) || local.length === 0) {
-        localStorage.setItem('spa_card_counter', '1');
-        return 1;
+        localStorage.setItem('spa_card_counter', String(BASE_ID_SEQUENCE));
+        return BASE_ID_SEQUENCE;
       }
     }
     const saved = localStorage.getItem('spa_card_counter');
-    const num = saved ? parseInt(saved, 10) : 1;
-    return isNaN(num) || num < 1 ? 1 : num;
+    const num = saved ? parseInt(saved, 10) : BASE_ID_SEQUENCE;
+    return isNaN(num) || num < BASE_ID_SEQUENCE ? BASE_ID_SEQUENCE : num;
   }
 
   function advanceCardSequence() {

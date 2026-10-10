@@ -1119,7 +1119,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       closeResetMembersModal();
 
-      showModalAlert(`All member records have been successfully wiped, and ID serial numbering has restarted from 0001!\n\nAll ${allSchools.length} schools and directory settings remain completely safe and untouched.`, {
+      showModalAlert(`All member records have been successfully wiped, and ID serial numbering has restarted from 050!\n\nAll ${allSchools.length} schools and directory settings remain completely safe and untouched.`, {
         title: 'Member Records Cleared',
         type: 'success'
       });

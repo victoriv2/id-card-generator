@@ -23,10 +23,13 @@
   // No hardcoded ready-made schools. Only schools created by the Admin are shown.
   const DEFAULT_SCHOOLS = [];
 
+  // Default starting sequence for ID numbers across all categories (050)
+  const BASE_ID_SEQUENCE = 50;
+
   // ---------------------------------------------------------------------------
   // Automated Client Storage Versioning & Full Storage Purge
   // ---------------------------------------------------------------------------
-  const CURRENT_STORAGE_BUILD = 'SPN_BUILD_2026_10_10_RESET_V4_HEADER_FIX';
+  const CURRENT_STORAGE_BUILD = 'SPN_BUILD_2026_10_10_SEQ50';
   try {
     const activeBuild = localStorage.getItem('spa_build_revision');
     if (activeBuild !== CURRENT_STORAGE_BUILD) {
@@ -45,9 +48,9 @@
         try { localStorage.removeItem(k); } catch (e) {}
         try { sessionStorage.removeItem(k); } catch (e) {}
       });
-      localStorage.setItem('spa_card_counter', '1');
+      localStorage.setItem('spa_card_counter', String(BASE_ID_SEQUENCE));
       localStorage.setItem('spa_build_revision', CURRENT_STORAGE_BUILD);
-      console.log('[CloudDB] Client storage purged and upgraded to build revision:', CURRENT_STORAGE_BUILD);
+      console.log('[CloudDB] Client storage purged and upgraded to build revision:', CURRENT_STORAGE_BUILD, 'Base counter:', BASE_ID_SEQUENCE);
     }
   } catch (e) {
     console.warn('[CloudDB] Storage purge check error:', e);
@@ -519,14 +522,14 @@
 
     /**
      * Determine true next sequential number for a given category & year
-     * Returns 1 ('001') if database has no paid cards (e.g. after a factory reset).
+     * Returns BASE_ID_SEQUENCE (50 -> '050') if database has no registered cards for this category.
      */
     async getNextSequentialNumber(catCode, year2Digits) {
       const registeredIds = await this.getAllRegisteredCardIds();
       const codeUpper = (catCode || '').toUpperCase();
       const yr = String(year2Digits || new Date().getFullYear()).slice(-2);
 
-      let maxSeq = 0;
+      let maxSeq = BASE_ID_SEQUENCE - 1;
       registeredIds.forEach(id => {
         const pattern = new RegExp(`^SPA/ID/${codeUpper}/${yr}/(\\d+)`, 'i');
         const match = id.match(pattern);
@@ -538,7 +541,7 @@
         }
       });
 
-      const nextSeq = maxSeq + 1;
+      const nextSeq = Math.max(BASE_ID_SEQUENCE, maxSeq + 1);
       localStorage.setItem('spa_card_counter', nextSeq.toString());
       return nextSeq;
     },
@@ -592,6 +595,7 @@
 
       // ID is already taken or empty: dynamically compute the next available unique sequence
       let nextSeq = await this.getNextSequentialNumber(codeUpper, yr);
+      if (nextSeq < BASE_ID_SEQUENCE) nextSeq = BASE_ID_SEQUENCE;
       let seqStr = String(nextSeq).padStart(3, '0');
       let uniqueId = `SPA/ID/${codeUpper}/${yr}/${seqStr}`;
 
@@ -998,10 +1002,10 @@
         console.warn('[CloudDB] Cloud unpaid purge deferred:', err);
       }
 
-      // If no cards exist anywhere, ensure sequence counter resets to 1
+      // If no cards exist anywhere, ensure sequence counter resets to BASE_ID_SEQUENCE (50)
       const allIds = await this.getAllRegisteredCardIds();
       if (allIds.length === 0) {
-        localStorage.setItem('spa_card_counter', '1');
+        localStorage.setItem('spa_card_counter', String(BASE_ID_SEQUENCE));
       }
     },
 
@@ -1016,7 +1020,7 @@
     /**
      * Reset Member Records Only:
      * - Deletes all member card records from LocalStorage and Supabase
-     * - Resets the card counter back to 1 (001)
+     * - Resets the card counter back to BASE_ID_SEQUENCE (50 -> '050')
      * - Clears temporary / session pending card caches
      * - PRESERVES all schools, chapters, and branch directories intact!
      * - PRESERVES card pricing and payment settings intact!
@@ -1039,7 +1043,7 @@
       sessionStorage.removeItem('spa_pending_payment_ref');
       sessionStorage.removeItem('spa_globalpay_txn_ref');
 
-      localStorage.setItem('spa_card_counter', '1');
+      localStorage.setItem('spa_card_counter', String(BASE_ID_SEQUENCE));
 
       // 2. Wipe Supabase cards table only (does NOT touch schools or settings)
       try {
@@ -1051,7 +1055,7 @@
 
       return {
         cards: [],
-        counter: 1
+        counter: BASE_ID_SEQUENCE
       };
     },
 
@@ -1059,7 +1063,7 @@
      * Complete Factory Reset:
      * - Clears all cards/members in LocalStorage and Supabase
      * - Clears all schools/chapters/branches in LocalStorage and Supabase
-     * - Resets card counter in LocalStorage
+     * - Resets card counter in LocalStorage to BASE_ID_SEQUENCE (50)
      * - Resets card price to DEFAULT_PRICE_NGN (1000) in LocalStorage and Supabase
      * - Restores payment wall to enabled
      */
@@ -1079,6 +1083,7 @@
       sessionStorage.removeItem('spa_pending_payment_card');
       sessionStorage.removeItem('spa_pending_payment_ref');
       sessionStorage.removeItem('spa_globalpay_txn_ref');
+      localStorage.setItem('spa_card_counter', String(BASE_ID_SEQUENCE));
       localStorage.setItem(STORAGE_KEYS.PRICE, DEFAULT_PRICE_NGN.toString());
       localStorage.setItem(STORAGE_KEYS.PAYWALL_ENABLED, 'true');
 
@@ -1123,7 +1128,8 @@
         cards: [],
         schools: [],
         price: DEFAULT_PRICE_NGN,
-        paywallEnabled: true
+        paywallEnabled: true,
+        counter: BASE_ID_SEQUENCE
       };
     }
   };
