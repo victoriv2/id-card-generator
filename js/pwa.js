@@ -196,7 +196,7 @@
   async function sharePortal() {
     const shareUrl = (window.location.origin && window.location.origin.startsWith('http')) 
       ? window.location.href.split('#')[0] 
-      : 'https://students-parliament-id-generator-live.vercel.app/';
+      : 'https://studentparliament-africa.com/';
     const shareData = {
       title: 'Students Parliament Nigeria - ID & Membership Portal',
       text: 'Official identification portal for Students Parliament Nigeria. Generate or retrieve your digital ID card online!',
