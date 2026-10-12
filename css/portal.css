@@ -9,6 +9,22 @@
   background: #f8fafc;
 }
 
+/* Hide Netlify Drawer & Badge Widget */
+#netlify-drawer,
+netlify-drawer,
+div[data-netlify-drawer],
+div[id^="netlify-"],
+div[class*="netlify-drawer"],
+iframe[src*="netlify.app"],
+iframe[title*="Netlify"],
+[class*="netlify-badge"],
+[id*="netlify-badge"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
 /* Hero Section */
 .portal-hero {
   text-align: center;

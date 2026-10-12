@@ -23,6 +23,22 @@
   padding: 0;
 }
 
+/* Hide Netlify Drawer & Badge Widget */
+#netlify-drawer,
+netlify-drawer,
+div[data-netlify-drawer],
+div[id^="netlify-"],
+div[class*="netlify-drawer"],
+iframe[src*="netlify.app"],
+iframe[title*="Netlify"],
+[class*="netlify-badge"],
+[id*="netlify-badge"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background: #f1f5f9;
