@@ -27,18 +27,14 @@
   const BASE_ID_SEQUENCE = 50;
 
   // ---------------------------------------------------------------------------
-  // Automated Client Storage Versioning & Full Storage Purge
+  // Automated Client Storage Versioning (Clears obsolete session tokens only)
+  // NEVER wipes spa_card_records or permanent member data!
   // ---------------------------------------------------------------------------
-  const CURRENT_STORAGE_BUILD = 'SPN_BUILD_2026_10_10_PURGE_SEQ50_V2';
+  const CURRENT_STORAGE_BUILD = 'SPN_BUILD_2026_10_14_PERSIST_RECORDS_V3';
   try {
     const activeBuild = localStorage.getItem('spa_build_revision');
     if (activeBuild !== CURRENT_STORAGE_BUILD) {
       const keysToClear = [
-        'spa_card_records',
-        'spa_card_counter',
-        'spa_active_verified_card',
-        'spa_last_paid_card',
-        'spa_load_card',
         'spa_pending_payment_card',
         'spa_pending_payment_ref',
         'spa_globalpay_txn_ref',
@@ -48,12 +44,11 @@
         try { localStorage.removeItem(k); } catch (e) {}
         try { sessionStorage.removeItem(k); } catch (e) {}
       });
-      localStorage.setItem('spa_card_counter', String(BASE_ID_SEQUENCE));
       localStorage.setItem('spa_build_revision', CURRENT_STORAGE_BUILD);
-      console.log('[CloudDB] Client storage purged and upgraded to build revision:', CURRENT_STORAGE_BUILD, 'Base counter:', BASE_ID_SEQUENCE);
+      console.log('[CloudDB] Client session storage updated to build revision:', CURRENT_STORAGE_BUILD);
     }
   } catch (e) {
-    console.warn('[CloudDB] Storage purge check error:', e);
+    console.warn('[CloudDB] Storage version check error:', e);
   }
 
   /**
@@ -108,6 +103,9 @@
     const isFree = (c.amountPaid === 0 || c.paymentRef === 'FREE_ISSUANCE');
     const amountVal = isFree ? 0 : (c.amountPaid != null ? Number(c.amountPaid) : DEFAULT_PRICE_NGN);
 
+    const hasRef = !!((c.paymentRef && String(c.paymentRef).trim().length > 0) || (c.payment_ref && String(c.payment_ref).trim().length > 0));
+    const isPaidVal = !!(c.isPaid || c.is_paid || isFree || hasRef);
+
     return {
       id: c.id,
       name: c.name || 'UNKNOWN',
@@ -117,7 +115,7 @@
       date_issued: c.dateIssued || c.date_issued || '',
       status: c.status || 'ACTIVE',
       photo: c.photo || '',
-      is_paid: !!(c.isPaid || c.is_paid || isFree),
+      is_paid: isPaidVal,
       payment_ref: c.paymentRef || c.payment_ref || (isFree ? 'FREE_ISSUANCE' : null),
       amount_paid: amountVal,
       payer_email: c.payerEmail || c.payer_email || null,
@@ -132,7 +130,8 @@
    */
   function fromRow(r) {
     const isFree = (r.amount_paid === 0 || r.amount_paid === '0' || r.payment_ref === 'FREE_ISSUANCE');
-    const isPaidVal = (r.is_paid === true || r.is_paid === 'true' || r.is_paid === 1 || r.is_paid === '1' || isFree);
+    const hasRef = !!(r.payment_ref && String(r.payment_ref).trim().length > 0 && r.payment_ref !== 'null' && r.payment_ref !== 'undefined');
+    const isPaidVal = (r.is_paid === true || r.is_paid === 'true' || r.is_paid === 1 || r.is_paid === '1' || isFree || hasRef);
     return {
       id: r.id,
       name: r.name,
@@ -419,7 +418,26 @@
     },
 
     saveLocalCards(cards) {
-      localStorage.setItem(STORAGE_KEYS.RECORDS, JSON.stringify(cards));
+      if (!Array.isArray(cards)) return;
+      try {
+        localStorage.setItem(STORAGE_KEYS.RECORDS, JSON.stringify(cards));
+      } catch (err) {
+        console.warn('[CloudDB] localStorage quota reached. Saving lightweight metadata to protect member records...', err);
+        try {
+          // Keep all critical member & payment information, but strip heavy base64 photo strings
+          const lightweightCards = cards.map(c => {
+            if (!c) return c;
+            const copy = { ...c };
+            if (copy.photo && copy.photo.length > 500) {
+              copy.photo = ''; // Preserved in cloud database; local copy prevents quota overflow
+            }
+            return copy;
+          });
+          localStorage.setItem(STORAGE_KEYS.RECORDS, JSON.stringify(lightweightCards));
+        } catch (innerErr) {
+          console.error('[CloudDB] Could not save cards to localStorage:', innerErr);
+        }
+      }
     },
 
     isCardPaid(id, matchDetails) {
@@ -428,7 +446,8 @@
       const cards = this.getLocalCards();
       const card = cards.find(c => c.id && (c.id || '').trim().toUpperCase().replace(/[-_]/g, '/') === cleanId);
       if (!card) return false;
-      const isPaid = !!(card.isPaid || card.paymentRef === 'FREE_ISSUANCE' || card.amountPaid === 0 || card.amountPaid === '0');
+      const hasRef = !!(card.paymentRef && String(card.paymentRef).trim().length > 0 && card.paymentRef !== 'null');
+      const isPaid = !!(card.isPaid || card.paymentRef === 'FREE_ISSUANCE' || card.amountPaid === 0 || card.amountPaid === '0' || hasRef);
       if (!isPaid) return false;
 
       // Verify that the requested data matches the recorded card without tampering
@@ -915,18 +934,24 @@
      * Used primarily by Admin Dashboard upon authorized sign-in
      */
     async loadFromCloud() {
+      // 1. Sync Settings (Price & Paywall Gate)
       try {
-        // 0. Auto-purge expired unpaid cards
-        await this.purgeExpiredUnpaidCards().catch(() => {});
-
-        // 1. Sync Settings (Price & Paywall Gate)
         await this.syncSettings();
+      } catch (e) {
+        console.warn('[CloudDB] Settings sync deferred:', e);
+      }
 
-        // 2. Fetch Cards from Supabase
+      // 2. Fetch Cards from Supabase
+      try {
         const cloudRows = await supabaseRequest('cards?select=*&order=saved_at.desc');
         if (Array.isArray(cloudRows)) {
           const cloudCards = cloudRows.map(fromRow);
-          this.saveLocalCards(cloudCards);
+          // Safely cache to localStorage without breaking if quota is tight
+          try {
+            this.saveLocalCards(cloudCards);
+          } catch (e) {
+            console.warn('[CloudDB] Local storage save skipped, returning cloud cards directly:', e);
+          }
           return cloudCards;
         }
       } catch (err) {
@@ -937,15 +962,21 @@
     },
 
     /**
-     * Auto-Purge Timer for Unpaid Cards:
-     * Removes any card record that has remained UNPAID for longer than maxAgeMs (default: 10 minutes).
-     * If maxAgeMs === 0, purges ALL unpaid card records immediately.
+     * Manual Purge for Unpaid Cards:
+     * Removes any card record that has remained UNPAID for longer than maxAgeMs.
+     * Only executed when explicitly triggered by an authorized Administrator.
      */
     async purgeExpiredUnpaidCards(maxAgeMs = 10 * 60 * 1000) {
       const now = Date.now();
       const isCardPaid = (c) => {
         if (!c) return false;
-        return c.isPaid === true || c.is_paid === true || c.paymentRef === 'FREE_ISSUANCE' || c.payment_ref === 'FREE_ISSUANCE' || c.amountPaid === 0 || c.amount_paid === 0;
+        if (c.isPaid === true || c.isPaid === 'true' || c.is_paid === true || c.is_paid === 'true' || c.is_paid === 1 || c.is_paid === '1') return true;
+        if (c.paymentRef === 'FREE_ISSUANCE' || c.payment_ref === 'FREE_ISSUANCE') return true;
+        if (c.amountPaid === 0 || c.amountPaid === '0' || c.amount_paid === 0 || c.amount_paid === '0') return true;
+        if (c.paymentRef && String(c.paymentRef).trim().length > 0 && c.paymentRef !== 'null') return true;
+        if (c.payment_ref && String(c.payment_ref).trim().length > 0 && c.payment_ref !== 'null') return true;
+        if (c.paidAt || c.paid_at) return true;
+        return false;
       };
 
       // 1. Purge from LocalStorage
@@ -1135,20 +1166,4 @@
   };
 
   window.CloudDB = CloudDB;
-
-  // Background Unpaid Cards Expiration Timer:
-  // Runs immediately on startup and every 60 seconds
-  if (typeof window !== 'undefined') {
-    setTimeout(() => {
-      if (window.CloudDB && typeof CloudDB.purgeExpiredUnpaidCards === 'function') {
-        CloudDB.purgeExpiredUnpaidCards().catch(() => {});
-      }
-    }, 1500);
-
-    setInterval(() => {
-      if (window.CloudDB && typeof CloudDB.purgeExpiredUnpaidCards === 'function') {
-        CloudDB.purgeExpiredUnpaidCards().catch(() => {});
-      }
-    }, 60000);
-  }
 })();

@@ -2009,9 +2009,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Initialize auto credentials, real-time sync, check for retrieval payload, check for payment returns, and update paywall state
-  if (window.CloudDB && typeof CloudDB.purgeExpiredUnpaidCards === 'function') {
-    CloudDB.purgeExpiredUnpaidCards().catch(() => {});
-  }
   updateAutoCredentials();
   syncOverlay();
   loadCardFromStorage();

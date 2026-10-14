@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Controls Elements
   const inputPrice = document.getElementById('inputAdminPrice');
   const btnSavePrice = document.getElementById('btnSavePrice');
+  const btnRefreshCards = document.getElementById('btnRefreshCards');
   const btnExportExcel = document.getElementById('btnExportExcel');
   const btnPurgeUnpaidCards = document.getElementById('btnPurgeUnpaidCards');
   const btnTogglePaywall = document.getElementById('btnTogglePaywall');
@@ -159,35 +160,36 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   async function loadDashboard() {
-    // 0. Auto-purge expired unpaid cards
-    if (window.CloudDB && typeof CloudDB.purgeExpiredUnpaidCards === 'function') {
-      await CloudDB.purgeExpiredUnpaidCards().catch(() => {});
-    }
-
     // 1. Load current price & paywall status
     if (inputPrice) {
       inputPrice.value = CloudDB.getPrice();
     }
     updatePaywallToggleUI(CloudDB.isPaywallEnabled());
 
-    // 2. Load cards from local
-    allCards = CloudDB.getLocalCards();
-    updateStatsAndRender();
+    // 2. Load cards from local cache first for instant render
+    const local = CloudDB.getLocalCards();
+    if (Array.isArray(local) && local.length > 0) {
+      allCards = local;
+      updateStatsAndRender();
+    }
 
     // 3. Load schools directory immediately
     loadSchoolsDirectory();
 
-    // 4. Trigger background cloud sync for cards & settings
-    CloudDB.loadFromCloud().then(cards => {
-      if (Array.isArray(cards)) {
-        allCards = cards;
+    // 4. Fetch live cards directly from Supabase Cloud Database
+    try {
+      const cloudCards = await CloudDB.loadFromCloud();
+      if (Array.isArray(cloudCards)) {
+        allCards = cloudCards;
         updateStatsAndRender();
       }
       if (inputPrice) {
         inputPrice.value = CloudDB.getPrice();
       }
       updatePaywallToggleUI(CloudDB.isPaywallEnabled());
-    }).catch(e => console.warn('[CloudDB] Cards load deferred:', e));
+    } catch (e) {
+      console.warn('[CloudDB] Cloud sync deferred:', e);
+    }
   }
 
   function updateStatsAndRender() {
@@ -640,6 +642,36 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // -------------------------------------------------------------------------
+  // Refresh Cards directly from Supabase Cloud Database
+  // -------------------------------------------------------------------------
+  if (btnRefreshCards) {
+    btnRefreshCards.addEventListener('click', async () => {
+      const origHtml = btnRefreshCards.innerHTML;
+      btnRefreshCards.disabled = true;
+      btnRefreshCards.innerHTML = `
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24" style="animation: spin 1s linear infinite;"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
+        <span>Refreshing...</span>
+      `;
+      try {
+        const cloudCards = await CloudDB.loadFromCloud();
+        if (Array.isArray(cloudCards)) {
+          allCards = cloudCards;
+          updateStatsAndRender();
+        }
+        showModalAlert(`Data synced successfully! Loaded ${allCards.length} member record(s) directly from Supabase Cloud Database.`, {
+          title: 'Cloud Sync Complete',
+          type: 'success'
+        });
+      } catch (err) {
+        showModalAlert('Failed to refresh cards from cloud: ' + (err.message || String(err)), { type: 'error' });
+      } finally {
+        btnRefreshCards.disabled = false;
+        btnRefreshCards.innerHTML = origHtml;
+      }
+    });
+  }
+
+  // -------------------------------------------------------------------------
   // Purge All Unpaid / Abandoned Member Records
   // -------------------------------------------------------------------------
   if (btnPurgeUnpaidCards) {
@@ -658,7 +690,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       try {
         if (window.CloudDB && typeof CloudDB.purgeAllUnpaidCards === 'function') {
           await CloudDB.purgeAllUnpaidCards();
-          allCards = CloudDB.getLocalCards();
+          const cloudCards = await CloudDB.loadFromCloud();
+          if (Array.isArray(cloudCards)) {
+            allCards = cloudCards;
+          } else {
+            allCards = CloudDB.getLocalCards();
+          }
           updateStatsAndRender();
           notify('All unpaid and abandoned card drafts have been purged.');
         }
