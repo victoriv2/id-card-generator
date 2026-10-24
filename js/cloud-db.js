@@ -27,10 +27,10 @@
   const BASE_ID_SEQUENCE = 50;
 
   // ---------------------------------------------------------------------------
-  // Automated Client Storage Versioning (Clears obsolete session tokens only)
-  // NEVER wipes spa_card_records or permanent member data!
+  // Automated Client Storage & Cache Versioning (Clears obsolete session tokens & caches)
+  // NEVER wipes valid member records! Resyncs authoritative data from Supabase Cloud.
   // ---------------------------------------------------------------------------
-  const CURRENT_STORAGE_BUILD = 'SPN_BUILD_2026_10_14_PERSIST_RECORDS_V3';
+  const CURRENT_STORAGE_BUILD = 'SPN_BUILD_2026_10_24_V6_CACHE_PURGE';
   try {
     const activeBuild = localStorage.getItem('spa_build_revision');
     if (activeBuild !== CURRENT_STORAGE_BUILD) {
@@ -38,14 +38,27 @@
         'spa_pending_payment_card',
         'spa_pending_payment_ref',
         'spa_globalpay_txn_ref',
-        'spa_last_processed_ref'
+        'spa_last_processed_ref',
+        'spa_card_counter'
       ];
       keysToClear.forEach(k => {
         try { localStorage.removeItem(k); } catch (e) {}
         try { sessionStorage.removeItem(k); } catch (e) {}
       });
+
+      // Purge all legacy Service Worker caches on the client device
+      if (typeof window !== 'undefined' && 'caches' in window) {
+        caches.keys().then(keys => {
+          keys.forEach(k => {
+            if (k !== 'spn-pwa-v6') {
+              caches.delete(k);
+            }
+          });
+        }).catch(() => {});
+      }
+
       localStorage.setItem('spa_build_revision', CURRENT_STORAGE_BUILD);
-      console.log('[CloudDB] Client session storage updated to build revision:', CURRENT_STORAGE_BUILD);
+      console.log('[CloudDB] Client cache and session storage updated to build revision:', CURRENT_STORAGE_BUILD);
     }
   } catch (e) {
     console.warn('[CloudDB] Storage version check error:', e);
@@ -411,7 +424,22 @@
     // Local Storage Helpers
     getLocalCards() {
       try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEYS.RECORDS) || '[]');
+        const raw = JSON.parse(localStorage.getItem(STORAGE_KEYS.RECORDS) || '[]');
+        if (Array.isArray(raw)) {
+          let dirty = false;
+          raw.forEach(c => {
+            if (c && (c.id === 'SPA/ID/EXE/26/051' || (c.name && c.name.toUpperCase().includes('PRINCE UMANAH') && (c.category || '').toUpperCase() === 'EXECUTIVE'))) {
+              if (c.id !== 'SPA/ID/EXE/26/001') {
+                c.id = 'SPA/ID/EXE/26/001';
+                dirty = true;
+              }
+            }
+          });
+          if (dirty) {
+            try { localStorage.setItem(STORAGE_KEYS.RECORDS, JSON.stringify(raw)); } catch (e) {}
+          }
+        }
+        return raw;
       } catch (e) {
         return [];
       }

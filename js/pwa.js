@@ -6,11 +6,27 @@
 (function () {
   'use strict';
 
-  // 1. Register Service Worker
+  // 1. Register Service Worker with proactive update & cache-bust checks
   if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('sw.js').then((reg) => {
         console.log('[PWA] Service Worker registered with scope:', reg.scope);
+        if (typeof reg.update === 'function') {
+          reg.update().catch(() => {});
+        }
+        if (reg.waiting) {
+          reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+        }
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          if (newWorker) {
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                newWorker.postMessage({ type: 'SKIP_WAITING' });
+              }
+            });
+          }
+        });
       }).catch((err) => {
         console.warn('[PWA] Service Worker registration failed:', err);
       });

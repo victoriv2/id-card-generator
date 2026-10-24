@@ -1,12 +1,13 @@
 /**
  * Students Parliament Nigeria - Progressive Web App Service Worker
- * Version: 2026.10.10-v5
+ * Version: 2026.10.24-v6
  */
 
-const CACHE_NAME = 'spn-pwa-v5';
+const CACHE_NAME = 'spn-pwa-v6';
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
+  '/id-portal.html',
   '/generator.html',
   '/css/style.css',
   '/css/paywall.css',
@@ -43,12 +44,22 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         cacheNames.map((name) => {
           if (name !== CACHE_NAME) {
+            console.log('[SW] Purging outdated cache:', name);
             return caches.delete(name);
           }
         })
       );
     }).then(() => self.clients.claim())
   );
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+  if (event.data && event.data.type === 'CLEAR_CACHE') {
+    caches.keys().then((keys) => Promise.all(keys.map((k) => caches.delete(k))));
+  }
 });
 
 self.addEventListener('fetch', (event) => {
@@ -76,7 +87,23 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Stale-while-revalidate for static assets
+  // Network-first with cache fallback for scripts and styles to ensure immediate cache invalidation
+  if (url.pathname.endsWith('.js') || url.pathname.endsWith('.css')) {
+    event.respondWith(
+      fetch(req)
+        .then((networkRes) => {
+          if (networkRes && networkRes.status === 200) {
+            const clone = networkRes.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
+          }
+          return networkRes;
+        })
+        .catch(() => caches.match(req))
+    );
+    return;
+  }
+
+  // Stale-while-revalidate for static assets (images, icons)
   event.respondWith(
     caches.match(req).then((cached) => {
       const fetchPromise = fetch(req)
