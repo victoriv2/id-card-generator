@@ -3,170 +3,1818 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Students Parliament Nigeria - ID Card Portal</title>
-  
-  <!-- Google Fonts -->
+  <title>Students Parliament Nigeria - Nurturing Future Leaders</title>
+  <meta name="description" content="Students Parliament Nigeria on TV — where students experience the workings of the Senate, House of Representatives, and State Houses of Assembly. Nurturing Future Leaders.">
+  <meta property="og:title" content="Students Parliament Nigeria">
+  <meta property="og:description" content="Nurturing Future Leaders through parliamentary experience, confidence, and civic education.">
+  <meta property="og:image" content="image/image-3.png">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  
-  <!-- Progressive Web App (PWA) & iOS Support -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="favicon.png">
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#0b3d23">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="SPN Portal">
-  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-  <link rel="icon" type="image/png" href="favicon.png">
-  
-  <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/modal-alert.css">
-  <link rel="stylesheet" href="css/portal.css?v=20261010_search">
-  <link rel="stylesheet" href="css/pwa.css?v=20261010_oneline">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green-deep:   #072518;
+      --green-dark:   #0b3d23;
+      --green-mid:    #14532d;
+      --green-light:  #166534;
+      --gold:         #c9a227;
+      --gold-light:   #e4c04a;
+      --gold-pale:    #fdf8ec;
+      --white:        #ffffff;
+      --off-white:    #f8fafc;
+      --gray-100:     #f1f5f9;
+      --gray-200:     #e2e8f0;
+      --gray-400:     #94a3b8;
+      --gray-600:     #475569;
+      --gray-800:     #1e293b;
+      --text:         #0f172a;
+      --radius:       10px;
+      --shadow-sm:    0 1px 3px rgba(0,0,0,.10);
+      --shadow-md:    0 4px 16px rgba(0,0,0,.12);
+      --shadow-lg:    0 12px 40px rgba(0,0,0,.16);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      color: var(--text);
+      background: var(--white);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* =====================================================================
+       NAVBAR
+    ===================================================================== */
+    .navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      background: rgba(7, 37, 24, 0.97);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(201, 162, 39, 0.2);
+      padding: 0 24px;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    .nav-logo {
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+    }
+
+    .nav-brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .nav-brand-name {
+      font-family: 'Cinzel', serif;
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: var(--gold-light);
+      letter-spacing: 0.04em;
+      line-height: 1.1;
+    }
+
+    .nav-brand-sub {
+      font-size: 0.68rem;
+      color: rgba(255,255,255,0.55);
+      letter-spacing: 0.02em;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: rgba(255,255,255,0.78);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 500;
+      padding: 7px 14px;
+      border-radius: 6px;
+      transition: color .2s, background .2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--gold-light);
+      background: rgba(201,162,39,0.10);
+    }
+
+    .btn-nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--gold);
+      color: var(--green-deep) !important;
+      font-weight: 700 !important;
+      padding: 9px 20px !important;
+      border-radius: 7px !important;
+      font-size: 0.84rem !important;
+      border: none;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background .2s;
+    }
+
+    .btn-nav-cta:hover {
+      background: var(--gold-light) !important;
+      color: var(--green-deep) !important;
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 6px;
+      background: none;
+      border: none;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--gold-light);
+      border-radius: 2px;
+      transition: all .3s;
+    }
+
+    /* =====================================================================
+       HERO
+    ===================================================================== */
+    .hero {
+      min-height: 100vh;
+      background: linear-gradient(160deg, var(--green-deep) 0%, var(--green-dark) 45%, #0d3320 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      padding: 100px 24px 60px;
+    }
+
+    .hero-pattern {
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 20% 30%, rgba(201,162,39,0.06) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(201,162,39,0.05) 0%, transparent 50%),
+        linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.3) 100%);
+      pointer-events: none;
+    }
+
+    /* Subtle geometric lines */
+    .hero-pattern::before {
+      content: '';
+      position: absolute;
+      top: -100px; right: -100px;
+      width: 500px; height: 500px;
+      border: 1px solid rgba(201,162,39,0.08);
+      border-radius: 50%;
+    }
+
+    .hero-pattern::after {
+      content: '';
+      position: absolute;
+      bottom: -80px; left: -80px;
+      width: 400px; height: 400px;
+      border: 1px solid rgba(201,162,39,0.06);
+      border-radius: 50%;
+    }
+
+    .hero-inner {
+      max-width: 860px;
+      width: 100%;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(201,162,39,0.15);
+      border: 1px solid rgba(201,162,39,0.30);
+      color: var(--gold-light);
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      border-radius: 100px;
+      margin-bottom: 28px;
+    }
+
+    .hero-logo {
+      width: 90px;
+      height: 90px;
+      object-fit: contain;
+      margin-bottom: 24px;
+      filter: drop-shadow(0 4px 20px rgba(201,162,39,0.3));
+    }
+
+    .hero-title {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(2.2rem, 5.5vw, 3.8rem);
+      font-weight: 900;
+      color: var(--white);
+      line-height: 1.12;
+      letter-spacing: 0.01em;
+      margin-bottom: 12px;
+    }
+
+    .hero-title span {
+      color: var(--gold-light);
+    }
+
+    .hero-tagline {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(1rem, 2.5vw, 1.4rem);
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 22px;
+    }
+
+    .hero-desc {
+      font-size: clamp(0.95rem, 2vw, 1.08rem);
+      color: rgba(255,255,255,0.72);
+      max-width: 620px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .btn-hero-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      background: var(--gold);
+      color: var(--green-deep);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding: 14px 30px;
+      border-radius: var(--radius);
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      letter-spacing: 0.01em;
+      transition: background .2s;
+    }
+
+    .btn-hero-primary:hover { background: var(--gold-light); }
+
+    .btn-hero-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      background: transparent;
+      color: var(--white);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 13px 28px;
+      border-radius: var(--radius);
+      border: 1.5px solid rgba(255,255,255,0.3);
+      text-decoration: none;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+    }
+
+    .btn-hero-outline:hover {
+      border-color: rgba(255,255,255,0.6);
+      background: rgba(255,255,255,0.07);
+    }
+
+    .hero-scroll-hint {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      color: rgba(255,255,255,0.38);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    /* =====================================================================
+       SECTION SHARED STYLES
+    ===================================================================== */
+    section { padding: 88px 24px; }
+
+    .section-container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--green-mid);
+      background: rgba(20,83,45,0.08);
+      border: 1px solid rgba(20,83,45,0.15);
+      padding: 4px 12px;
+      border-radius: 100px;
+      margin-bottom: 14px;
+    }
+
+    .section-title {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+      font-weight: 800;
+      color: var(--green-dark);
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+
+    .section-subtitle {
+      font-size: 1.02rem;
+      color: var(--gray-600);
+      max-width: 560px;
+      line-height: 1.7;
+    }
+
+    .gold-divider {
+      width: 52px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--gold), transparent);
+      border-radius: 2px;
+      margin: 16px 0 28px;
+    }
+
+    /* =====================================================================
+       ABOUT SECTION
+    ===================================================================== */
+    .about { background: var(--off-white); }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: center;
+    }
+
+    .about-text-block {}
+
+    .about-body {
+      font-size: 1rem;
+      color: var(--gray-600);
+      line-height: 1.85;
+      margin-bottom: 28px;
+    }
+
+    .about-body + .about-body { margin-top: -10px; }
+
+    .about-feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .about-feature-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 0.95rem;
+      color: var(--gray-800);
+      font-weight: 500;
+    }
+
+    .feature-icon {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      background: linear-gradient(135deg, var(--green-dark), var(--green-mid));
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .feature-icon svg { color: var(--gold-light); }
+
+    .about-image-block {
+      position: relative;
+    }
+
+    .about-img-main {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      border-radius: 14px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .about-img-badge {
+      position: absolute;
+      bottom: -18px;
+      left: -18px;
+      background: var(--green-dark);
+      color: var(--white);
+      padding: 16px 22px;
+      border-radius: 12px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .about-img-badge-num {
+      font-family: 'Cinzel', serif;
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: var(--gold-light);
+      line-height: 1;
+    }
+
+    .about-img-badge-label {
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.65);
+      margin-top: 2px;
+    }
+
+    /* =====================================================================
+       PILLARS / WHAT YOU GAIN
+    ===================================================================== */
+    .pillars { background: var(--white); }
+
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-top: 48px;
+    }
+
+    .pillar-card {
+      background: var(--off-white);
+      border: 1px solid var(--gray-200);
+      border-radius: 14px;
+      padding: 30px 22px;
+      text-align: center;
+    }
+
+    .pillar-icon-wrap {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, var(--green-dark), var(--green-mid));
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 18px;
+    }
+
+    .pillar-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--green-dark);
+      margin-bottom: 8px;
+    }
+
+    .pillar-desc {
+      font-size: 0.85rem;
+      color: var(--gray-600);
+      line-height: 1.65;
+    }
+
+    /* =====================================================================
+       DAY SPEAKER - HOW TO WIN
+    ===================================================================== */
+    .day-speaker { background: var(--green-dark); position: relative; overflow: hidden; }
+
+    .day-speaker::before {
+      content: '';
+      position: absolute;
+      top: -120px; right: -120px;
+      width: 480px; height: 480px;
+      border: 1px solid rgba(201,162,39,0.08);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .day-speaker .section-label { color: var(--gold-light); background: rgba(201,162,39,0.12); border-color: rgba(201,162,39,0.25); }
+    .day-speaker .section-title { color: var(--white); }
+    .day-speaker .gold-divider { background: linear-gradient(90deg, var(--gold), transparent); }
+
+    .speaker-intro {
+      color: rgba(255,255,255,0.68);
+      font-size: 1rem;
+      max-width: 600px;
+      line-height: 1.75;
+      margin-bottom: 52px;
+    }
+
+    .tips-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .tip-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 12px;
+      padding: 24px 22px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .tip-number {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--gold) 0%, #a87b0a 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      font-weight: 900;
+      color: var(--green-deep);
+    }
+
+    .tip-body {}
+
+    .tip-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 5px;
+      line-height: 1.3;
+    }
+
+    .tip-desc {
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.60);
+      line-height: 1.6;
+    }
+
+    .parliamentary-terms {
+      margin-top: 52px;
+      background: rgba(201,162,39,0.07);
+      border: 1px solid rgba(201,162,39,0.2);
+      border-radius: 14px;
+      padding: 32px 36px;
+    }
+
+    .terms-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--gold-light);
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .terms-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .term-pill {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(201,162,39,0.2);
+      color: rgba(255,255,255,0.80);
+      font-size: 0.82rem;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-style: italic;
+    }
+
+    /* =====================================================================
+       GALLERY
+    ===================================================================== */
+    .gallery { background: var(--gray-100); }
+
+    .gallery-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 32px 0 28px;
+    }
+
+    .gallery-tab {
+      background: var(--white);
+      border: 1.5px solid var(--gray-200);
+      color: var(--gray-600);
+      font-size: 0.83rem;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .gallery-tab.active,
+    .gallery-tab:hover {
+      background: var(--green-dark);
+      border-color: var(--green-dark);
+      color: var(--white);
+    }
+
+    .gallery-event { display: none; }
+    .gallery-event.active { display: block; }
+
+    .gallery-event-header {
+      margin-bottom: 20px;
+    }
+
+    .gallery-event-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--green-dark);
+      margin-bottom: 4px;
+    }
+
+    .gallery-event-caption {
+      font-size: 0.86rem;
+      color: var(--gray-600);
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 14px;
+    }
+
+    .gallery-item {
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      aspect-ratio: 4/3;
+      background: var(--gray-200);
+      cursor: pointer;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform .3s ease;
+    }
+
+    .gallery-item:hover img { transform: scale(1.04); }
+
+    .gallery-item-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 50%, rgba(7,37,24,0.82) 100%);
+      opacity: 0;
+      transition: opacity .25s;
+      display: flex;
+      align-items: flex-end;
+      padding: 14px;
+    }
+
+    .gallery-item:hover .gallery-item-overlay { opacity: 1; }
+
+    .gallery-item-label {
+      color: var(--white);
+      font-size: 0.78rem;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    /* Lightbox */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(0,0,0,0.93);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lightbox.open { display: flex; }
+
+    .lightbox-img {
+      max-width: 90vw;
+      max-height: 88vh;
+      object-fit: contain;
+      border-radius: 6px;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 20px; right: 24px;
+      background: none;
+      border: none;
+      color: var(--white);
+      cursor: pointer;
+      padding: 8px;
+    }
+
+    .lightbox-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255,255,255,0.12);
+      border: none;
+      color: var(--white);
+      cursor: pointer;
+      padding: 14px 10px;
+      border-radius: 8px;
+    }
+
+    .lightbox-nav.prev { left: 16px; }
+    .lightbox-nav.next { right: 16px; }
+    .lightbox-nav:hover { background: rgba(255,255,255,0.22); }
+
+    .lightbox-caption {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,0.70);
+      font-size: 0.82rem;
+      text-align: center;
+      max-width: 500px;
+    }
+
+    /* =====================================================================
+       PARTNERS
+    ===================================================================== */
+    .partners { background: var(--off-white); }
+
+    .partners-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 48px;
+    }
+
+    .partner-card {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: 14px;
+      padding: 36px 28px;
+      text-align: center;
+    }
+
+    .partner-icon {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, var(--green-dark), var(--green-mid));
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 18px;
+    }
+
+    .partner-name {
+      font-family: 'Cinzel', serif;
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: var(--green-dark);
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+
+    .partner-role {
+      font-size: 0.8rem;
+      color: var(--gray-400);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 10px;
+    }
+
+    .partner-desc {
+      font-size: 0.86rem;
+      color: var(--gray-600);
+      line-height: 1.65;
+    }
+
+    /* =====================================================================
+       ID CARD CTA SECTION
+    ===================================================================== */
+    .idcard-cta {
+      background: linear-gradient(135deg, var(--green-deep) 0%, #0d3320 50%, var(--green-dark) 100%);
+      text-align: center;
+      padding: 80px 24px;
+    }
+
+    .idcard-cta .section-label { color: var(--gold-light); background: rgba(201,162,39,0.12); border-color: rgba(201,162,39,0.25); }
+    .idcard-cta .section-title { color: var(--white); margin: 0 auto 12px; }
+    .idcard-cta .gold-divider { margin: 16px auto 20px; }
+
+    .idcard-cta-desc {
+      color: rgba(255,255,255,0.68);
+      font-size: 1rem;
+      max-width: 540px;
+      margin: 0 auto 36px;
+      line-height: 1.7;
+    }
+
+    /* =====================================================================
+       CONTACT SECTION
+    ===================================================================== */
+    .contact { background: var(--white); }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: start;
+      margin-top: 48px;
+    }
+
+    .contact-info-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .contact-info-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .contact-info-icon {
+      flex-shrink: 0;
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, var(--green-dark), var(--green-mid));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .contact-info-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--gray-400);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 3px;
+    }
+
+    .contact-info-value {
+      font-size: 0.96rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .contact-info-value a {
+      color: var(--green-mid);
+      text-decoration: none;
+    }
+
+    .contact-info-value a:hover { text-decoration: underline; }
+
+    .social-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 32px;
+    }
+
+    .social-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 600;
+      border: 1.5px solid var(--gray-200);
+      color: var(--gray-800);
+      background: var(--off-white);
+      transition: border-color .2s, background .2s;
+    }
+
+    .social-btn:hover {
+      border-color: var(--green-mid);
+      background: rgba(20,83,45,0.05);
+      color: var(--green-mid);
+    }
+
+    .contact-websites {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .website-card {
+      background: var(--off-white);
+      border: 1px solid var(--gray-200);
+      border-radius: 12px;
+      padding: 20px 22px;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      transition: border-color .2s, background .2s;
+    }
+
+    .website-card:hover {
+      border-color: var(--green-mid);
+      background: rgba(20,83,45,0.04);
+    }
+
+    .website-card-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--gray-400);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 3px;
+    }
+
+    .website-card-url {
+      font-size: 0.94rem;
+      font-weight: 700;
+      color: var(--green-mid);
+    }
+
+    /* =====================================================================
+       FOOTER
+    ===================================================================== */
+    footer {
+      background: var(--green-deep);
+      padding: 40px 24px;
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .footer-logo { width: 36px; height: 36px; object-fit: contain; }
+
+    .footer-brand-name {
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--gold-light);
+    }
+
+    .footer-copy {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.40);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 20px;
+      list-style: none;
+    }
+
+    .footer-links a {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.45);
+      text-decoration: none;
+    }
+
+    .footer-links a:hover { color: var(--gold-light); }
+
+    /* =====================================================================
+       MOBILE NAV DRAWER
+    ===================================================================== */
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      top: 68px; left: 0; right: 0;
+      background: var(--green-deep);
+      border-top: 1px solid rgba(201,162,39,0.15);
+      padding: 16px 24px;
+      z-index: 999;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .mobile-nav.open { display: flex; }
+
+    .mobile-nav a {
+      color: rgba(255,255,255,0.78);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      padding: 12px 4px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .mobile-nav a:last-child { border-bottom: none; }
+    .mobile-nav a:hover { color: var(--gold-light); }
+
+    .mobile-nav .btn-nav-cta {
+      margin-top: 8px;
+      justify-content: center;
+    }
+
+    /* =====================================================================
+       ALL HOVER = NO TRANSFORM (as required)
+    ===================================================================== */
+    * { transform-origin: center; }
+    button, a, .pillar-card, .partner-card, .tip-card, .gallery-tab {
+      transform: none !important;
+    }
+
+    /* =====================================================================
+       RESPONSIVE
+    ===================================================================== */
+    @media (max-width: 900px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .about-grid { grid-template-columns: 1fr; gap: 40px; }
+      .about-image-block { order: -1; }
+      .about-img-badge { left: 12px; bottom: -14px; }
+      .pillars-grid { grid-template-columns: repeat(2, 1fr); }
+      .tips-grid { grid-template-columns: 1fr 1fr; }
+      .partners-grid { grid-template-columns: 1fr; }
+      .contact-grid { grid-template-columns: 1fr; gap: 40px; }
+    }
+
+    @media (max-width: 560px) {
+      section { padding: 60px 20px; }
+      .pillars-grid { grid-template-columns: 1fr; }
+      .tips-grid { grid-template-columns: 1fr; }
+      .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+      .hero-actions { flex-direction: column; align-items: stretch; }
+      .btn-hero-primary, .btn-hero-outline { justify-content: center; }
+      .social-row { flex-wrap: wrap; }
+    }
+  </style>
 </head>
-<body class="portal-body">
+<body>
 
-  <!-- Application Header -->
-  <header class="app-header">
-    <div class="header-inner">
-      <div class="header-brand">
-        <img src="image/image-3.png" alt="Students Parliament Logo" class="header-logo">
-        <div class="header-titles">
-          <h1>Students Parliament Nigeria</h1>
-          <p>National Identification & Membership Portal</p>
-        </div>
-      </div>
-      <div class="header-actions">
-        <button type="button" class="btn-pwa-action btn-pwa-share" id="btnPwaShareHeader" title="Share portal with members or chapters">
-          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8m-4-6l-4-4m0 0L8 6m4-4v12"/></svg>
-          <span class="btn-label-desktop">Share App</span>
-          <span class="btn-label-mobile">Share</span>
-        </button>
-        <button type="button" class="btn-pwa-action btn-pwa-install" id="btnPwaInstallHeader" style="display: none;" title="Install SPN App on your phone">
-          <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
-          <span class="btn-label-desktop">Install App</span>
-          <span class="btn-label-mobile">Install</span>
-        </button>
-        <a href="generator.html" class="btn-header-action" title="Issue a new ID Card">
-          <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-          <span class="btn-label-desktop">New ID Card</span>
-          <span class="btn-label-mobile">New Card</span>
-        </a>
-      </div>
+<!-- =========================================================
+     NAVBAR
+========================================================= -->
+<nav class="navbar" id="navbar">
+  <a href="#" class="nav-brand">
+    <img src="image/image-3.png" alt="Students Parliament Nigeria Logo" class="nav-logo">
+    <div class="nav-brand-text">
+      <span class="nav-brand-name">Students Parliament Nigeria</span>
+      <span class="nav-brand-sub">Nurturing Future Leaders</span>
     </div>
-  </header>
-
-  <!-- Hero Banner -->
-  <section class="portal-hero">
-    <div class="portal-badge">
-      <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
-      Official Identification System
-    </div>
-    <h1>Welcome to Students Parliament Nigeria ID Portal</h1>
-    <p>Please select an option below to generate a new high-security ID card or retrieve and re-download an existing member card.</p>
-  </section>
-
-  <!-- Main Action Cards -->
-  <main class="portal-actions-grid">
-    <!-- Option 1: Generate ID Card -->
-    <div class="portal-card">
-      <div class="portal-card-icon">
-        <svg width="30" height="30" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>
-        </svg>
-      </div>
-      <h2>Generate ID Card</h2>
-      <p>Issue an authentic Front & Back membership card with automatic sequential credentials, photo framing, category codes, and real-time QR code verification.</p>
-      <a href="generator.html" class="portal-btn portal-btn-primary">
+  </a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#program">Program</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#partners">Partners</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li>
+      <a href="id-portal.html" class="btn-nav-cta">
+        <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
         Generate ID Card
-        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+      </a>
+    </li>
+  </ul>
+  <button class="hamburger" id="hamburger" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- Mobile Nav -->
+<div class="mobile-nav" id="mobileNav">
+  <a href="#about" class="mobile-link">About the Program</a>
+  <a href="#program" class="mobile-link">Day Speaker Tips</a>
+  <a href="#gallery" class="mobile-link">Event Gallery</a>
+  <a href="#partners" class="mobile-link">Partners</a>
+  <a href="#contact" class="mobile-link">Contact Us</a>
+  <a href="id-portal.html" class="btn-nav-cta">
+    <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+    Generate ID Card
+  </a>
+</div>
+
+<!-- =========================================================
+     HERO
+========================================================= -->
+<section class="hero" id="home">
+  <div class="hero-pattern"></div>
+  <div class="hero-inner">
+    <div class="hero-badge">
+      <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      Students Parliament Nigeria on TV
+    </div>
+    <img src="image/image-3.png" alt="Students Parliament Nigeria" class="hero-logo">
+    <h1 class="hero-title">Students Parliament<br><span>Nigeria</span></h1>
+    <p class="hero-tagline">Nurturing Future Leaders</p>
+    <p class="hero-desc">
+      Empowering students across Nigeria with hands-on parliamentary experience — cultivating confidence, discipline, patriotism, and leadership skills that last a lifetime.
+    </p>
+    <div class="hero-actions">
+      <a href="id-portal.html" class="btn-hero-primary">
+        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+        Generate Your ID Card
+      </a>
+      <a href="#about" class="btn-hero-outline">
+        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        Learn About the Program
       </a>
     </div>
+  </div>
+  <div class="hero-scroll-hint">
+    <span>Scroll to Explore</span>
+    <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+  </div>
+</section>
 
-    <!-- Option 2: Retrieve ID Card -->
-    <div class="portal-card retrieve-card">
-      <div class="portal-card-icon">
-        <svg width="30" height="30" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-        </svg>
+<!-- =========================================================
+     ABOUT
+========================================================= -->
+<section class="about" id="about">
+  <div class="section-container">
+    <div class="about-grid">
+      <div class="about-text-block">
+        <span class="section-label">About the Program</span>
+        <h2 class="section-title">Where Students Experience Real Parliamentary Democracy</h2>
+        <div class="gold-divider"></div>
+        <p class="about-body">
+          The Students Parliament on TV offers students valuable hands-on experience with the workings and processes of the Senate, Chamber, House of Representatives, and State Houses of Assembly. This is not a classroom exercise — it is an authentic encounter with Nigeria's legislative heritage.
+        </p>
+        <p class="about-body">
+          Through this program, students are inspired to cultivate confidence, discipline, patriotism, and leadership skills, while gaining a deeper understanding of their rights and responsibilities as citizens within their Students Parliament Club in their respective schools.
+        </p>
+        <p class="about-body">
+          Additionally, outstanding students earn prizes for exceptional performance during interschool Parliamentarians contests and earn the prestigious opportunity to serve as a Day Parliamentarian in any Chamber.
+        </p>
+        <ul class="about-feature-list">
+          <li>
+            <span class="feature-icon"><svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24" color="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span>
+            Interschool Parliamentarians Contest
+          </li>
+          <li>
+            <span class="feature-icon"><svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24" color="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span>
+            Day Parliamentarian Experience in Real Chambers
+          </li>
+          <li>
+            <span class="feature-icon"><svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24" color="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span>
+            Medals and Prizes for Outstanding Performance
+          </li>
+          <li>
+            <span class="feature-icon"><svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24" color="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span>
+            Student Parliament Club in Every School
+          </li>
+        </ul>
       </div>
-      <h2>Retrieve ID Card</h2>
-      <p>Look up, reprint, or re-download an issued card from your history using the member's Full Name or official ID Number.</p>
-      <button type="button" id="btnShowRetrieve" class="portal-btn portal-btn-secondary">
-        Retrieve ID Card
-        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
-      </button>
-    </div>
-  </main>
-
-  <!-- Progressive Web App Section -->
-  <section class="portal-pwa-card" aria-label="Install & Share Portal">
-    <div class="portal-pwa-badge">
-      <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>
-      Installable Web App
-    </div>
-    <div class="portal-pwa-content">
-      <div class="portal-pwa-info">
-        <h3>Install SPN Portal On Your Phone</h3>
-        <p>Install this portal directly on your Android or iPhone home screen. It opens like a real mobile app, runs in full-screen view without browser address bars, and lets you share instantly with other members.</p>
-      </div>
-      <div class="portal-pwa-buttons">
-        <button type="button" class="btn-pwa-portal-install" id="btnPwaInstallPortal">
-          <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
-          <span>Install App</span>
-        </button>
-        <button type="button" class="btn-pwa-portal-share" id="btnPwaSharePortal">
-          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8m-4-6l-4-4m0 0L8 6m4-4v12"/></svg>
-          <span>Share App</span>
-        </button>
-      </div>
-    </div>
-  </section>
-
-
-  <!-- Card Retrieval Modal Dialog -->
-  <div class="portal-retrieve-backdrop" id="retrieveModal" role="dialog" aria-modal="true" aria-labelledby="retrieveModalTitle">
-    <div class="portal-retrieve-box">
-      <div class="portal-retrieve-header">
-        <h3 id="retrieveModalTitle">
-          <svg width="22" height="22" fill="#b45309" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-          Search & Retrieve Issued ID Cards
-        </h3>
-        <button type="button" id="btnCloseRetrieve" class="portal-btn-close" aria-label="Close search modal" title="Close">
-          <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-        </button>
-      </div>
-
-      <div class="portal-search-bar">
-        <input type="text" id="portalSearchInput" class="portal-search-input" placeholder="Type Full Name or ID Number..." autocomplete="off" spellcheck="false">
-        <button type="button" id="btnPortalSearch" class="portal-search-btn">
-          <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-          Search
-        </button>
-      </div>
-
-      <div class="portal-results-list" id="portalResultsList">
-        <!-- Records populated dynamically by portal.js -->
-      </div>
-
-      <div class="portal-empty-state" id="portalEmptyState" style="display: none;">
-        <svg width="48" height="48" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-        <p>No ID cards found.</p>
+      <div class="about-image-block">
+        <img src="gallery/ev1-01.jpeg" alt="Students Parliament Nigeria parliamentary session" class="about-img-main" loading="lazy">
+        <div class="about-img-badge">
+          <div class="about-img-badge-num">Lagos</div>
+          <div class="about-img-badge-label">State-Wide Program</div>
+        </div>
       </div>
     </div>
   </div>
+</section>
 
-  <!-- Portal Footer -->
-  <footer class="portal-footer">
-    <p>Students Parliament Nigeria © 2026. Official Identification & Membership Portal.</p>
-  </footer>
+<!-- =========================================================
+     PILLARS
+========================================================= -->
+<section class="pillars">
+  <div class="section-container">
+    <div style="text-align: center; max-width: 580px; margin: 0 auto;">
+      <span class="section-label">What Students Gain</span>
+      <h2 class="section-title">Four Pillars of the Program</h2>
+      <div class="gold-divider" style="margin: 16px auto 0;"></div>
+    </div>
+    <div class="pillars-grid">
+      <div class="pillar-card">
+        <div class="pillar-icon-wrap">
+          <svg width="28" height="28" fill="none" stroke="#e4c04a" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+        <h3 class="pillar-title">Confidence</h3>
+        <p class="pillar-desc">Students stand before cameras, address chambers formally, and project their voice with conviction — building unshakeable confidence that lasts beyond school.</p>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-icon-wrap">
+          <svg width="28" height="28" fill="none" stroke="#e4c04a" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        </div>
+        <h3 class="pillar-title">Discipline</h3>
+        <p class="pillar-desc">Parliamentary procedure demands order, timing, and respect. Students learn to follow rules, listen attentively, and conduct themselves with exceptional maturity.</p>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-icon-wrap">
+          <svg width="28" height="28" fill="none" stroke="#e4c04a" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M3 7v1a3 3 0 006 0V7m0 1a3 3 0 006 0V7m0 1a3 3 0 006 0V7H3l2-4h14l2 4"/><path d="M5 21V10.85"/><path d="M19 21V10.85"/><path d="M12 21V13"/></svg>
+        </div>
+        <h3 class="pillar-title">Patriotism</h3>
+        <p class="pillar-desc">By participating in Nigeria's legislative processes, students develop a deep sense of pride in their nation and a commitment to contributing positively to society.</p>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-icon-wrap">
+          <svg width="28" height="28" fill="none" stroke="#e4c04a" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0112 0v2"/><path d="M18 14l2 2 4-4"/></svg>
+        </div>
+        <h3 class="pillar-title">Leadership</h3>
+        <p class="pillar-desc">From moving motions to representing peers on issues of education, child welfare, and youth development — students emerge as genuine community leaders.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-  <!-- Scripts -->
-  <script src="js/modal-alert.js?v=20261010_50"></script>
-  <script src="js/cloud-db.js?v=20261014_fixpurge"></script>
-  <script src="js/portal.js?v=20261010_50"></script>
-  <script src="js/pwa.js?v=20261010_pwa"></script>
+<!-- =========================================================
+     DAY SPEAKER - HOW TO WIN
+========================================================= -->
+<section class="day-speaker" id="program">
+  <div class="section-container">
+    <span class="section-label">Day Speaker Programme</span>
+    <h2 class="section-title">How to Win a Day Speaker Spot</h2>
+    <div class="gold-divider"></div>
+    <p class="speaker-intro">
+      Earning a "Day Speaker" position in the Students Parliament TV program is an honour that demands preparation, presence, and purpose. Master these principles and you stand apart from the floor.
+    </p>
+    <div class="tips-grid">
+
+      <div class="tip-card">
+        <div class="tip-number">01</div>
+        <div class="tip-body">
+          <div class="tip-title">Master Parliamentary Procedures</div>
+          <div class="tip-desc">Speak with bold confidence, present clear solutions to student issues, and maintain exceptional composure under studio lights or live broadcast pressure.</div>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-number">02</div>
+        <div class="tip-body">
+          <div class="tip-title">Respect the Hierarchy of the Floor</div>
+          <div class="tip-desc">Address the house formally, acknowledge the Speaker correctly, and always respect the order of proceedings and the seniority of those on the floor.</div>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-number">03</div>
+        <div class="tip-body">
+          <div class="tip-title">Control Your Timing</div>
+          <div class="tip-desc">Keep your contributions precise and purposeful. Avoid rambling during proceedings — every word you deliver on camera must count.</div>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-number">04</div>
+        <div class="tip-body">
+          <div class="tip-title">Deliver a Powerful Presentation</div>
+          <div class="tip-desc">Stand straight, make direct eye contact with the camera, and project your voice with authority. Your posture and presence speak before your words do.</div>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-number">05</div>
+        <div class="tip-body">
+          <div class="tip-title">Use Persuasive, Simple Language</div>
+          <div class="tip-desc">Use words that are clear, compelling, and accessible. The most powerful arguments are those any student in any school can understand and believe in.</div>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-number">06</div>
+        <div class="tip-body">
+          <div class="tip-title">Back Arguments with Facts</div>
+          <div class="tip-desc">Ground your contributions in logical facts about education, youth development, child rights, or student welfare. Evidence elevates every debate.</div>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-number">07</div>
+        <div class="tip-body">
+          <div class="tip-title">Speak on Real Student Issues</div>
+          <div class="tip-desc">Focus on matters that affect Nigerian students — school infrastructure, learning tools, student welfare, child protection, child trafficking, and out-of-school children.</div>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-number">08</div>
+        <div class="tip-body">
+          <div class="tip-title">Offer Actionable Solutions</div>
+          <div class="tip-desc">Do not merely identify problems — propose realistic, implementable solutions. A speaker who solves wins the house.</div>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-number">09</div>
+        <div class="tip-body">
+          <div class="tip-title">Display Leadership Qualities</div>
+          <div class="tip-desc">Show maturity, composure, and the ability to represent your peers with dignity. Respect opposing views during debates — it demonstrates true character.</div>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-number">10</div>
+        <div class="tip-body">
+          <div class="tip-title">Dress with Purpose</div>
+          <div class="tip-desc">Appear in a neat, pressed school uniform or official parliamentary attire. Your presentation begins the moment you are seen — long before you speak.</div>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-number">11</div>
+        <div class="tip-body">
+          <div class="tip-title">Stay Calm Under Pressure</div>
+          <div class="tip-desc">Studio lights, cameras, and a live audience test your composure. The students who remain calm and smile through pressure are the ones who win trust and votes.</div>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-number">12</div>
+        <div class="tip-body">
+          <div class="tip-title">Win the Audience and Judges</div>
+          <div class="tip-desc">Your credibility, consistency, and command of the floor should make both the judges and your fellow students confident that you truly represent the voice of the next generation.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="parliamentary-terms">
+      <div class="terms-title">
+        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24" color="#e4c04a"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>
+        Essential Parliamentary Terms to Master
+      </div>
+      <div class="terms-list">
+        <span class="term-pill">"Mr. Speaker"</span>
+        <span class="term-pill">"Point of Order"</span>
+        <span class="term-pill">"Motion to Move"</span>
+        <span class="term-pill">"I So Move"</span>
+        <span class="term-pill">"I So Submit"</span>
+        <span class="term-pill">"I Rest My Case"</span>
+        <span class="term-pill">"I So Support"</span>
+        <span class="term-pill">"I Second the Motion"</span>
+        <span class="term-pill">"Order, Order"</span>
+        <span class="term-pill">"The Motion is Carried"</span>
+        <span class="term-pill">"The Ayes Have It"</span>
+        <span class="term-pill">"I Yield the Floor"</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================
+     GALLERY
+========================================================= -->
+<section class="gallery" id="gallery">
+  <div class="section-container">
+    <span class="section-label">Event Gallery</span>
+    <h2 class="section-title">Moments from Our Parliamentary Sessions</h2>
+    <div class="gold-divider"></div>
+    <p class="section-subtitle">A glimpse into the energy, prestige, and purpose behind every Students Parliament session — from plenary debates to medal ceremonies.</p>
+
+    <div class="gallery-tabs">
+      <button class="gallery-tab active" data-event="ev1">Parliamentary Sessions</button>
+      <button class="gallery-tab" data-event="ev2">Students Parliament on TV</button>
+      <button class="gallery-tab" data-event="ev3">Medal Award Ceremony</button>
+      <button class="gallery-tab" data-event="ev4">Senate Chamber Plenary</button>
+    </div>
+
+    <!-- Event 1 -->
+    <div class="gallery-event active" id="gallery-ev1">
+      <div class="gallery-event-header">
+        <h3 class="gallery-event-title">Parliamentary Sessions</h3>
+        <p class="gallery-event-caption">Students participating in full parliamentary proceedings — engaging in formal debates, motions, and legislative exercises that mirror Nigeria's real chambers.</p>
+      </div>
+      <div class="gallery-grid">
+        <div class="gallery-item" onclick="openLightbox(this)" data-src="gallery/ev1-01.jpeg" data-caption="Students engaging in a formal parliamentary session">
+          <img src="gallery/ev1-01.jpeg" alt="Parliamentary session" loading="lazy">
+          <div class="gallery-item-overlay"><span class="gallery-item-label">Parliamentary Session</span></div>
+        </div>
+        <div class="gallery-item" onclick="openLightbox(this)" data-src="gallery/ev1-02.jpeg" data-caption="Students debating on the floor of the chamber">
+          <img src="gallery/ev1-02.jpeg" alt="Students debating" loading="lazy">
+          <div class="gallery-item-overlay"><span class="gallery-item-label">Floor Debate</span></div>
+        </div>
+        <div class="gallery-item" onclick="openLightbox(this)" data-src="gallery/ev1-03.jpeg" data-caption="Formal proceedings during a parliamentary session">
+          <img src="gallery/ev1-03.jpeg" alt="Formal proceedings" loading="lazy">
+          <div class="gallery-item-overlay"><span class="gallery-item-label">Formal Proceedings</span></div>
+        </div>
+        <div class="gallery-item" onclick="openLightbox(this)" data-src="gallery/ev1-04.jpeg" data-caption="Students addressing the house during proceedings">
+          <img src="gallery/ev1-04.jpeg" alt="Addressing the house" loading="lazy">
+          <div class="gallery-item-overlay"><span class="gallery-item-label">Addressing the House</span></div>
+        </div>
+        <div class="gallery-item" onclick="openLightbox(this)" data-src="gallery/ev1-05.jpeg" data-caption="Legislative debate in full session">
+          <img src="gallery/ev1-05.jpeg" alt="Legislative debate" loading="lazy">
+          <div class="gallery-item-overlay"><span class="gallery-item-label">Legislative Debate</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Event 2 -->
+    <div class="gallery-event" id="gallery-ev2">
+      <div class="gallery-event-header">
+        <h3 class="gallery-event-title">Students Parliament on TV</h3>
+        <p class="gallery-event-caption">The Students Parliament TV program in action — students under studio lights, cameras rolling, bringing their knowledge of parliamentary procedure to a national audience.</p>
+      </div>
+      <div class="gallery-grid">
+        <div class="gallery-item" onclick="openLightbox(this)" data-src="gallery/ev2-01.jpeg" data-caption="Students Parliament Nigeria on TV — live studio recording">
+          <img src="gallery/ev2-01.jpeg" alt="Students Parliament TV recording" loading="lazy">
+          <div class="gallery-item-overlay"><span class="gallery-item-label">TV Program Recording</span></div>
+        </div>
+        <div class="gallery-item" onclick="openLightbox(this)" data-src="gallery/ev2-02.jpeg" data-caption="Students in the television studio during a live session">
+          <img src="gallery/ev2-02.jpeg" alt="Studio session" loading="lazy">
+          <div class="gallery-item-overlay"><span class="gallery-item-label">Live Studio Session</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Event 3 -->
+    <div class="gallery-event" id="gallery-ev3">
+      <div class="gallery-event-header">
+        <h3 class="gallery-event-title">Medal Award Ceremony</h3>
+        <p class="gallery-event-caption">Students Parliament Nigeria awards medals to the best performing Parliamentarians — recognising exceptional debate, composure, and leadership on the floor of the chamber.</p>
+      </div>
+      <div class="gallery-grid">
+        <div class="gallery-item" onclick="openLightbox(this)" data-src="gallery/ev3-01.jpeg" data-caption="Medal presentation to a best-performing student Parliamentarian">
+          <img src="gallery/ev3-01.jpeg" alt="Medal presentation" loading="lazy">
+          <div class="gallery-item-overlay"><span class="gallery-item-label">Medal Presentation</span></div>
+        </div>
+        <div class="gallery-item" onclick="openLightbox(this)" data-src="gallery/ev3-02.jpeg" data-caption="Award ceremony recognising outstanding student Parliamentarians">
+          <img src="gallery/ev3-02.jpeg" alt="Award ceremony" loading="lazy">
+          <div class="gallery-item-overlay"><span class="gallery-item-label">Award Ceremony</span></div>
+        </div>
+        <div class="gallery-item" onclick="openLightbox(this)" data-src="gallery/ev3-03.jpeg" data-caption="Students receiving medals for exceptional parliamentary performance">
+          <img src="gallery/ev3-03.jpeg" alt="Students receiving medals" loading="lazy">
+          <div class="gallery-item-overlay"><span class="gallery-item-label">Medal Recipients</span></div>
+        </div>
+        <div class="gallery-item" onclick="openLightbox(this)" data-src="gallery/ev3-04.jpeg" data-caption="Honours awarded to standout student leaders on the floor">
+          <img src="gallery/ev3-04.jpeg" alt="Standout student leaders" loading="lazy">
+          <div class="gallery-item-overlay"><span class="gallery-item-label">Student Leaders Honoured</span></div>
+        </div>
+        <div class="gallery-item" onclick="openLightbox(this)" data-src="gallery/ev3-05.jpeg" data-caption="Parliamentarians distinguished for their debate and composure">
+          <img src="gallery/ev3-05.jpeg" alt="Distinguished Parliamentarians" loading="lazy">
+          <div class="gallery-item-overlay"><span class="gallery-item-label">Distinguished Parliamentarians</span></div>
+        </div>
+        <div class="gallery-item" onclick="openLightbox(this)" data-src="gallery/ev3-06.jpeg" data-caption="Presentation moment during the medal award ceremony">
+          <img src="gallery/ev3-06.jpeg" alt="Presentation moment" loading="lazy">
+          <div class="gallery-item-overlay"><span class="gallery-item-label">Award Presentation</span></div>
+        </div>
+        <div class="gallery-item" onclick="openLightbox(this)" data-src="gallery/ev3-07.jpeg" data-caption="Recognition of best performance in the interschool Parliamentarians contest">
+          <img src="gallery/ev3-07.jpeg" alt="Best performance recognition" loading="lazy">
+          <div class="gallery-item-overlay"><span class="gallery-item-label">Best Performance Award</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Event 4 -->
+    <div class="gallery-event" id="gallery-ev4">
+      <div class="gallery-event-header">
+        <h3 class="gallery-event-title">Senate Chamber Plenary Session</h3>
+        <p class="gallery-event-caption">Teachers honoured during a plenary session held in the former Senate Chamber — a recognition of educators who champion parliamentary education and student development in their schools.</p>
+      </div>
+      <div class="gallery-grid">
+        <div class="gallery-item" onclick="openLightbox(this)" data-src="gallery/ev4-01.jpeg" data-caption="Teachers honoured during plenary session in the former Senate Chamber">
+          <img src="gallery/ev4-01.jpeg" alt="Teachers honoured in Senate Chamber" loading="lazy">
+          <div class="gallery-item-overlay"><span class="gallery-item-label">Teachers Honoured</span></div>
+        </div>
+        <div class="gallery-item" onclick="openLightbox(this)" data-src="gallery/ev4-02.jpeg" data-caption="Plenary proceedings in the former Senate Chamber">
+          <img src="gallery/ev4-02.jpeg" alt="Senate Chamber plenary" loading="lazy">
+          <div class="gallery-item-overlay"><span class="gallery-item-label">Senate Chamber Plenary</span></div>
+        </div>
+        <div class="gallery-item" onclick="openLightbox(this)" data-src="gallery/ev4-03.jpeg" data-caption="Award presentation to educators at the Senate Chamber session">
+          <img src="gallery/ev4-03.jpeg" alt="Educators award presentation" loading="lazy">
+          <div class="gallery-item-overlay"><span class="gallery-item-label">Educators Award</span></div>
+        </div>
+        <div class="gallery-item" onclick="openLightbox(this)" data-src="gallery/ev4-04.jpeg" data-caption="Full house during the plenary session in the Senate Chamber">
+          <img src="gallery/ev4-04.jpeg" alt="Full house plenary" loading="lazy">
+          <div class="gallery-item-overlay"><span class="gallery-item-label">Full House Plenary</span></div>
+        </div>
+        <div class="gallery-item" onclick="openLightbox(this)" data-src="gallery/ev4-05.jpeg" data-caption="Recognition of teaching excellence in parliamentary education">
+          <img src="gallery/ev4-05.jpeg" alt="Teaching excellence recognition" loading="lazy">
+          <div class="gallery-item-overlay"><span class="gallery-item-label">Teaching Excellence</span></div>
+        </div>
+        <div class="gallery-item" onclick="openLightbox(this)" data-src="gallery/ev4-06.jpeg" data-caption="Distinguished educators received at the former Senate Chamber">
+          <img src="gallery/ev4-06.jpeg" alt="Distinguished educators" loading="lazy">
+          <div class="gallery-item-overlay"><span class="gallery-item-label">Distinguished Educators</span></div>
+        </div>
+        <div class="gallery-item" onclick="openLightbox(this)" data-src="gallery/ev4-07.jpeg" data-caption="Ceremony proceedings in the legislative chamber">
+          <img src="gallery/ev4-07.jpeg" alt="Ceremony proceedings" loading="lazy">
+          <div class="gallery-item-overlay"><span class="gallery-item-label">Ceremony Proceedings</span></div>
+        </div>
+        <div class="gallery-item" onclick="openLightbox(this)" data-src="gallery/ev4-08.jpeg" data-caption="Teachers receiving awards during the plenary session">
+          <img src="gallery/ev4-08.jpeg" alt="Teachers receiving awards" loading="lazy">
+          <div class="gallery-item-overlay"><span class="gallery-item-label">Teachers Receiving Awards</span></div>
+        </div>
+        <div class="gallery-item" onclick="openLightbox(this)" data-src="gallery/ev4-09.jpeg" data-caption="A moment of recognition inside the former Senate Chamber">
+          <img src="gallery/ev4-09.jpeg" alt="Recognition inside Senate Chamber" loading="lazy">
+          <div class="gallery-item-overlay"><span class="gallery-item-label">Senate Chamber Ceremony</span></div>
+        </div>
+        <div class="gallery-item" onclick="openLightbox(this)" data-src="gallery/ev4-10.jpeg" data-caption="Participants at the plenary session honoring educators">
+          <img src="gallery/ev4-10.jpeg" alt="Participants at plenary" loading="lazy">
+          <div class="gallery-item-overlay"><span class="gallery-item-label">Plenary Participants</span></div>
+        </div>
+        <div class="gallery-item" onclick="openLightbox(this)" data-src="gallery/ev4-11.jpeg" data-caption="Official proceedings at the Senate Chamber plenary">
+          <img src="gallery/ev4-11.jpeg" alt="Official proceedings" loading="lazy">
+          <div class="gallery-item-overlay"><span class="gallery-item-label">Official Proceedings</span></div>
+        </div>
+        <div class="gallery-item" onclick="openLightbox(this)" data-src="gallery/ev4-12.jpeg" data-caption="Closing moments of the plenary session at the Senate Chamber">
+          <img src="gallery/ev4-12.jpeg" alt="Closing plenary moments" loading="lazy">
+          <div class="gallery-item-overlay"><span class="gallery-item-label">Closing Session</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" id="lightboxClose" aria-label="Close">
+    <svg width="28" height="28" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+  <button class="lightbox-nav prev" id="lightboxPrev" aria-label="Previous">
+    <svg width="20" height="20" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <img src="" alt="" class="lightbox-img" id="lightboxImg">
+  <button class="lightbox-nav next" id="lightboxNext" aria-label="Next">
+    <svg width="20" height="20" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+  <div class="lightbox-caption" id="lightboxCaption"></div>
+</div>
+
+<!-- =========================================================
+     PARTNERS
+========================================================= -->
+<section class="partners" id="partners">
+  <div class="section-container">
+    <div style="text-align: center; max-width: 580px; margin: 0 auto;">
+      <span class="section-label">Partners and Collaborators</span>
+      <h2 class="section-title">The Organisations Behind This Programme</h2>
+      <div class="gold-divider" style="margin: 16px auto 0;"></div>
+    </div>
+    <div class="partners-grid">
+      <div class="partner-card">
+        <div class="partner-icon">
+          <svg width="30" height="30" fill="none" stroke="#e4c04a" stroke-width="2" viewBox="0 0 24 24"><path d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.36a1 1 0 01-1.447.894L15 14"/><rect x="1" y="6" width="14" height="12" rx="2"/></svg>
+        </div>
+        <h3 class="partner-name">I-Zone Multimedia Studio</h3>
+        <p class="partner-role">Production Partner</p>
+        <p class="partner-desc">The creative and technical force behind Students Parliament on TV — delivering professional broadcast production that brings this programme to a national television audience.</p>
+      </div>
+      <div class="partner-card">
+        <div class="partner-icon">
+          <svg width="30" height="30" fill="none" stroke="#e4c04a" stroke-width="2" viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zm0 8.47L4.5 8.18 12 4.09l7.5 4.09L12 11.47zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
+        </div>
+        <h3 class="partner-name">Lagos State Ministry of Education</h3>
+        <p class="partner-role">Government Collaborator</p>
+        <p class="partner-desc">A proud collaborator in the Students Parliament programme, helping to extend this civic education initiative to schools across Lagos State and supporting student participation at scale.</p>
+      </div>
+      <div class="partner-card">
+        <div class="partner-icon">
+          <svg width="30" height="30" fill="none" stroke="#e4c04a" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        </div>
+        <h3 class="partner-name">Prince Umanah Future Leaders Development Foundation</h3>
+        <p class="partner-role">Supporting Foundation</p>
+        <p class="partner-desc">Dedicated to developing tomorrow's leaders today. This foundation provides vital support for the program's expansion, ensuring more students across Nigeria can access this transformative experience.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================
+     ID CARD CTA
+========================================================= -->
+<section class="idcard-cta">
+  <div class="section-container" style="text-align: center;">
+    <span class="section-label">Member Identification</span>
+    <h2 class="section-title" style="color: white; max-width: 520px; margin: 12px auto 0;">Generate Your Official SPN ID Card</h2>
+    <div class="gold-divider" style="margin: 16px auto;"></div>
+    <p class="idcard-cta-desc">Every registered student parliamentarian deserves an official identity. Generate, pay, and download your personalised SPN ID card — recognised across all participating schools in Lagos State.</p>
+    <a href="id-portal.html" class="btn-hero-primary">
+      <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+      Generate Your ID Card Now
+    </a>
+  </div>
+</section>
+
+<!-- =========================================================
+     CONTACT
+========================================================= -->
+<section class="contact" id="contact">
+  <div class="section-container">
+    <span class="section-label">Get in Touch</span>
+    <h2 class="section-title">Contact &amp; Connect</h2>
+    <div class="gold-divider"></div>
+
+    <div class="contact-grid">
+      <div>
+        <ul class="contact-info-list">
+          <li class="contact-info-item">
+            <span class="contact-info-icon">
+              <svg width="22" height="22" fill="none" stroke="#e4c04a" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.67 19.79 19.79 0 01.03 2.1 2 2 0 012 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14v2.92z"/></svg>
+            </span>
+            <div>
+              <div class="contact-info-label">Phone</div>
+              <div class="contact-info-value"><a href="tel:08088882028">08088882028</a></div>
+            </div>
+          </li>
+          <li class="contact-info-item">
+            <span class="contact-info-icon">
+              <svg width="22" height="22" fill="none" stroke="#e4c04a" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </span>
+            <div>
+              <div class="contact-info-label">Email</div>
+              <div class="contact-info-value"><a href="mailto:studentsparliamentontv@gmail.com">studentsparliamentontv@gmail.com</a></div>
+            </div>
+          </li>
+        </ul>
+        <div class="social-row">
+          <a href="https://www.youtube.com/@Studentsparliament" target="_blank" rel="noopener" class="social-btn">
+            <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            YouTube
+          </a>
+          <a href="https://www.facebook.com/share/1CENk3PmTH/" target="_blank" rel="noopener" class="social-btn">
+            <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            Facebook
+          </a>
+        </div>
+      </div>
+
+      <div class="contact-websites">
+        <p style="font-size: 0.88rem; color: var(--gray-600); margin-bottom: 16px; line-height: 1.6;">Students Parliament Nigeria operates two websites — the main programme website and this dedicated ID card portal for registered student members.</p>
+        <a href="https://www.studentparliament.africa" target="_blank" rel="noopener" class="website-card">
+          <div>
+            <div class="website-card-label">Main Programme Website</div>
+            <div class="website-card-url">www.studentparliament.africa</div>
+          </div>
+          <svg width="18" height="18" fill="none" stroke="#14532d" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+        <a href="id-portal.html" class="website-card">
+          <div>
+            <div class="website-card-label">ID Card Portal</div>
+            <div class="website-card-url">www.studentparliament-africa.com</div>
+          </div>
+          <svg width="18" height="18" fill="none" stroke="#14532d" stroke-width="2" viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- =========================================================
+     FOOTER
+========================================================= -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <img src="image/image-3.png" alt="SPN Logo" class="footer-logo">
+      <span class="footer-brand-name">Students Parliament Nigeria</span>
+    </div>
+    <div class="footer-copy">
+      &copy; 2026 Students Parliament Nigeria. All rights reserved. Produced by I-Zone Multimedia Studio.
+    </div>
+    <ul class="footer-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#gallery">Gallery</a></li>
+      <li><a href="#contact">Contact</a></li>
+      <li><a href="id-portal.html">ID Card</a></li>
+    </ul>
+  </div>
+</footer>
+
+<!-- =========================================================
+     SCRIPTS
+========================================================= -->
+<script>
+  // Hamburger toggle
+  const hamburger = document.getElementById('hamburger');
+  const mobileNav = document.getElementById('mobileNav');
+  hamburger.addEventListener('click', () => {
+    mobileNav.classList.toggle('open');
+  });
+  document.querySelectorAll('.mobile-link').forEach(link => {
+    link.addEventListener('click', () => mobileNav.classList.remove('open'));
+  });
+
+  // Gallery tab switching
+  const tabs = document.querySelectorAll('.gallery-tab');
+  const events = document.querySelectorAll('.gallery-event');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const target = tab.dataset.event;
+      tabs.forEach(t => t.classList.remove('active'));
+      events.forEach(e => e.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('gallery-' + target).classList.add('active');
+      currentGallery = Array.from(document.querySelectorAll('#gallery-' + target + ' .gallery-item'));
+    });
+  });
+
+  // Lightbox
+  let currentGallery = Array.from(document.querySelectorAll('#gallery-ev1 .gallery-item'));
+  let currentIdx = 0;
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightboxImg');
+  const lightboxCaption = document.getElementById('lightboxCaption');
+
+  function openLightbox(el) {
+    const activeEvent = document.querySelector('.gallery-event.active');
+    currentGallery = Array.from(activeEvent.querySelectorAll('.gallery-item'));
+    currentIdx = currentGallery.indexOf(el);
+    showLightboxAt(currentIdx);
+    lightbox.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function showLightboxAt(idx) {
+    const item = currentGallery[idx];
+    lightboxImg.src = item.dataset.src;
+    lightboxImg.alt = item.dataset.caption || '';
+    lightboxCaption.textContent = item.dataset.caption || '';
+  }
+
+  document.getElementById('lightboxClose').addEventListener('click', () => {
+    lightbox.classList.remove('open');
+    document.body.style.overflow = '';
+  });
+
+  document.getElementById('lightboxPrev').addEventListener('click', () => {
+    currentIdx = (currentIdx - 1 + currentGallery.length) % currentGallery.length;
+    showLightboxAt(currentIdx);
+  });
+
+  document.getElementById('lightboxNext').addEventListener('click', () => {
+    currentIdx = (currentIdx + 1) % currentGallery.length;
+    showLightboxAt(currentIdx);
+  });
+
+  lightbox.addEventListener('click', (e) => {
+    if (e.target === lightbox) {
+      lightbox.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (!lightbox.classList.contains('open')) return;
+    if (e.key === 'Escape') { lightbox.classList.remove('open'); document.body.style.overflow = ''; }
+    if (e.key === 'ArrowLeft') { currentIdx = (currentIdx - 1 + currentGallery.length) % currentGallery.length; showLightboxAt(currentIdx); }
+    if (e.key === 'ArrowRight') { currentIdx = (currentIdx + 1) % currentGallery.length; showLightboxAt(currentIdx); }
+  });
+
+  // Scroll active nav highlight
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 40) {
+      navbar.style.boxShadow = '0 2px 24px rgba(0,0,0,0.22)';
+    } else {
+      navbar.style.boxShadow = 'none';
+    }
+  }, { passive: true });
+</script>
+
 </body>
 </html>
