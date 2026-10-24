@@ -222,13 +222,14 @@
       background: rgba(201,162,39,0.15);
       border: 1px solid rgba(201,162,39,0.30);
       color: var(--gold-light);
-      font-size: 0.78rem;
+      font-size: 0.72rem;
       font-weight: 600;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
       padding: 6px 16px;
       border-radius: 100px;
       margin-bottom: 28px;
+      white-space: nowrap;
     }
 
     .hero-logo {
@@ -882,16 +883,16 @@
 
     .contact-info-item {
       display: flex;
-      align-items: flex-start;
-      gap: 16px;
+      align-items: center;
+      gap: 14px;
     }
 
     .contact-info-icon {
       flex-shrink: 0;
-      width: 44px;
-      height: 44px;
+      width: 36px;
+      height: 36px;
       background: linear-gradient(135deg, var(--green-dark), var(--green-mid));
-      border-radius: 10px;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -907,9 +908,10 @@
     }
 
     .contact-info-value {
-      font-size: 0.96rem;
+      font-size: 0.88rem;
       font-weight: 600;
       color: var(--text);
+      word-break: break-all;
     }
 
     .contact-info-value a {
@@ -1656,7 +1658,7 @@
         <ul class="contact-info-list">
           <li class="contact-info-item">
             <span class="contact-info-icon">
-              <svg width="22" height="22" fill="none" stroke="#e4c04a" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.67 19.79 19.79 0 01.03 2.1 2 2 0 012 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14v2.92z"/></svg>
+              <svg width="16" height="16" fill="none" stroke="#e4c04a" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.67 19.79 19.79 0 01.03 2.1 2 2 0 012 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14v2.92z"/></svg>
             </span>
             <div>
               <div class="contact-info-label">Phone</div>
@@ -1665,7 +1667,7 @@
           </li>
           <li class="contact-info-item">
             <span class="contact-info-icon">
-              <svg width="22" height="22" fill="none" stroke="#e4c04a" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              <svg width="16" height="16" fill="none" stroke="#e4c04a" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
             </span>
             <div>
               <div class="contact-info-label">Email</div>
