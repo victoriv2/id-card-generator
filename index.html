@@ -2471,314 +2471,320 @@
      SCRIPTS
 ========================================================= -->
 <script>
-  // Hamburger toggle
-  const hamburger = document.getElementById('hamburger');
-  const mobileNav = document.getElementById('mobileNav');
-  hamburger.addEventListener('click', () => {
-    mobileNav.classList.toggle('open');
-  });
-  document.querySelectorAll('.mobile-link').forEach(link => {
-    link.addEventListener('click', () => mobileNav.classList.remove('open'));
-  });
+  // Wait for full DOM before wiring any events
+  document.addEventListener('DOMContentLoaded', function () {
 
-  // Gallery tab switching
-  const tabs = document.querySelectorAll('.gallery-tab');
-  const events = document.querySelectorAll('.gallery-event');
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      const target = tab.dataset.event;
-      tabs.forEach(t => t.classList.remove('active'));
-      events.forEach(e => e.classList.remove('active'));
-      tab.classList.add('active');
-      document.getElementById('gallery-' + target).classList.add('active');
-      currentGallery = Array.from(document.querySelectorAll('#gallery-' + target + ' .gallery-item'));
+    // =====================================================
+    // HAMBURGER MENU
+    // =====================================================
+    var hamburger = document.getElementById('hamburger');
+    var mobileNav = document.getElementById('mobileNav');
+    if (hamburger && mobileNav) {
+      hamburger.addEventListener('click', function () {
+        mobileNav.classList.toggle('open');
+      });
+      document.querySelectorAll('.mobile-link').forEach(function (link) {
+        link.addEventListener('click', function () { mobileNav.classList.remove('open'); });
+      });
+    }
+
+    // =====================================================
+    // GALLERY TABS
+    // =====================================================
+    var galleryTabs = document.querySelectorAll('.gallery-tab');
+    var galleryEvents = document.querySelectorAll('.gallery-event');
+    galleryTabs.forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        var target = tab.dataset.event;
+        galleryTabs.forEach(function (t) { t.classList.remove('active'); });
+        galleryEvents.forEach(function (e) { e.classList.remove('active'); });
+        tab.classList.add('active');
+        var panel = document.getElementById('gallery-' + target);
+        if (panel) { panel.classList.add('active'); }
+        currentGallery = Array.from(document.querySelectorAll('#gallery-' + target + ' .gallery-item'));
+      });
     });
-  });
 
-  // Lightbox
-  let currentGallery = Array.from(document.querySelectorAll('#gallery-ev1 .gallery-item'));
-  let currentIdx = 0;
-  const lightbox = document.getElementById('lightbox');
-  const lightboxImg = document.getElementById('lightboxImg');
-  const lightboxCaption = document.getElementById('lightboxCaption');
+    // =====================================================
+    // LIGHTBOX
+    // =====================================================
+    var currentGallery = Array.from(document.querySelectorAll('#gallery-ev1 .gallery-item'));
+    var currentIdx = 0;
+    var lightbox = document.getElementById('lightbox');
+    var lightboxImg = document.getElementById('lightboxImg');
+    var lightboxCaption = document.getElementById('lightboxCaption');
 
-  function openLightbox(el) {
-    const activeEvent = document.querySelector('.gallery-event.active');
-    currentGallery = Array.from(activeEvent.querySelectorAll('.gallery-item'));
-    currentIdx = currentGallery.indexOf(el);
-    showLightboxAt(currentIdx);
-    lightbox.classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
+    window.openLightbox = function (el) {
+      var activeEvent = document.querySelector('.gallery-event.active');
+      if (activeEvent) {
+        currentGallery = Array.from(activeEvent.querySelectorAll('.gallery-item'));
+      }
+      currentIdx = currentGallery.indexOf(el);
+      showLightboxAt(currentIdx);
+      if (lightbox) { lightbox.classList.add('open'); document.body.style.overflow = 'hidden'; }
+    };
 
-  function showLightboxAt(idx) {
-    const item = currentGallery[idx];
-    lightboxImg.src = item.dataset.src;
-    lightboxImg.alt = item.dataset.caption || '';
-    lightboxCaption.textContent = item.dataset.caption || '';
-  }
-
-  document.getElementById('lightboxClose').addEventListener('click', () => {
-    lightbox.classList.remove('open');
-    document.body.style.overflow = '';
-  });
-
-  document.getElementById('lightboxPrev').addEventListener('click', () => {
-    currentIdx = (currentIdx - 1 + currentGallery.length) % currentGallery.length;
-    showLightboxAt(currentIdx);
-  });
-
-  document.getElementById('lightboxNext').addEventListener('click', () => {
-    currentIdx = (currentIdx + 1) % currentGallery.length;
-    showLightboxAt(currentIdx);
-  });
-
-  lightbox.addEventListener('click', (e) => {
-    if (e.target === lightbox) {
-      lightbox.classList.remove('open');
-      document.body.style.overflow = '';
-    }
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (!lightbox.classList.contains('open')) return;
-    if (e.key === 'Escape') { lightbox.classList.remove('open'); document.body.style.overflow = ''; }
-    if (e.key === 'ArrowLeft') { currentIdx = (currentIdx - 1 + currentGallery.length) % currentGallery.length; showLightboxAt(currentIdx); }
-    if (e.key === 'ArrowRight') { currentIdx = (currentIdx + 1) % currentGallery.length; showLightboxAt(currentIdx); }
-  });
-
-  // Scroll active nav highlight
-  const navbar = document.getElementById('navbar');
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 40) {
-      navbar.style.boxShadow = '0 2px 24px rgba(0,0,0,0.22)';
-    } else {
-      navbar.style.boxShadow = 'none';
-    }
-  }, { passive: true });
-  // =========================================================
-  // ANTHEM AUDIO PLAYER CONTROLLER
-  // =========================================================
-  const anthemAudio = document.getElementById('anthemAudio');
-  const anthemPlayBtn = document.getElementById('anthemPlayBtn');
-  const anthemRestartBtn = document.getElementById('anthemRestartBtn');
-  const anthemMuteBtn = document.getElementById('anthemMuteBtn');
-  const anthemVolumeSlider = document.getElementById('anthemVolumeSlider');
-  const anthemSeekTrack = document.getElementById('anthemSeekTrack');
-  const anthemSeekFill = document.getElementById('anthemSeekFill');
-  const anthemSeekHandle = document.getElementById('anthemSeekHandle');
-  const anthemCurrentTime = document.getElementById('anthemCurrentTime');
-  const anthemDuration = document.getElementById('anthemDuration');
-  const anthemPlayerCard = document.querySelector('.anthem-player-card');
-
-  if (anthemAudio && anthemPlayBtn) {
-    const iconPlay = anthemPlayBtn.querySelector('.icon-play');
-    const iconPause = anthemPlayBtn.querySelector('.icon-pause');
-    const iconVolHigh = anthemMuteBtn ? anthemMuteBtn.querySelector('.icon-vol-high') : null;
-    const iconVolMuted = anthemMuteBtn ? anthemMuteBtn.querySelector('.icon-vol-muted') : null;
-
-    function formatTime(seconds) {
-      if (isNaN(seconds) || seconds < 0) return '0:00';
-      const m = Math.floor(seconds / 60);
-      const s = Math.floor(seconds % 60);
-      return m + ':' + (s < 10 ? '0' : '') + s;
+    function showLightboxAt(idx) {
+      var item = currentGallery[idx];
+      if (!item || !lightboxImg || !lightboxCaption) return;
+      lightboxImg.src = item.dataset.src;
+      lightboxImg.alt = item.dataset.caption || '';
+      lightboxCaption.textContent = item.dataset.caption || '';
     }
 
-    function updatePlayState(playing) {
-      if (playing) {
-        if (anthemPlayerCard) anthemPlayerCard.classList.add('is-playing');
-        if (iconPlay) iconPlay.style.display = 'none';
-        if (iconPause) iconPause.style.display = 'block';
+    var lbClose = document.getElementById('lightboxClose');
+    var lbPrev  = document.getElementById('lightboxPrev');
+    var lbNext  = document.getElementById('lightboxNext');
+
+    if (lbClose) {
+      lbClose.addEventListener('click', function () {
+        lightbox.classList.remove('open'); document.body.style.overflow = '';
+      });
+    }
+    if (lbPrev) {
+      lbPrev.addEventListener('click', function () {
+        currentIdx = (currentIdx - 1 + currentGallery.length) % currentGallery.length;
+        showLightboxAt(currentIdx);
+      });
+    }
+    if (lbNext) {
+      lbNext.addEventListener('click', function () {
+        currentIdx = (currentIdx + 1) % currentGallery.length;
+        showLightboxAt(currentIdx);
+      });
+    }
+    if (lightbox) {
+      lightbox.addEventListener('click', function (e) {
+        if (e.target === lightbox) { lightbox.classList.remove('open'); document.body.style.overflow = ''; }
+      });
+    }
+    document.addEventListener('keydown', function (e) {
+      if (!lightbox || !lightbox.classList.contains('open')) return;
+      if (e.key === 'Escape') { lightbox.classList.remove('open'); document.body.style.overflow = ''; }
+      if (e.key === 'ArrowLeft') { currentIdx = (currentIdx - 1 + currentGallery.length) % currentGallery.length; showLightboxAt(currentIdx); }
+      if (e.key === 'ArrowRight') { currentIdx = (currentIdx + 1) % currentGallery.length; showLightboxAt(currentIdx); }
+    });
+
+    // =====================================================
+    // NAV SCROLL SHADOW
+    // =====================================================
+    var navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', function () {
+      if (!navbar) return;
+      navbar.style.boxShadow = window.scrollY > 40 ? '0 2px 24px rgba(0,0,0,0.22)' : 'none';
+    }, { passive: true });
+
+    // =====================================================
+    // ANTHEM AUDIO PLAYER
+    // =====================================================
+    var anthemAudio      = document.getElementById('anthemAudio');
+    var anthemPlayBtn    = document.getElementById('anthemPlayBtn');
+    var anthemRestartBtn = document.getElementById('anthemRestartBtn');
+    var anthemMuteBtn    = document.getElementById('anthemMuteBtn');
+    var anthemVolSlider  = document.getElementById('anthemVolumeSlider');
+    var seekTrack        = document.getElementById('anthemSeekTrack');
+    var seekFill         = document.getElementById('anthemSeekFill');
+    var seekHandle       = document.getElementById('anthemSeekHandle');
+    var timeEl           = document.getElementById('anthemCurrentTime');
+    var durEl            = document.getElementById('anthemDuration');
+    var playerCard       = document.querySelector('.anthem-player-card');
+
+    function fmtTime(s) {
+      if (isNaN(s) || s < 0) return '0:00';
+      var m = Math.floor(s / 60);
+      var sec = Math.floor(s % 60);
+      return m + ':' + (sec < 10 ? '0' : '') + sec;
+    }
+
+    function setPlaying(isPlaying) {
+      if (!anthemPlayBtn) return;
+      var iPlay  = anthemPlayBtn.querySelector('.icon-play');
+      var iPause = anthemPlayBtn.querySelector('.icon-pause');
+      if (isPlaying) {
+        if (playerCard) playerCard.classList.add('is-playing');
+        if (iPlay)  iPlay.style.display  = 'none';
+        if (iPause) iPause.style.display = 'block';
         anthemPlayBtn.setAttribute('aria-label', 'Pause anthem');
       } else {
-        if (anthemPlayerCard) anthemPlayerCard.classList.remove('is-playing');
-        if (iconPlay) iconPlay.style.display = 'block';
-        if (iconPause) iconPause.style.display = 'none';
+        if (playerCard) playerCard.classList.remove('is-playing');
+        if (iPlay)  iPlay.style.display  = 'block';
+        if (iPause) iPause.style.display = 'none';
         anthemPlayBtn.setAttribute('aria-label', 'Play anthem');
       }
     }
 
-    anthemPlayBtn.addEventListener('click', () => {
-      if (anthemAudio.paused) {
-        anthemAudio.play().then(() => updatePlayState(true)).catch((e) => {
-          console.warn('Playback error:', e);
-        });
-      } else {
-        anthemAudio.pause();
-        updatePlayState(false);
-      }
-    });
-
-    if (anthemRestartBtn) {
-      anthemRestartBtn.addEventListener('click', () => {
-        anthemAudio.currentTime = 0;
-        anthemAudio.play().then(() => updatePlayState(true)).catch(() => {});
-      });
-    }
-
-    anthemAudio.addEventListener('play', () => updatePlayState(true));
-    anthemAudio.addEventListener('pause', () => updatePlayState(false));
-    anthemAudio.addEventListener('ended', () => {
-      updatePlayState(false);
-      anthemAudio.currentTime = 0;
-      if (anthemSeekFill) anthemSeekFill.style.width = '0%';
-      if (anthemSeekHandle) anthemSeekHandle.style.left = '0%';
-      if (anthemCurrentTime) anthemCurrentTime.textContent = '0:00';
-    });
-
-    anthemAudio.addEventListener('loadedmetadata', () => {
-      if (anthemDuration && !isNaN(anthemAudio.duration)) {
-        anthemDuration.textContent = formatTime(anthemAudio.duration);
-      }
-    });
-
-    anthemAudio.addEventListener('timeupdate', () => {
-      if (!anthemAudio.duration) return;
-      const pct = (anthemAudio.currentTime / anthemAudio.duration) * 100;
-      if (anthemSeekFill) anthemSeekFill.style.width = pct + '%';
-      if (anthemSeekHandle) anthemSeekHandle.style.left = pct + '%';
-      if (anthemCurrentTime) anthemCurrentTime.textContent = formatTime(anthemAudio.currentTime);
-      if (anthemSeekTrack) anthemSeekTrack.setAttribute('aria-valuenow', Math.round(pct));
-    });
-
-    // Scrubbing / Seek bar
-    if (anthemSeekTrack) {
-      function seekTo(e) {
-        const rect = anthemSeekTrack.getBoundingClientRect();
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const offsetX = Math.max(0, Math.min(clientX - rect.left, rect.width));
-        const pct = offsetX / rect.width;
-        if (anthemAudio.duration) {
-          anthemAudio.currentTime = pct * anthemAudio.duration;
-        }
-      }
-
-      let isDragging = false;
-      anthemSeekTrack.addEventListener('mousedown', (e) => {
-        isDragging = true;
-        seekTo(e);
-      });
-      window.addEventListener('mousemove', (e) => {
-        if (isDragging) seekTo(e);
-      });
-      window.addEventListener('mouseup', () => {
-        isDragging = false;
-      });
-      anthemSeekTrack.addEventListener('touchstart', (e) => {
-        seekTo(e);
-      }, { passive: true });
-      anthemSeekTrack.addEventListener('touchmove', (e) => {
-        seekTo(e);
-      }, { passive: true });
-    }
-
-    // Volume & Mute
-    if (anthemVolumeSlider) {
-      anthemVolumeSlider.addEventListener('input', (e) => {
-        anthemAudio.volume = parseFloat(e.target.value);
-        anthemAudio.muted = (anthemAudio.volume === 0);
-        updateVolumeUI();
-      });
-    }
-
-    function updateVolumeUI() {
-      const isMuted = anthemAudio.muted || anthemAudio.volume === 0;
-      if (iconVolHigh) iconVolHigh.style.display = isMuted ? 'none' : 'block';
-      if (iconVolMuted) iconVolMuted.style.display = isMuted ? 'block' : 'none';
-      if (anthemVolumeSlider && !isMuted) {
-        anthemVolumeSlider.value = anthemAudio.volume;
-      }
-    }
-
-    if (anthemMuteBtn) {
-      anthemMuteBtn.addEventListener('click', () => {
-        anthemAudio.muted = !anthemAudio.muted;
-        updateVolumeUI();
-      });
-    }
-  }
-
-  // =========================================================
-  // COPY LYRICS CONTROLLER
-  // =========================================================
-  const btnCopyLyrics = document.getElementById('btnCopyLyrics');
-  const copyLyricsLabel = document.getElementById('copyLyricsLabel');
-  if (btnCopyLyrics) {
-    btnCopyLyrics.addEventListener('click', async () => {
-      const lyricsText = [
-        'STUDENTS PARLIAMENT ON TV - OFFICIAL ANTHEM',
-        '',
-        '(Verse 1)',
-        'From every school, a voice so clear,',
-        'Young minds gather, banish fear.',
-        'In halls of learning, truth takes flight,',
-        'For children\'s future, shining bright.',
-        '',
-        '(Chorus)',
-        'Students Parliament, on TV\'s screen,',
-        'A platform rising, bold and keen.',
-        'For rights and justice, we stand tall,',
-        'Answering freedom\'s urgent call.',
-        '',
-        '(Verse 2)',
-        'Speaker, Deputy, House Leaders too,',
-        'Chief Whip, Provost, and members true.',
-        'Debating issues, grave and deep,',
-        'Promises for tomorrow, we will keep.',
-        '',
-        '(Chorus)',
-        'Students Parliament, on TV\'s screen,',
-        'A platform rising, bold and keen.',
-        'For rights and justice, we stand tall,',
-        'Answering freedom\'s urgent call.',
-        '',
-        '(Bridge)',
-        'No child trafficked, no abuse, no pain,',
-        'Education for girls, again and again.',
-        'Against molestation, we raise our plea,',
-        'For healthy families, wild and free.',
-        '',
-        '(Chorus)',
-        'Students Parliament, on TV\'s screen,',
-        'A platform rising, bold and keen.',
-        'For rights and justice, we stand tall,',
-        'Answering freedom\'s urgent call.',
-        '',
-        '(Outro)',
-        'Future leaders, we aspire to be,',
-        'beneath watchful skies.',
-        '',
-        'Authored, composed, and produced by Prince Umanah. (c) All rights reserved.'
-      ].join('\n');
-
-      try {
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          await navigator.clipboard.writeText(lyricsText);
+    if (anthemAudio && anthemPlayBtn) {
+      anthemPlayBtn.addEventListener('click', function () {
+        if (anthemAudio.paused) {
+          anthemAudio.play().then(function () { setPlaying(true); }).catch(function (err) {
+            console.warn('[Anthem] Playback blocked:', err);
+          });
         } else {
-          const ta = document.createElement('textarea');
-          ta.value = lyricsText;
-          ta.style.position = 'fixed';
-          ta.style.opacity = '0';
-          document.body.appendChild(ta);
-          ta.select();
-          document.execCommand('copy');
-          document.body.removeChild(ta);
+          anthemAudio.pause();
+          setPlaying(false);
         }
+      });
 
-        btnCopyLyrics.classList.add('copied');
-        if (copyLyricsLabel) copyLyricsLabel.textContent = 'Copied!';
-        setTimeout(() => {
-          btnCopyLyrics.classList.remove('copied');
-          if (copyLyricsLabel) copyLyricsLabel.textContent = 'Copy Lyrics';
-        }, 2500);
-      } catch (err) {
-        console.warn('Copy failed:', err);
+      if (anthemRestartBtn) {
+        anthemRestartBtn.addEventListener('click', function () {
+          anthemAudio.currentTime = 0;
+          anthemAudio.play().then(function () { setPlaying(true); }).catch(function () {});
+        });
       }
-    });
-  }
 
+      anthemAudio.addEventListener('play',  function () { setPlaying(true);  });
+      anthemAudio.addEventListener('pause', function () { setPlaying(false); });
+      anthemAudio.addEventListener('ended', function () {
+        setPlaying(false);
+        anthemAudio.currentTime = 0;
+        if (seekFill)   seekFill.style.width  = '0%';
+        if (seekHandle) seekHandle.style.left = '0%';
+        if (timeEl)     timeEl.textContent    = '0:00';
+      });
+
+      anthemAudio.addEventListener('loadedmetadata', function () {
+        if (durEl && !isNaN(anthemAudio.duration)) {
+          durEl.textContent = fmtTime(anthemAudio.duration);
+        }
+      });
+
+      anthemAudio.addEventListener('timeupdate', function () {
+        if (!anthemAudio.duration) return;
+        var pct = (anthemAudio.currentTime / anthemAudio.duration) * 100;
+        if (seekFill)   seekFill.style.width  = pct + '%';
+        if (seekHandle) seekHandle.style.left = pct + '%';
+        if (timeEl)     timeEl.textContent    = fmtTime(anthemAudio.currentTime);
+        if (seekTrack)  seekTrack.setAttribute('aria-valuenow', Math.round(pct));
+      });
+
+      // Seek bar scrubbing
+      if (seekTrack) {
+        var isDragging = false;
+        function doSeek(clientX) {
+          var rect = seekTrack.getBoundingClientRect();
+          var x = Math.max(0, Math.min(clientX - rect.left, rect.width));
+          if (anthemAudio.duration) {
+            anthemAudio.currentTime = (x / rect.width) * anthemAudio.duration;
+          }
+        }
+        seekTrack.addEventListener('mousedown', function (e) { isDragging = true; doSeek(e.clientX); });
+        window.addEventListener('mousemove', function (e) { if (isDragging) doSeek(e.clientX); });
+        window.addEventListener('mouseup',   function () { isDragging = false; });
+        seekTrack.addEventListener('touchstart', function (e) { doSeek(e.touches[0].clientX); }, { passive: true });
+        seekTrack.addEventListener('touchmove',  function (e) { doSeek(e.touches[0].clientX); }, { passive: true });
+      }
+
+      // Volume
+      function syncVolumeUI() {
+        var muted = anthemAudio.muted || anthemAudio.volume === 0;
+        if (anthemMuteBtn) {
+          var hi   = anthemMuteBtn.querySelector('.icon-vol-high');
+          var mute = anthemMuteBtn.querySelector('.icon-vol-muted');
+          if (hi)   hi.style.display   = muted ? 'none'  : 'block';
+          if (mute) mute.style.display = muted ? 'block' : 'none';
+        }
+        if (anthemVolSlider && !muted) anthemVolSlider.value = anthemAudio.volume;
+      }
+
+      if (anthemVolSlider) {
+        anthemVolSlider.addEventListener('input', function () {
+          anthemAudio.volume = parseFloat(anthemVolSlider.value);
+          anthemAudio.muted  = (anthemAudio.volume === 0);
+          syncVolumeUI();
+        });
+      }
+
+      if (anthemMuteBtn) {
+        anthemMuteBtn.addEventListener('click', function () {
+          anthemAudio.muted = !anthemAudio.muted;
+          syncVolumeUI();
+        });
+      }
+    }
+
+    // =====================================================
+    // COPY LYRICS
+    // =====================================================
+    var btnCopy      = document.getElementById('btnCopyLyrics');
+    var copyLabel    = document.getElementById('copyLyricsLabel');
+    var lyricsLines  = [
+      'STUDENTS PARLIAMENT ON TV - OFFICIAL ANTHEM',
+      '',
+      '(Verse 1)',
+      'From every school, a voice so clear,',
+      'Young minds gather, banish fear.',
+      'In halls of learning, truth takes flight,',
+      "For children's future, shining bright.",
+      '',
+      '(Chorus)',
+      "Students Parliament, on TV's screen,",
+      'A platform rising, bold and keen.',
+      'For rights and justice, we stand tall,',
+      "Answering freedom's urgent call.",
+      '',
+      '(Verse 2)',
+      'Speaker, Deputy, House Leaders too,',
+      'Chief Whip, Provost, and members true.',
+      'Debating issues, grave and deep,',
+      'Promises for tomorrow, we will keep.',
+      '',
+      '(Chorus)',
+      "Students Parliament, on TV's screen,",
+      'A platform rising, bold and keen.',
+      'For rights and justice, we stand tall,',
+      "Answering freedom's urgent call.",
+      '',
+      '(Bridge)',
+      'No child trafficked, no abuse, no pain,',
+      'Education for girls, again and again.',
+      'Against molestation, we raise our plea,',
+      'For healthy families, wild and free.',
+      '',
+      '(Chorus)',
+      "Students Parliament, on TV's screen,",
+      'A platform rising, bold and keen.',
+      'For rights and justice, we stand tall,',
+      "Answering freedom's urgent call.",
+      '',
+      '(Outro)',
+      'Future leaders, we aspire to be,',
+      'beneath watchful skies.',
+      '',
+      'Authored, composed, and produced by Prince Umanah. (c) All rights reserved.'
+    ];
+
+    if (btnCopy) {
+      btnCopy.addEventListener('click', function () {
+        var text = lyricsLines.join('\n');
+        function markCopied() {
+          btnCopy.classList.add('copied');
+          if (copyLabel) copyLabel.textContent = 'Copied!';
+          setTimeout(function () {
+            btnCopy.classList.remove('copied');
+            if (copyLabel) copyLabel.textContent = 'Copy Lyrics';
+          }, 2500);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(markCopied).catch(function () {
+            fallbackCopy(text); markCopied();
+          });
+        } else {
+          fallbackCopy(text); markCopied();
+        }
+      });
+    }
+
+    function fallbackCopy(text) {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(ta);
+    }
+
+  }); // end DOMContentLoaded
 </script>
-
-  <script src="js/pwa.js?v=20261027_v7"></script>
 </body>
 </html>
