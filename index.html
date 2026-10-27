@@ -1846,7 +1846,9 @@
           </div>
 
           <!-- Audio Element -->
-          <audio id="anthemAudio" preload="metadata" src="audio/spn-anthem.mp3"></audio>
+          <audio id="anthemAudio" preload="auto" playsinline src="audio/spn-anthem.mp3">
+            <source src="audio/spn-anthem.mp3" type="audio/mpeg">
+          </audio>
 
           <!-- Timeline Scrubber -->
           <div class="anthem-timeline-wrap">
@@ -2703,7 +2705,51 @@
   const copyLyricsLabel = document.getElementById('copyLyricsLabel');
   if (btnCopyLyrics) {
     btnCopyLyrics.addEventListener('click', async () => {
-      const lyricsText = STUDENTS PARLIAMENT ON TV - OFFICIAL ANTHEM\n\n(Verse 1)\nFrom every school, a voice so clear,\nYoung minds gather, banish fear.\nIn halls of learning, truth takes flight,\nFor children's future, shining bright.\n\n(Chorus)\nStudents Parliament, on TV's screen,\nA platform rising, bold and keen.\nFor rights and justice, we stand tall,\nAnswering freedom's urgent call.\n\n(Verse 2)\nSpeaker, Deputy, House Leaders too,\nChief Whip, Provost, and members true.\nDebating issues, grave and deep,\nPromises for tomorrow, we will keep.\n\n(Chorus)\nStudents Parliament, on TV's screen,\nA platform rising, bold and keen.\nFor rights and justice, we stand tall,\nAnswering freedom's urgent call.\n\n(Bridge)\nNo child trafficked, no abuse, no pain,\nEducation for girls, again and again.\nAgainst molestation, we raise our plea,\nFor healthy families, wild and free.\n\n(Chorus)\nStudents Parliament, on TV's screen,\nA platform rising, bold and keen.\nFor rights and justice, we stand tall,\nAnswering freedom's urgent call.\n\n(Outro)\nFuture leaders, we aspire to be,\nbeneath watchful skies.\n\nAuthored, composed, and produced by Prince Umanah. (c) All rights reserved.;
+      const lyricsText = [
+        'STUDENTS PARLIAMENT ON TV - OFFICIAL ANTHEM',
+        '',
+        '(Verse 1)',
+        'From every school, a voice so clear,',
+        'Young minds gather, banish fear.',
+        'In halls of learning, truth takes flight,',
+        'For children\'s future, shining bright.',
+        '',
+        '(Chorus)',
+        'Students Parliament, on TV\'s screen,',
+        'A platform rising, bold and keen.',
+        'For rights and justice, we stand tall,',
+        'Answering freedom\'s urgent call.',
+        '',
+        '(Verse 2)',
+        'Speaker, Deputy, House Leaders too,',
+        'Chief Whip, Provost, and members true.',
+        'Debating issues, grave and deep,',
+        'Promises for tomorrow, we will keep.',
+        '',
+        '(Chorus)',
+        'Students Parliament, on TV\'s screen,',
+        'A platform rising, bold and keen.',
+        'For rights and justice, we stand tall,',
+        'Answering freedom\'s urgent call.',
+        '',
+        '(Bridge)',
+        'No child trafficked, no abuse, no pain,',
+        'Education for girls, again and again.',
+        'Against molestation, we raise our plea,',
+        'For healthy families, wild and free.',
+        '',
+        '(Chorus)',
+        'Students Parliament, on TV\'s screen,',
+        'A platform rising, bold and keen.',
+        'For rights and justice, we stand tall,',
+        'Answering freedom\'s urgent call.',
+        '',
+        '(Outro)',
+        'Future leaders, we aspire to be,',
+        'beneath watchful skies.',
+        '',
+        'Authored, composed, and produced by Prince Umanah. (c) All rights reserved.'
+      ].join('\n');
 
       try {
         if (navigator.clipboard && navigator.clipboard.writeText) {
