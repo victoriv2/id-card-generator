@@ -522,6 +522,526 @@
       color: var(--gray-600);
       line-height: 1.65;
     }
+    /* =====================================================================
+       OFFICIAL ANTHEM & LYRICS
+    ===================================================================== */
+    .anthem {
+      background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+      border-top: 1px solid var(--gray-200);
+      border-bottom: 1px solid var(--gray-200);
+      position: relative;
+    }
+
+    .anthem-header {
+      text-align: center;
+      max-width: 680px;
+      margin: 0 auto 48px;
+    }
+
+    .anthem-header .gold-divider {
+      margin: 16px auto 0;
+    }
+
+    .anthem-subtitle {
+      font-size: 0.98rem;
+      color: var(--gray-600);
+      margin-top: 14px;
+      line-height: 1.65;
+    }
+
+    .anthem-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+
+    .anthem-card {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+      overflow: hidden;
+    }
+
+    .anthem-player-card {
+      padding: 32px 28px;
+      background: linear-gradient(160deg, #072518 0%, #0b3d23 60%, #14532d 100%);
+      color: var(--white);
+      border-color: rgba(201,162,39,0.25);
+      box-shadow: 0 12px 36px rgba(7,37,24,0.18);
+    }
+
+    .anthem-badge-art {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+
+    .anthem-art-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 16px;
+      background: rgba(201,162,39,0.12);
+      border: 1.5px solid rgba(201,162,39,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .anthem-track-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      background: rgba(201,162,39,0.18);
+      border: 1px solid rgba(201,162,39,0.3);
+      padding: 3px 10px;
+      border-radius: 100px;
+      margin-bottom: 6px;
+    }
+
+    .anthem-track-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--white);
+      margin-bottom: 4px;
+      line-height: 1.2;
+    }
+
+    .anthem-track-author {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.72);
+    }
+
+    .anthem-visualizer {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      height: 44px;
+      padding: 8px 12px;
+      background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      margin-bottom: 22px;
+      gap: 4px;
+    }
+
+    .anthem-visualizer .bar {
+      flex: 1;
+      background: rgba(201,162,39,0.35);
+      border-radius: 3px;
+      height: 6px;
+      transition: height 0.2s ease, background 0.2s ease;
+    }
+
+    .anthem-player-card.is-playing .anthem-visualizer .bar {
+      background: linear-gradient(180deg, var(--gold-light), var(--gold));
+      animation: barPulse 1.2s infinite ease-in-out alternate;
+    }
+
+    .anthem-visualizer .bar:nth-child(2) { animation-delay: 0.1s; }
+    .anthem-visualizer .bar:nth-child(3) { animation-delay: 0.25s; }
+    .anthem-visualizer .bar:nth-child(4) { animation-delay: 0.15s; }
+    .anthem-visualizer .bar:nth-child(5) { animation-delay: 0.35s; }
+    .anthem-visualizer .bar:nth-child(6) { animation-delay: 0.2s; }
+    .anthem-visualizer .bar:nth-child(7) { animation-delay: 0.4s; }
+    .anthem-visualizer .bar:nth-child(8) { animation-delay: 0.1s; }
+    .anthem-visualizer .bar:nth-child(9) { animation-delay: 0.3s; }
+    .anthem-visualizer .bar:nth-child(10) { animation-delay: 0.22s; }
+    .anthem-visualizer .bar:nth-child(11) { animation-delay: 0.45s; }
+    .anthem-visualizer .bar:nth-child(12) { animation-delay: 0.18s; }
+    .anthem-visualizer .bar:nth-child(13) { animation-delay: 0.38s; }
+    .anthem-visualizer .bar:nth-child(14) { animation-delay: 0.12s; }
+    .anthem-visualizer .bar:nth-child(15) { animation-delay: 0.28s; }
+    .anthem-visualizer .bar:nth-child(16) { animation-delay: 0.42s; }
+
+    @keyframes barPulse {
+      0% { height: 6px; }
+      50% { height: 32px; }
+      100% { height: 12px; }
+    }
+
+    .anthem-timeline-wrap {
+      margin-bottom: 22px;
+    }
+
+    .anthem-time-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 8px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .anthem-seek-track {
+      width: 100%;
+      height: 8px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 99px;
+      position: relative;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .anthem-seek-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--gold), var(--gold-light));
+      border-radius: 99px;
+      position: relative;
+    }
+
+    .anthem-seek-handle {
+      position: absolute;
+      top: 50%;
+      left: 0%;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--white);
+      border: 3px solid var(--gold);
+      transform: translate(-50%, -50%);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      cursor: pointer;
+    }
+
+    .anthem-controls-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .btn-anthem-play {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      border: none;
+      color: var(--green-deep);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(201,162,39,0.4);
+      flex-shrink: 0;
+      transition: background 0.2s;
+    }
+
+    .btn-anthem-play:hover {
+      background: var(--gold-light);
+    }
+
+    .btn-anthem-sub {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .btn-anthem-sub:hover {
+      background: rgba(255,255,255,0.16);
+      border-color: rgba(255,255,255,0.3);
+    }
+
+    .anthem-volume-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .anthem-volume-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 72px;
+      height: 5px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 5px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .anthem-volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: var(--gold-light);
+      cursor: pointer;
+    }
+
+    .btn-anthem-download {
+      margin-left: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(201,162,39,0.35);
+      color: var(--gold-light);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 9px 15px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .btn-anthem-download:hover {
+      background: rgba(201,162,39,0.18);
+      border-color: var(--gold-light);
+    }
+
+    .anthem-credits-box {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 16px;
+      background: rgba(0,0,0,0.22);
+      border-left: 3px solid var(--gold);
+      border-radius: 8px;
+      font-size: 0.8rem;
+      line-height: 1.5;
+    }
+
+    .anthem-credits-box svg {
+      color: var(--gold-light);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .anthem-credits-box strong {
+      display: block;
+      color: var(--white);
+      font-size: 0.82rem;
+      margin-bottom: 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .anthem-credits-box p {
+      color: rgba(255,255,255,0.72);
+      margin: 0;
+    }
+
+    .anthem-causes-card {
+      margin-top: 20px;
+      padding: 24px;
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+    }
+
+    .causes-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: var(--green-dark);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 14px;
+    }
+
+    .causes-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .cause-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--off-white);
+      border: 1px solid var(--gray-200);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--gray-800);
+    }
+
+    .cause-pill svg {
+      color: var(--green-mid);
+      flex-shrink: 0;
+    }
+
+    .anthem-lyrics-card {
+      padding: 32px 30px;
+      display: flex;
+      flex-direction: column;
+      border-top: 4px solid var(--gold);
+    }
+
+    .lyrics-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--gray-200);
+      padding-bottom: 18px;
+      margin-bottom: 24px;
+    }
+
+    .lyrics-eyebrow {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--green-mid);
+    }
+
+    .lyrics-main-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.2;
+    }
+
+    .btn-copy-lyrics {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--off-white);
+      border: 1px solid var(--gray-200);
+      color: var(--gray-800);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+    }
+
+    .btn-copy-lyrics:hover {
+      background: var(--gray-100);
+      border-color: var(--gray-400);
+    }
+
+    .btn-copy-lyrics.copied {
+      background: #e6f4ea;
+      border-color: #34a853;
+      color: #137333;
+    }
+
+    .lyrics-body {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-height: 520px;
+      overflow-y: auto;
+      padding-right: 8px;
+    }
+
+    .lyrics-body::-webkit-scrollbar {
+      width: 6px;
+    }
+    .lyrics-body::-webkit-scrollbar-track {
+      background: var(--gray-100);
+      border-radius: 10px;
+    }
+    .lyrics-body::-webkit-scrollbar-thumb {
+      background: var(--gray-300, #cbd5e1);
+      border-radius: 10px;
+    }
+
+    .lyrics-stanza {
+      position: relative;
+      padding: 14px 18px 14px 20px;
+      border-radius: 10px;
+      background: var(--off-white);
+      border-left: 3px solid var(--gray-400);
+      font-size: 0.94rem;
+      line-height: 1.68;
+      color: var(--gray-800);
+    }
+
+    .lyrics-stanza p {
+      margin: 0;
+    }
+
+    .stanza-tag {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+      background: var(--gray-200);
+      color: var(--gray-600);
+    }
+
+    .lyrics-stanza.chorus {
+      background: rgba(201,162,39,0.08);
+      border-left: 3px solid var(--gold);
+      border-color: rgba(201,162,39,0.25);
+    }
+
+    .lyrics-stanza.chorus p strong {
+      color: var(--green-deep);
+      font-weight: 700;
+    }
+
+    .stanza-tag.chorus-tag {
+      background: var(--gold);
+      color: var(--green-deep);
+    }
+
+    .lyrics-stanza.bridge {
+      background: rgba(20,83,45,0.06);
+      border-left: 3px solid var(--green-mid);
+    }
+
+    .stanza-tag.bridge-tag {
+      background: var(--green-mid);
+      color: var(--white);
+    }
+
+    .lyrics-stanza.outro {
+      background: var(--off-white);
+      border-left: 3px solid var(--gold-light);
+    }
+
+    .stanza-tag.outro-tag {
+      background: var(--gold-light);
+      color: var(--green-deep);
+    }
+
+    .lyrics-footer {
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid var(--gray-200);
+      font-size: 0.8rem;
+      color: var(--gray-600);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-style: italic;
+    }
+
+    .lyrics-footer svg {
+      color: var(--gold);
+      flex-shrink: 0;
+    }
+
 
     /* =====================================================================
        DAY SPEAKER - HOW TO WIN
@@ -1091,6 +1611,8 @@
       .about-image-block { order: -1; }
       .about-img-badge { left: 12px; bottom: -14px; }
       .pillars-grid { grid-template-columns: repeat(2, 1fr); }
+      .anthem-grid { grid-template-columns: 1fr; }
+      .lyrics-body { max-height: none; }
       .tips-grid { grid-template-columns: 1fr 1fr; }
       .partners-grid { grid-template-columns: 1fr; }
       .contact-grid { grid-template-columns: 1fr; gap: 40px; }
@@ -1099,6 +1621,9 @@
     @media (max-width: 560px) {
       section { padding: 60px 20px; }
       .pillars-grid { grid-template-columns: 1fr; }
+      .anthem-controls-row { justify-content: space-between; }
+      .btn-anthem-download { margin-left: 0; width: 100%; justify-content: center; }
+      .causes-grid { grid-template-columns: 1fr; }
       .tips-grid { grid-template-columns: 1fr; }
       .gallery-grid { grid-template-columns: repeat(2, 1fr); }
       .hero-actions { flex-direction: column; align-items: stretch; }
@@ -1122,6 +1647,7 @@
   </a>
   <ul class="nav-links">
     <li><a href="#about">About</a></li>
+    <li><a href="#anthem">Anthem</a></li>
     <li><a href="#program">Program</a></li>
     <li><a href="#gallery">Gallery</a></li>
     <li><a href="#partners">Partners</a></li>
@@ -1141,6 +1667,7 @@
 <!-- Mobile Nav -->
 <div class="mobile-nav" id="mobileNav">
   <a href="#about" class="mobile-link">About the Program</a>
+  <a href="#anthem" class="mobile-link">Official Anthem</a>
   <a href="#program" class="mobile-link">Day Speaker Tips</a>
   <a href="#gallery" class="mobile-link">Event Gallery</a>
   <a href="#partners" class="mobile-link">Partners</a>
@@ -1271,6 +1798,213 @@
         </div>
         <h3 class="pillar-title">Leadership</h3>
         <p class="pillar-desc">From moving motions to representing peers on issues of education, child welfare, and youth development — students emerge as genuine community leaders.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================
+     OFFICIAL ANTHEM & LYRICS
+========================================================= -->
+<section class="anthem" id="anthem">
+  <div class="section-container">
+    <div class="anthem-header">
+      <span class="section-label">Official Program Anthem</span>
+      <h2 class="section-title">The Students Parliament Anthem</h2>
+      <div class="gold-divider"></div>
+      <p class="anthem-subtitle">
+        Authored, composed, and produced by <strong>Prince Umanah</strong> for Students Parliament Nigeria on TV — an inspiring creed of democracy, youth leadership, and children's rights.
+      </p>
+    </div>
+
+    <div class="anthem-grid">
+      <!-- Left: Interactive Player & Causes -->
+      <div class="anthem-player-col">
+        <div class="anthem-card anthem-player-card">
+          <!-- Album / Badge Art Header -->
+          <div class="anthem-badge-art">
+            <div class="anthem-art-icon">
+              <svg width="38" height="38" fill="none" stroke="#e4c04a" stroke-width="1.8" viewBox="0 0 24 24">
+                <path d="M9 18V5l12-2v13"></path>
+                <circle cx="6" cy="18" r="3"></circle>
+                <circle cx="18" cy="16" r="3"></circle>
+              </svg>
+            </div>
+            <div class="anthem-art-meta">
+              <span class="anthem-track-badge">Official Anthem</span>
+              <h3 class="anthem-track-title">Students Parliament on TV</h3>
+              <p class="anthem-track-author">Prince Umanah &bull; Producer &amp; Composer</p>
+            </div>
+          </div>
+
+          <!-- Waveform / Equalizer Animation -->
+          <div class="anthem-visualizer" id="anthemVisualizer" aria-hidden="true">
+            <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
+          </div>
+
+          <!-- Audio Element -->
+          <audio id="anthemAudio" preload="metadata" src="audio/spn-anthem.mp3"></audio>
+
+          <!-- Timeline Scrubber -->
+          <div class="anthem-timeline-wrap">
+            <div class="anthem-time-row">
+              <span id="anthemCurrentTime" class="anthem-time">0:00</span>
+              <span id="anthemDuration" class="anthem-time">2:57</span>
+            </div>
+            <div class="anthem-seek-track" id="anthemSeekTrack" role="slider" aria-label="Audio progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+              <div class="anthem-seek-fill" id="anthemSeekFill"></div>
+              <div class="anthem-seek-handle" id="anthemSeekHandle"></div>
+            </div>
+          </div>
+
+          <!-- Controls Row: Play/Pause, Restart, Volume, Download -->
+          <div class="anthem-controls-row">
+            <button type="button" class="btn-anthem-play" id="anthemPlayBtn" aria-label="Play anthem">
+              <!-- Play Icon -->
+              <svg class="icon-play" width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              <!-- Pause Icon -->
+              <svg class="icon-pause" width="22" height="22" fill="currentColor" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            </button>
+
+            <button type="button" class="btn-anthem-sub" id="anthemRestartBtn" title="Restart Anthem" aria-label="Restart Anthem">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+            </button>
+
+            <!-- Volume Control -->
+            <div class="anthem-volume-wrap">
+              <button type="button" class="btn-anthem-sub" id="anthemMuteBtn" title="Mute or Unmute" aria-label="Mute or Unmute">
+                <svg class="icon-vol-high" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                <svg class="icon-vol-muted" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:none;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
+              </button>
+              <input type="range" class="anthem-volume-slider" id="anthemVolumeSlider" min="0" max="1" step="0.05" value="1" aria-label="Anthem volume">
+            </div>
+
+            <!-- Download MP3 -->
+            <a href="audio/spn-anthem.mp3" download="Students-Parliament-Nigeria-Anthem.mp3" class="btn-anthem-download" title="Download Audio (MP3)" aria-label="Download Anthem MP3">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>Download MP3</span>
+            </a>
+          </div>
+
+          <!-- Production Credits Banner -->
+          <div class="anthem-credits-box">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+            <div>
+              <strong>Production Credit</strong>
+              <p>Authored, composed, and produced by Prince Umanah. &copy; All rights reserved.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Causes Card (Under Player) -->
+        <div class="anthem-card anthem-causes-card">
+          <h4 class="causes-title">Causes Championed by the Anthem</h4>
+          <div class="causes-grid">
+            <div class="cause-pill">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <span>Child Rights &amp; Protection</span>
+            </div>
+            <div class="cause-pill">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+              <span>Girl-Child Education</span>
+            </div>
+            <div class="cause-pill">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+              <span>Anti-Abuse &amp; Trafficking</span>
+            </div>
+            <div class="cause-pill">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span>Healthy Families &amp; Youth</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Official Lyrics Display -->
+      <div class="anthem-lyrics-col">
+        <div class="anthem-card anthem-lyrics-card">
+          <div class="lyrics-header">
+            <div>
+              <span class="lyrics-eyebrow">Official Words</span>
+              <h3 class="lyrics-main-title">Anthem Lyrics</h3>
+            </div>
+            <button type="button" class="btn-copy-lyrics" id="btnCopyLyrics" aria-label="Copy lyrics to clipboard">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span id="copyLyricsLabel">Copy Lyrics</span>
+            </button>
+          </div>
+
+          <div class="lyrics-body" id="lyricsTextContainer">
+            <!-- Verse 1 -->
+            <div class="lyrics-stanza verse">
+              <span class="stanza-tag">Verse 1</span>
+              <p>From every school, a voice so clear,</p>
+              <p>Young minds gather, banish fear.</p>
+              <p>In halls of learning, truth takes flight,</p>
+              <p>For children's future, shining bright.</p>
+            </div>
+
+            <!-- Chorus -->
+            <div class="lyrics-stanza chorus">
+              <span class="stanza-tag chorus-tag">Chorus</span>
+              <p><strong>Students Parliament, on TV's screen,</strong></p>
+              <p><strong>A platform rising, bold and keen.</strong></p>
+              <p><strong>For rights and justice, we stand tall,</strong></p>
+              <p><strong>Answering freedom's urgent call.</strong></p>
+            </div>
+
+            <!-- Verse 2 -->
+            <div class="lyrics-stanza verse">
+              <span class="stanza-tag">Verse 2</span>
+              <p>Speaker, Deputy, House Leaders too,</p>
+              <p>Chief Whip, Provost, and members true.</p>
+              <p>Debating issues, grave and deep,</p>
+              <p>Promises for tomorrow, we will keep.</p>
+            </div>
+
+            <!-- Chorus -->
+            <div class="lyrics-stanza chorus">
+              <span class="stanza-tag chorus-tag">Chorus</span>
+              <p><strong>Students Parliament, on TV's screen,</strong></p>
+              <p><strong>A platform rising, bold and keen.</strong></p>
+              <p><strong>For rights and justice, we stand tall,</strong></p>
+              <p><strong>Answering freedom's urgent call.</strong></p>
+            </div>
+
+            <!-- Bridge -->
+            <div class="lyrics-stanza bridge">
+              <span class="stanza-tag bridge-tag">Bridge</span>
+              <p>No child trafficked, no abuse, no pain,</p>
+              <p>Education for girls, again and again.</p>
+              <p>Against molestation, we raise our plea,</p>
+              <p>For healthy families, wild and free.</p>
+            </div>
+
+            <!-- Chorus -->
+            <div class="lyrics-stanza chorus">
+              <span class="stanza-tag chorus-tag">Chorus</span>
+              <p><strong>Students Parliament, on TV's screen,</strong></p>
+              <p><strong>A platform rising, bold and keen.</strong></p>
+              <p><strong>For rights and justice, we stand tall,</strong></p>
+              <p><strong>Answering freedom's urgent call.</strong></p>
+            </div>
+
+            <!-- Outro -->
+            <div class="lyrics-stanza outro">
+              <span class="stanza-tag outro-tag">Outro</span>
+              <p>Future leaders, we aspire to be,</p>
+              <p>beneath watchful skies.</p>
+            </div>
+          </div>
+
+          <div class="lyrics-footer">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <span>Authored, composed, and produced by Prince Umanah. &copy; All rights reserved.</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1723,6 +2457,7 @@
     </div>
     <ul class="footer-links">
       <li><a href="#about">About</a></li>
+      <li><a href="#anthem">Anthem</a></li>
       <li><a href="#gallery">Gallery</a></li>
       <li><a href="#contact">Contact</a></li>
       <li><a href="id-portal.html">ID Card</a></li>
@@ -1819,8 +2554,185 @@
       navbar.style.boxShadow = 'none';
     }
   }, { passive: true });
+  // =========================================================
+  // ANTHEM AUDIO PLAYER CONTROLLER
+  // =========================================================
+  const anthemAudio = document.getElementById('anthemAudio');
+  const anthemPlayBtn = document.getElementById('anthemPlayBtn');
+  const anthemRestartBtn = document.getElementById('anthemRestartBtn');
+  const anthemMuteBtn = document.getElementById('anthemMuteBtn');
+  const anthemVolumeSlider = document.getElementById('anthemVolumeSlider');
+  const anthemSeekTrack = document.getElementById('anthemSeekTrack');
+  const anthemSeekFill = document.getElementById('anthemSeekFill');
+  const anthemSeekHandle = document.getElementById('anthemSeekHandle');
+  const anthemCurrentTime = document.getElementById('anthemCurrentTime');
+  const anthemDuration = document.getElementById('anthemDuration');
+  const anthemPlayerCard = document.querySelector('.anthem-player-card');
+
+  if (anthemAudio && anthemPlayBtn) {
+    const iconPlay = anthemPlayBtn.querySelector('.icon-play');
+    const iconPause = anthemPlayBtn.querySelector('.icon-pause');
+    const iconVolHigh = anthemMuteBtn ? anthemMuteBtn.querySelector('.icon-vol-high') : null;
+    const iconVolMuted = anthemMuteBtn ? anthemMuteBtn.querySelector('.icon-vol-muted') : null;
+
+    function formatTime(seconds) {
+      if (isNaN(seconds) || seconds < 0) return '0:00';
+      const m = Math.floor(seconds / 60);
+      const s = Math.floor(seconds % 60);
+      return m + ':' + (s < 10 ? '0' : '') + s;
+    }
+
+    function updatePlayState(playing) {
+      if (playing) {
+        if (anthemPlayerCard) anthemPlayerCard.classList.add('is-playing');
+        if (iconPlay) iconPlay.style.display = 'none';
+        if (iconPause) iconPause.style.display = 'block';
+        anthemPlayBtn.setAttribute('aria-label', 'Pause anthem');
+      } else {
+        if (anthemPlayerCard) anthemPlayerCard.classList.remove('is-playing');
+        if (iconPlay) iconPlay.style.display = 'block';
+        if (iconPause) iconPause.style.display = 'none';
+        anthemPlayBtn.setAttribute('aria-label', 'Play anthem');
+      }
+    }
+
+    anthemPlayBtn.addEventListener('click', () => {
+      if (anthemAudio.paused) {
+        anthemAudio.play().then(() => updatePlayState(true)).catch((e) => {
+          console.warn('Playback error:', e);
+        });
+      } else {
+        anthemAudio.pause();
+        updatePlayState(false);
+      }
+    });
+
+    if (anthemRestartBtn) {
+      anthemRestartBtn.addEventListener('click', () => {
+        anthemAudio.currentTime = 0;
+        anthemAudio.play().then(() => updatePlayState(true)).catch(() => {});
+      });
+    }
+
+    anthemAudio.addEventListener('play', () => updatePlayState(true));
+    anthemAudio.addEventListener('pause', () => updatePlayState(false));
+    anthemAudio.addEventListener('ended', () => {
+      updatePlayState(false);
+      anthemAudio.currentTime = 0;
+      if (anthemSeekFill) anthemSeekFill.style.width = '0%';
+      if (anthemSeekHandle) anthemSeekHandle.style.left = '0%';
+      if (anthemCurrentTime) anthemCurrentTime.textContent = '0:00';
+    });
+
+    anthemAudio.addEventListener('loadedmetadata', () => {
+      if (anthemDuration && !isNaN(anthemAudio.duration)) {
+        anthemDuration.textContent = formatTime(anthemAudio.duration);
+      }
+    });
+
+    anthemAudio.addEventListener('timeupdate', () => {
+      if (!anthemAudio.duration) return;
+      const pct = (anthemAudio.currentTime / anthemAudio.duration) * 100;
+      if (anthemSeekFill) anthemSeekFill.style.width = pct + '%';
+      if (anthemSeekHandle) anthemSeekHandle.style.left = pct + '%';
+      if (anthemCurrentTime) anthemCurrentTime.textContent = formatTime(anthemAudio.currentTime);
+      if (anthemSeekTrack) anthemSeekTrack.setAttribute('aria-valuenow', Math.round(pct));
+    });
+
+    // Scrubbing / Seek bar
+    if (anthemSeekTrack) {
+      function seekTo(e) {
+        const rect = anthemSeekTrack.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const offsetX = Math.max(0, Math.min(clientX - rect.left, rect.width));
+        const pct = offsetX / rect.width;
+        if (anthemAudio.duration) {
+          anthemAudio.currentTime = pct * anthemAudio.duration;
+        }
+      }
+
+      let isDragging = false;
+      anthemSeekTrack.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        seekTo(e);
+      });
+      window.addEventListener('mousemove', (e) => {
+        if (isDragging) seekTo(e);
+      });
+      window.addEventListener('mouseup', () => {
+        isDragging = false;
+      });
+      anthemSeekTrack.addEventListener('touchstart', (e) => {
+        seekTo(e);
+      }, { passive: true });
+      anthemSeekTrack.addEventListener('touchmove', (e) => {
+        seekTo(e);
+      }, { passive: true });
+    }
+
+    // Volume & Mute
+    if (anthemVolumeSlider) {
+      anthemVolumeSlider.addEventListener('input', (e) => {
+        anthemAudio.volume = parseFloat(e.target.value);
+        anthemAudio.muted = (anthemAudio.volume === 0);
+        updateVolumeUI();
+      });
+    }
+
+    function updateVolumeUI() {
+      const isMuted = anthemAudio.muted || anthemAudio.volume === 0;
+      if (iconVolHigh) iconVolHigh.style.display = isMuted ? 'none' : 'block';
+      if (iconVolMuted) iconVolMuted.style.display = isMuted ? 'block' : 'none';
+      if (anthemVolumeSlider && !isMuted) {
+        anthemVolumeSlider.value = anthemAudio.volume;
+      }
+    }
+
+    if (anthemMuteBtn) {
+      anthemMuteBtn.addEventListener('click', () => {
+        anthemAudio.muted = !anthemAudio.muted;
+        updateVolumeUI();
+      });
+    }
+  }
+
+  // =========================================================
+  // COPY LYRICS CONTROLLER
+  // =========================================================
+  const btnCopyLyrics = document.getElementById('btnCopyLyrics');
+  const copyLyricsLabel = document.getElementById('copyLyricsLabel');
+  if (btnCopyLyrics) {
+    btnCopyLyrics.addEventListener('click', async () => {
+      const lyricsText = STUDENTS PARLIAMENT ON TV - OFFICIAL ANTHEM\n\n(Verse 1)\nFrom every school, a voice so clear,\nYoung minds gather, banish fear.\nIn halls of learning, truth takes flight,\nFor children's future, shining bright.\n\n(Chorus)\nStudents Parliament, on TV's screen,\nA platform rising, bold and keen.\nFor rights and justice, we stand tall,\nAnswering freedom's urgent call.\n\n(Verse 2)\nSpeaker, Deputy, House Leaders too,\nChief Whip, Provost, and members true.\nDebating issues, grave and deep,\nPromises for tomorrow, we will keep.\n\n(Chorus)\nStudents Parliament, on TV's screen,\nA platform rising, bold and keen.\nFor rights and justice, we stand tall,\nAnswering freedom's urgent call.\n\n(Bridge)\nNo child trafficked, no abuse, no pain,\nEducation for girls, again and again.\nAgainst molestation, we raise our plea,\nFor healthy families, wild and free.\n\n(Chorus)\nStudents Parliament, on TV's screen,\nA platform rising, bold and keen.\nFor rights and justice, we stand tall,\nAnswering freedom's urgent call.\n\n(Outro)\nFuture leaders, we aspire to be,\nbeneath watchful skies.\n\nAuthored, composed, and produced by Prince Umanah. (c) All rights reserved.;
+
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(lyricsText);
+        } else {
+          const ta = document.createElement('textarea');
+          ta.value = lyricsText;
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+        }
+
+        btnCopyLyrics.classList.add('copied');
+        if (copyLyricsLabel) copyLyricsLabel.textContent = 'Copied!';
+        setTimeout(() => {
+          btnCopyLyrics.classList.remove('copied');
+          if (copyLyricsLabel) copyLyricsLabel.textContent = 'Copy Lyrics';
+        }, 2500);
+      } catch (err) {
+        console.warn('Copy failed:', err);
+      }
+    });
+  }
+
 </script>
 
-  <script src="js/pwa.js?v=20261024_v6"></script>
+  <script src="js/pwa.js?v=20261027_v7"></script>
 </body>
 </html>

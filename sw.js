@@ -1,9 +1,9 @@
 /**
  * Students Parliament Nigeria - Progressive Web App Service Worker
- * Version: 2026.10.24-v6
+ * Version: 2026.10.27-v7
  */
 
-const CACHE_NAME = 'spn-pwa-v6';
+const CACHE_NAME = 'spn-pwa-v7';
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
@@ -68,6 +68,11 @@ self.addEventListener('fetch', (event) => {
 
   // Skip non-GET requests and external API/database calls (e.g. Supabase, Paystack, Google Fonts)
   if (req.method !== 'GET' || url.origin !== location.origin) {
+    return;
+  }
+
+  // Range requests and media files (e.g. mp3 audio) should stream directly from network
+  if (req.headers.has('range') || url.pathname.endsWith('.mp3')) {
     return;
   }
 
