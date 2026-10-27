@@ -17,6 +17,9 @@
 /id-portal.html
   Cache-Control: public, max-age=0, must-revalidate
 
+/id-portal
+  Cache-Control: public, max-age=0, must-revalidate
+
 /admin.html
   Cache-Control: public, max-age=0, must-revalidate
 
