@@ -1409,8 +1409,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (inputAdminTvTag) inputAdminTvTag.value = data.tag || 'Official Broadcast';
     if (inputAdminTvDesc) inputAdminTvDesc.value = data.description || '';
 
-    // If there is a videoId/videoUrl and enabled is not explicitly false, show it
-    const isEnabled = data.enabled !== false && !!(data.videoId || data.videoUrl);
+    // Only enabled if explicitly true
+    const isEnabled = data.enabled === true;
     updateTvToggleUI(isEnabled);
     updateLivePreviewFromInputs();
   }
@@ -1434,12 +1434,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Real-time live input preview listeners
   if (inputAdminTvVideoUrl) {
     inputAdminTvVideoUrl.addEventListener('input', () => {
-      // If user is pasting or typing a video and toggle was off, turn it ON automatically
-      const rawUrl = inputAdminTvVideoUrl.value.trim();
-      if (rawUrl && checkboxAdminTvEnabled && !checkboxAdminTvEnabled.checked) {
-        checkboxAdminTvEnabled.checked = true;
-        updateTvToggleUI(true);
-      }
       updateLivePreviewFromInputs();
     });
   }
@@ -1447,11 +1441,30 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (inputAdminTvTag) inputAdminTvTag.addEventListener('input', updateLivePreviewFromInputs);
   if (inputAdminTvDesc) inputAdminTvDesc.addEventListener('input', updateLivePreviewFromInputs);
 
-  // Toggle Switch Change
+  // Toggle Switch Change (Instantly saves state to Supabase & LocalStorage)
   if (checkboxAdminTvEnabled) {
-    checkboxAdminTvEnabled.addEventListener('change', () => {
+    checkboxAdminTvEnabled.addEventListener('change', async () => {
       const isChecked = checkboxAdminTvEnabled.checked;
       updateTvToggleUI(isChecked);
+
+      try {
+        const updated = await CloudDB.setTvBroadcast({ enabled: isChecked });
+        activeTvData = { ...updated };
+        if (isChecked) {
+          showModalAlert('Students Parliament TV broadcast is now LIVE on the public website!\n\nVisitors can now see the broadcast section below the Official Anthem.', {
+            title: 'Broadcast Published & Live',
+            type: 'success'
+          });
+        } else {
+          showModalAlert('Students Parliament TV broadcast is now HIDDEN (Offline).\n\nThe TV section is completely hidden from the public website.', {
+            title: 'Broadcast Hidden (Offline)',
+            type: 'info'
+          });
+        }
+      } catch (err) {
+        console.error('[Admin] Error updating broadcast toggle:', err);
+        showModalAlert('Could not update broadcast visibility: ' + (err.message || err), { type: 'error' });
+      }
     });
   }
 
@@ -1462,8 +1475,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       const detectedId = CloudDB.extractYouTubeId(rawUrl);
       const isEnabled = !!(checkboxAdminTvEnabled && checkboxAdminTvEnabled.checked);
 
-      if (!detectedId) {
-        showModalAlert('Please enter a valid YouTube video link or embed code (e.g. from YouTube Share -> Embed, or a watch link).', {
+      if (isEnabled && !detectedId) {
+        showModalAlert('Public visibility is toggled ON, but no valid YouTube video was provided. Please paste a valid YouTube video URL or embed code, or toggle the switch OFF.', {
           title: 'YouTube Video Required',
           type: 'warning'
         });

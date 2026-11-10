@@ -2617,7 +2617,7 @@
 <!-- =========================================================
      SCRIPTS
 ========================================================= -->
-<script src="js/cloud-db.js?v=20261110_tv2"></script>
+<script src="js/cloud-db.js?v=20261110_tv4"></script>
 <script>
   // Wait for full DOM before wiring any events
   document.addEventListener('DOMContentLoaded', function () {
@@ -2947,7 +2947,7 @@
       if (!tvSection || !tvIframe) return;
 
       function applyTvState(data) {
-        if (!data || data.enabled === false) {
+        if (!data || data.enabled !== true) {
           // Broadcast is toggled off: keep page 100% normal
           tvSection.style.display = 'none';
           tvIframe.src = '';

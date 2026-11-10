@@ -241,7 +241,7 @@
     // -----------------------------------------------------------------------
     getDefaultTvBroadcast() {
       return {
-        enabled: true,
+        enabled: false,
         videoUrl: '',
         videoId: '',
         title: 'Students Parliament on TV',
@@ -267,11 +267,21 @@
 
       // Check if raw iframe code was provided: extract src attribute
       const iframeSrcMatch = str.match(/src=["']([^"']+)["']/i);
-      const target = iframeSrcMatch ? iframeSrcMatch[1] : str;
+      const target = (iframeSrcMatch ? iframeSrcMatch[1] : str).trim();
 
+      // 1. Direct 11-character alphanumeric/dash/underscore ID
+      if (/^[\w-]{11}$/.test(target)) {
+        return target;
+      }
+
+      // 2. Comprehensive URL pattern matching (handles desktop, mobile, shorts, live, embeds)
       const patterns = [
-        /(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:embed\/|v\/|live\/|shorts\/|watch\?v=|watch\?.+&v=))([\w-]{11})/i,
-        /^([\w-]{11})$/
+        /(?:youtu\.be\/|(?:[a-zA-Z0-9_-]+\.)?youtube(?:-nocookie)?\.com\/(?:embed\/|v\/|live\/|shorts\/|watch\?v=|watch\?.+&v=))([\w-]{11})/i,
+        /[?&]v=([\w-]{11})/i,
+        /\/embed\/([\w-]{11})/i,
+        /\/live\/([\w-]{11})/i,
+        /\/shorts\/([\w-]{11})/i,
+        /youtu\.be\/([\w-]{11})/i
       ];
 
       for (const pattern of patterns) {
@@ -374,12 +384,13 @@
 
     async loadTvBroadcast() {
       try {
-        const res = await supabaseRequest('app_settings?key=eq.spn_tv_broadcast&select=*');
+        const res = await supabaseRequest(`app_settings?key=eq.spn_tv_broadcast&select=*&_ts=${Date.now()}`);
         if (Array.isArray(res) && res.length > 0 && res[0].value) {
           const parsed = JSON.parse(res[0].value);
           const full = {
             ...this.getDefaultTvBroadcast(),
-            ...parsed
+            ...parsed,
+            enabled: parsed.enabled === true
           };
           try {
             localStorage.setItem(STORAGE_KEYS.TV_BROADCAST, JSON.stringify(full));
