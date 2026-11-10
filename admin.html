@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -96,6 +96,10 @@
         <button type="button" class="admin-tab-btn" data-tab="settings">
           <svg width="17" height="17" fill="currentColor" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
           <span>Fee &amp; Paywall Settings</span>
+        </button>
+        <button type="button" class="admin-tab-btn" data-tab="tv">
+          <svg width="17" height="17" fill="currentColor" viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12zm-11-2l6-4.5-6-4.5v9z"/></svg>
+          <span>Students Parliament TV</span>
         </button>
       </div>
     </nav>
@@ -433,6 +437,187 @@
           </div>
         </section>
       </div>
+
+      <!-- ============================================================
+           TAB 5: STUDENTS PARLIAMENT TV (YOUTUBE EMBED & BROADCAST)
+           ============================================================ -->
+      <div class="admin-tab-panel" id="tabPanel-tv">
+        <!-- Master Status & Toggle Card -->
+        <section class="admin-panel-card admin-tv-hero-card" style="margin-bottom: 24px;">
+          <div class="admin-section-header" style="margin-bottom: 8px;">
+            <h2>
+              <span class="admin-header-icon gold">
+                <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12zm-11-2l6-4.5-6-4.5v9z"/></svg>
+              </span>
+              <span>Students Parliament TV Broadcast</span>
+            </h2>
+            <div class="paywall-status-pill disabled" id="tvStatusPill">
+              <span class="status-indicator-dot"></span>
+              <span id="tvStatusText">Broadcast: HIDDEN (Offline)</span>
+            </div>
+          </div>
+          <p style="color: #475569; font-size: 0.9rem; line-height: 1.6; margin: 0 0 16px;">
+            Manage the official video broadcast displayed on the public website. When enabled, the broadcast player appears immediately following the Official Anthem on the homepage. When toggled off, the TV section is completely hidden from public view.
+          </p>
+          <div class="admin-paywall-control-box" style="margin-top: 0; padding-top: 14px; border-top: 1px solid #f1f5f9;">
+            <div style="font-size: 0.85rem; color: #64748b; font-weight: 600;">
+              Public Visibility: <span id="tvVisibilitySummary" style="color: #0f172a; font-weight: 800;">Section is currently HIDDEN</span>
+            </div>
+            <button type="button" class="btn-paywall-toggle" id="btnToggleTvVisibility" data-enabled="false">
+              <span id="btnToggleTvVisibilityLabel">Show on Public Page</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- 2-Column TV Grid: Editor on Left, Live Preview on Right -->
+        <div class="admin-tv-grid">
+          <!-- Left Column: Broadcast Editor Form -->
+          <div class="admin-tv-col-form">
+            <div class="admin-panel-card">
+              <div class="admin-section-header">
+                <h2>
+                  <span class="admin-header-icon blue">
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+                  </span>
+                  <span>Video Source &amp; Embed</span>
+                </h2>
+              </div>
+
+              <!-- YouTube Link / Iframe Input -->
+              <div style="margin-bottom: 18px;">
+                <label for="inputAdminTvVideoUrl" style="display: block; font-size: 0.82rem; font-weight: 800; color: #1e293b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
+                  YouTube Video Link or Embed Code
+                </label>
+                <textarea id="inputAdminTvVideoUrl" rows="3" style="width: 100%; box-sizing: border-box; padding: 10px 14px; border: 2px solid #cbd5e1; border-radius: 8px; font-family: monospace; font-size: 0.88rem; line-height: 1.4; color: #0f172a;" placeholder="Paste YouTube link (https://www.youtube.com/watch?v=... or https://youtu.be/...) or raw <iframe> embed code here"></textarea>
+                
+                <!-- Real-time ID Detection Badge -->
+                <div id="tvDetectedVideoIdBadge" class="admin-tv-id-badge not-detected" style="margin-top: 8px;">
+                  <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  <span id="tvDetectedVideoIdText">No YouTube video detected yet. Paste a link or embed code above.</span>
+                </div>
+              </div>
+
+              <!-- Broadcast Title & Tag/Category Row -->
+              <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 14px; margin-bottom: 18px;">
+                <div>
+                  <label for="inputAdminTvTitle" style="display: block; font-size: 0.82rem; font-weight: 800; color: #1e293b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
+                    Broadcast Title
+                  </label>
+                  <input type="text" id="inputAdminTvTitle" style="width: 100%; box-sizing: border-box; height: 42px; padding: 0 14px; border: 2px solid #cbd5e1; border-radius: 8px; font-weight: 700; font-size: 0.92rem; color: #0f172a;" placeholder="Students Parliament on TV - National Youth Assembly">
+                </div>
+                <div>
+                  <label for="inputAdminTvTag" style="display: block; font-size: 0.82rem; font-weight: 800; color: #1e293b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
+                    Category / Tag
+                  </label>
+                  <input type="text" id="inputAdminTvTag" style="width: 100%; box-sizing: border-box; height: 42px; padding: 0 14px; border: 2px solid #cbd5e1; border-radius: 8px; font-weight: 700; font-size: 0.92rem; color: #0f172a;" placeholder="Official Broadcast">
+                </div>
+              </div>
+
+              <!-- Synopsis / Description -->
+              <div style="margin-bottom: 20px;">
+                <label for="inputAdminTvDesc" style="display: block; font-size: 0.82rem; font-weight: 800; color: #1e293b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
+                  Synopsis / Episode Description
+                </label>
+                <textarea id="inputAdminTvDesc" rows="3" style="width: 100%; box-sizing: border-box; padding: 10px 14px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 0.88rem; line-height: 1.5; color: #0f172a;" placeholder="Tune in to the official Students Parliament broadcast, youth debates, and legislative proceedings."></textarea>
+              </div>
+
+              <!-- Schedule Next Broadcast Box -->
+              <div style="background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 10px; padding: 16px; margin-bottom: 22px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                  <label class="admin-checkbox-item" style="padding: 0; background: none; border: none; cursor: pointer; user-select: none;">
+                    <input type="checkbox" id="checkboxAdminTvSchedule">
+                    <span class="admin-checkbox-box"></span>
+                    <span class="admin-checkbox-label" style="font-size: 0.88rem; font-weight: 800; color: #92400e;">
+                      Display Next Broadcast / Event Notice Banner
+                    </span>
+                  </label>
+                </div>
+                <div>
+                  <label for="inputAdminTvScheduleText" style="display: block; font-size: 0.78rem; font-weight: 700; color: #78350f; margin-bottom: 6px; text-transform: uppercase;">
+                    Schedule Announcement Text
+                  </label>
+                  <input type="text" id="inputAdminTvScheduleText" style="width: 100%; box-sizing: border-box; height: 40px; padding: 0 12px; border: 1.5px solid #fcd34d; border-radius: 7px; background: #ffffff; font-weight: 600; font-size: 0.88rem; color: #78350f;" placeholder="e.g. Next Live Session: Saturday, 10:00 AM WAT • Topic: Constitutional Youth Engagement">
+                </div>
+              </div>
+
+              <!-- Form Action Buttons -->
+              <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: space-between; padding-top: 14px; border-top: 1px solid #e2e8f0;">
+                <button type="button" id="btnDeleteAdminTv" class="btn-admin-danger" style="padding: 11px 18px;">
+                  <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                  <span>Clear / Delete Broadcast</span>
+                </button>
+
+                <button type="button" id="btnSaveAdminTv" class="btn-admin-action" style="padding: 11px 24px;">
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+                  <span>Save Broadcast Changes</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Live Interactive Homepage Preview -->
+          <div class="admin-tv-col-preview">
+            <div class="admin-panel-card" style="position: sticky; top: 90px;">
+              <div class="admin-section-header" style="margin-bottom: 12px;">
+                <h2>
+                  <span class="admin-header-icon green">
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                  </span>
+                  <span>Public Page Live Preview</span>
+                </h2>
+                <span class="admin-tv-preview-pill" id="adminTvPreviewLiveTag">Simulated View</span>
+              </div>
+              <p style="font-size: 0.82rem; color: #64748b; margin-bottom: 14px;">
+                This represents exactly how the broadcast appears to visitors on the homepage:
+              </p>
+
+              <!-- Video Container Frame (16:9) -->
+              <div class="admin-tv-preview-videowrap" id="adminTvPreviewVideowrap">
+                <div class="admin-tv-preview-placeholder" id="adminTvPreviewPlaceholder">
+                  <svg width="48" height="48" fill="none" stroke="#94a3b8" stroke-width="1.6" viewBox="0 0 24 24">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                    <line x1="8" y1="21" x2="16" y2="21"/>
+                    <line x1="12" y1="17" x2="12" y2="21"/>
+                  </svg>
+                  <p style="margin: 8px 0 0; font-size: 0.85rem; color: #64748b; font-weight: 600;">No video configured yet</p>
+                  <span style="font-size: 0.75rem; color: #94a3b8;">Paste a YouTube link or embed code on the left</span>
+                </div>
+                <iframe id="adminTvPreviewIframe" title="Students Parliament TV Preview" style="display: none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+              </div>
+
+              <!-- Live Meta Preview Card below video -->
+              <div class="admin-tv-preview-details" style="margin-top: 14px; padding: 14px; background: #072518; border-radius: 10px; color: #ffffff;">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px;">
+                  <span class="admin-tv-preview-badge" id="adminTvPreviewBadge">Official Broadcast</span>
+                  <span style="font-size: 0.72rem; color: #f7df94; letter-spacing: 0.5px; font-weight: 700; text-transform: uppercase;">Students Parliament TV</span>
+                </div>
+                <h4 id="adminTvPreviewTitle" style="margin: 0 0 6px; font-size: 1.05rem; font-weight: 800; color: #ffffff; line-height: 1.35;">
+                  Students Parliament on TV
+                </h4>
+                <p id="adminTvPreviewDesc" style="margin: 0; font-size: 0.82rem; color: rgba(255,255,255,0.78); line-height: 1.5;">
+                  Tune in to the official Students Parliament broadcast, youth debates, and legislative proceedings.
+                </p>
+
+                <!-- Scheduled Notice Preview Box -->
+                <div id="adminTvPreviewScheduleBanner" style="display: none; margin-top: 10px; background: rgba(205, 164, 52, 0.15); border: 1px solid #cda434; border-radius: 6px; padding: 8px 12px; font-size: 0.78rem; color: #f7df94; font-weight: 600;">
+                  <div style="display: flex; align-items: center; gap: 6px;">
+                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+                    <span id="adminTvPreviewScheduleText">Next Live Session Announcement</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Direct Homepage Anchor Link -->
+              <div style="margin-top: 14px; text-align: center;">
+                <a href="/#tv" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.84rem; font-weight: 700; color: #0b3d23; text-decoration: none;">
+                  <span>Open Homepage Section in New Tab</span>
+                  <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
   </div>
 
@@ -711,9 +896,9 @@
 
   <!-- Shared Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="js/modal-alert.js?v=20261024_v6"></script>
-  <script src="js/cloud-db.js?v=20261024_v6"></script>
-  <script src="js/admin.js?v=20261024_v6"></script>
-  <script src="js/pwa.js?v=20261024_v6"></script>
+  <script src="js/modal-alert.js?v=20261110_tv"></script>
+  <script src="js/cloud-db.js?v=20261110_tv"></script>
+  <script src="js/admin.js?v=20261110_tv"></script>
+  <script src="js/pwa.js?v=20261110_tv"></script>
 </body>
 </html>

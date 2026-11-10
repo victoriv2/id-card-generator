@@ -71,6 +71,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         loadSchoolsDirectory();
       } else if (targetTabId === 'records') {
         renderTable();
+      } else if (targetTabId === 'tv') {
+        loadTvSettings();
       }
     }
   }
@@ -175,6 +177,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 3. Load schools directory immediately
     loadSchoolsDirectory();
+
+    // 4. Load Students Parliament TV settings
+    loadTvSettings();
 
     // 4. Fetch live cards directly from Supabase Cloud Database
     try {
@@ -1294,6 +1299,260 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (e.key === 'Enter') {
         e.preventDefault();
         handleConfirmFactoryReset();
+      }
+    });
+  }
+
+  // -------------------------------------------------------------------------
+  // Students Parliament TV Broadcast Administration
+  // -------------------------------------------------------------------------
+  const tvStatusPill = document.getElementById('tvStatusPill');
+  const tvStatusText = document.getElementById('tvStatusText');
+  const tvVisibilitySummary = document.getElementById('tvVisibilitySummary');
+  const btnToggleTvVisibility = document.getElementById('btnToggleTvVisibility');
+  const btnToggleTvVisibilityLabel = document.getElementById('btnToggleTvVisibilityLabel');
+
+  const inputAdminTvVideoUrl = document.getElementById('inputAdminTvVideoUrl');
+  const tvDetectedVideoIdBadge = document.getElementById('tvDetectedVideoIdBadge');
+  const tvDetectedVideoIdText = document.getElementById('tvDetectedVideoIdText');
+  const inputAdminTvTitle = document.getElementById('inputAdminTvTitle');
+  const inputAdminTvTag = document.getElementById('inputAdminTvTag');
+  const inputAdminTvDesc = document.getElementById('inputAdminTvDesc');
+  const checkboxAdminTvSchedule = document.getElementById('checkboxAdminTvSchedule');
+  const inputAdminTvScheduleText = document.getElementById('inputAdminTvScheduleText');
+
+  const btnSaveAdminTv = document.getElementById('btnSaveAdminTv');
+  const btnDeleteAdminTv = document.getElementById('btnDeleteAdminTv');
+
+  // Preview elements
+  const adminTvPreviewPlaceholder = document.getElementById('adminTvPreviewPlaceholder');
+  const adminTvPreviewIframe = document.getElementById('adminTvPreviewIframe');
+  const adminTvPreviewBadge = document.getElementById('adminTvPreviewBadge');
+  const adminTvPreviewTitle = document.getElementById('adminTvPreviewTitle');
+  const adminTvPreviewDesc = document.getElementById('adminTvPreviewDesc');
+  const adminTvPreviewScheduleBanner = document.getElementById('adminTvPreviewScheduleBanner');
+  const adminTvPreviewScheduleText = document.getElementById('adminTvPreviewScheduleText');
+
+  let activeTvData = CloudDB.getTvBroadcast();
+
+  function updateTvToggleUI(isEnabled) {
+    if (!btnToggleTvVisibility) return;
+    btnToggleTvVisibility.setAttribute('data-enabled', isEnabled ? 'true' : 'false');
+
+    if (tvStatusPill) {
+      tvStatusPill.className = 'paywall-status-pill ' + (isEnabled ? 'active' : 'disabled');
+    }
+    if (tvStatusText) {
+      tvStatusText.textContent = isEnabled
+        ? 'Broadcast: LIVE (Visible on Homepage)'
+        : 'Broadcast: HIDDEN (Offline)';
+    }
+    if (tvVisibilitySummary) {
+      tvVisibilitySummary.textContent = isEnabled
+        ? 'Section is currently LIVE on the homepage'
+        : 'Section is currently HIDDEN';
+      tvVisibilitySummary.style.color = isEnabled ? '#059669' : '#64748b';
+    }
+    if (btnToggleTvVisibilityLabel) {
+      btnToggleTvVisibilityLabel.textContent = isEnabled ? 'Hide from Public Page' : 'Show on Public Page';
+    }
+  }
+
+  function updateLivePreviewFromInputs() {
+    const rawUrl = (inputAdminTvVideoUrl ? inputAdminTvVideoUrl.value : '').trim();
+    const detectedId = CloudDB.extractYouTubeId(rawUrl);
+    const title = (inputAdminTvTitle ? inputAdminTvTitle.value : '').trim() || 'Students Parliament on TV';
+    const tag = (inputAdminTvTag ? inputAdminTvTag.value : '').trim() || 'Official Broadcast';
+    const desc = (inputAdminTvDesc ? inputAdminTvDesc.value : '').trim() || 'Tune in to the official Students Parliament broadcast, youth debates, and legislative proceedings.';
+    const scheduleEnabled = !!(checkboxAdminTvSchedule && checkboxAdminTvSchedule.checked);
+    const scheduleText = (inputAdminTvScheduleText ? inputAdminTvScheduleText.value : '').trim();
+
+    // 1. Update ID Detection Badge
+    if (tvDetectedVideoIdBadge && tvDetectedVideoIdText) {
+      if (detectedId) {
+        tvDetectedVideoIdBadge.className = 'admin-tv-id-badge detected';
+        tvDetectedVideoIdText.textContent = `Valid YouTube Video ID: "${detectedId}" (Ready)`;
+      } else if (rawUrl) {
+        tvDetectedVideoIdBadge.className = 'admin-tv-id-badge not-detected';
+        tvDetectedVideoIdText.textContent = 'Could not detect a valid YouTube video ID from input. Please check link.';
+      } else {
+        tvDetectedVideoIdBadge.className = 'admin-tv-id-badge not-detected';
+        tvDetectedVideoIdText.textContent = 'No YouTube video pasted yet. Paste a link or iframe code above.';
+      }
+    }
+
+    // 2. Update Preview Video Frame
+    if (adminTvPreviewIframe && adminTvPreviewPlaceholder) {
+      if (detectedId) {
+        adminTvPreviewPlaceholder.style.display = 'none';
+        adminTvPreviewIframe.style.display = 'block';
+        const expectedSrc = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(detectedId)}`;
+        if (adminTvPreviewIframe.getAttribute('data-loaded-id') !== detectedId) {
+          adminTvPreviewIframe.src = expectedSrc;
+          adminTvPreviewIframe.setAttribute('data-loaded-id', detectedId);
+        }
+      } else {
+        adminTvPreviewPlaceholder.style.display = 'flex';
+        adminTvPreviewIframe.style.display = 'none';
+        adminTvPreviewIframe.removeAttribute('src');
+        adminTvPreviewIframe.removeAttribute('data-loaded-id');
+      }
+    }
+
+    // 3. Update Preview Metadata
+    if (adminTvPreviewBadge) adminTvPreviewBadge.textContent = tag;
+    if (adminTvPreviewTitle) adminTvPreviewTitle.textContent = title;
+    if (adminTvPreviewDesc) adminTvPreviewDesc.textContent = desc;
+
+    if (adminTvPreviewScheduleBanner && adminTvPreviewScheduleText) {
+      if (scheduleEnabled && scheduleText) {
+        adminTvPreviewScheduleBanner.style.display = 'block';
+        adminTvPreviewScheduleText.textContent = scheduleText;
+      } else {
+        adminTvPreviewScheduleBanner.style.display = 'none';
+      }
+    }
+  }
+
+  function populateTvInputs(data) {
+    if (!data) return;
+    activeTvData = { ...data };
+
+    if (inputAdminTvVideoUrl) inputAdminTvVideoUrl.value = data.videoUrl || (data.videoId ? `https://www.youtube.com/watch?v=${data.videoId}` : '');
+    if (inputAdminTvTitle) inputAdminTvTitle.value = data.title || 'Students Parliament on TV';
+    if (inputAdminTvTag) inputAdminTvTag.value = data.tag || 'Official Broadcast';
+    if (inputAdminTvDesc) inputAdminTvDesc.value = data.description || '';
+    if (checkboxAdminTvSchedule) checkboxAdminTvSchedule.checked = !!data.scheduleEnabled;
+    if (inputAdminTvScheduleText) inputAdminTvScheduleText.value = data.scheduledAt || '';
+
+    updateTvToggleUI(!!data.enabled);
+    updateLivePreviewFromInputs();
+  }
+
+  async function loadTvSettings() {
+    // 1. Instant populate from local storage
+    const localTv = CloudDB.getTvBroadcast();
+    populateTvInputs(localTv);
+
+    // 2. Fetch fresh state from Supabase Cloud
+    try {
+      const cloudTv = await CloudDB.loadTvBroadcast();
+      if (cloudTv) {
+        populateTvInputs(cloudTv);
+      }
+    } catch (e) {
+      console.warn('[Admin] Cloud TV broadcast sync deferred:', e);
+    }
+  }
+
+  // Real-time live input preview listeners
+  if (inputAdminTvVideoUrl) inputAdminTvVideoUrl.addEventListener('input', updateLivePreviewFromInputs);
+  if (inputAdminTvTitle) inputAdminTvTitle.addEventListener('input', updateLivePreviewFromInputs);
+  if (inputAdminTvTag) inputAdminTvTag.addEventListener('input', updateLivePreviewFromInputs);
+  if (inputAdminTvDesc) inputAdminTvDesc.addEventListener('input', updateLivePreviewFromInputs);
+  if (checkboxAdminTvSchedule) checkboxAdminTvSchedule.addEventListener('change', updateLivePreviewFromInputs);
+  if (inputAdminTvScheduleText) inputAdminTvScheduleText.addEventListener('input', updateLivePreviewFromInputs);
+
+  // Toggle Visibility Button
+  if (btnToggleTvVisibility) {
+    btnToggleTvVisibility.addEventListener('click', () => {
+      const isCurrentlyEnabled = btnToggleTvVisibility.getAttribute('data-enabled') === 'true';
+      const newState = !isCurrentlyEnabled;
+
+      if (newState) {
+        const rawUrl = (inputAdminTvVideoUrl ? inputAdminTvVideoUrl.value : '').trim();
+        const detectedId = CloudDB.extractYouTubeId(rawUrl);
+        if (!detectedId) {
+          showModalAlert('Please enter a valid YouTube video link or embed code first so the public page has content to show.', {
+            title: 'Video Required',
+            type: 'warning'
+          });
+          if (inputAdminTvVideoUrl) inputAdminTvVideoUrl.focus();
+          return;
+        }
+      }
+
+      activeTvData.enabled = newState;
+      updateTvToggleUI(newState);
+    });
+  }
+
+  // Save TV Broadcast Button
+  if (btnSaveAdminTv) {
+    btnSaveAdminTv.addEventListener('click', async () => {
+      const rawUrl = (inputAdminTvVideoUrl ? inputAdminTvVideoUrl.value : '').trim();
+      const detectedId = CloudDB.extractYouTubeId(rawUrl);
+      const isEnabled = btnToggleTvVisibility ? (btnToggleTvVisibility.getAttribute('data-enabled') === 'true') : false;
+
+      if (isEnabled && !detectedId) {
+        showModalAlert('Public visibility is enabled, but no valid YouTube video was provided. Please paste a valid YouTube video URL or embed code, or toggle visibility off.', {
+          title: 'Missing YouTube Video',
+          type: 'warning'
+        });
+        if (inputAdminTvVideoUrl) inputAdminTvVideoUrl.focus();
+        return;
+      }
+
+      btnSaveAdminTv.disabled = true;
+      btnSaveAdminTv.innerText = 'Saving Broadcast...';
+
+      try {
+        const payload = {
+          enabled: isEnabled,
+          videoUrl: rawUrl,
+          videoId: detectedId,
+          title: (inputAdminTvTitle ? inputAdminTvTitle.value : '').trim() || 'Students Parliament on TV',
+          tag: (inputAdminTvTag ? inputAdminTvTag.value : '').trim() || 'Official Broadcast',
+          description: (inputAdminTvDesc ? inputAdminTvDesc.value : '').trim(),
+          scheduleEnabled: !!(checkboxAdminTvSchedule && checkboxAdminTvSchedule.checked),
+          scheduledAt: (inputAdminTvScheduleText ? inputAdminTvScheduleText.value : '').trim()
+        };
+
+        const saved = await CloudDB.setTvBroadcast(payload);
+        populateTvInputs(saved);
+
+        showModalAlert(
+          isEnabled
+            ? 'Students Parliament TV broadcast is now SAVED and LIVE on the public website!\n\nVisitors can now watch the video immediately below the Official Anthem.'
+            : 'TV broadcast settings have been saved successfully. The TV section remains HIDDEN on the public website.',
+          {
+            title: isEnabled ? 'Broadcast Live & Published' : 'Settings Saved (Offline Mode)',
+            type: 'success'
+          }
+        );
+      } catch (err) {
+        console.error('[Admin] Save TV broadcast error:', err);
+        showModalAlert(err.message || 'Error saving TV broadcast settings.', { type: 'error' });
+      } finally {
+        btnSaveAdminTv.disabled = false;
+        btnSaveAdminTv.innerText = 'Save Broadcast Changes';
+      }
+    });
+  }
+
+  // Clear / Delete TV Broadcast Button
+  if (btnDeleteAdminTv) {
+    btnDeleteAdminTv.addEventListener('click', async () => {
+      const ok = await showModalConfirm('Are you sure you want to delete and reset the Students Parliament TV broadcast? This will remove the video and immediately hide the TV section from the homepage.', {
+        title: 'Delete TV Broadcast',
+        confirmText: 'Yes, Delete Broadcast',
+        type: 'warning'
+      });
+      if (!ok) return;
+
+      btnDeleteAdminTv.disabled = true;
+
+      try {
+        const cleared = await CloudDB.deleteTvBroadcast();
+        populateTvInputs(cleared);
+        showModalAlert('The TV broadcast has been removed. The TV section is now completely hidden from the public website.', {
+          title: 'Broadcast Cleared',
+          type: 'info'
+        });
+      } catch (err) {
+        showModalAlert(err.message || 'Error deleting TV broadcast.', { type: 'error' });
+      } finally {
+        btnDeleteAdminTv.disabled = false;
       }
     });
   }

@@ -17,7 +17,8 @@
     RECORDS: 'spa_card_records',
     PRICE: 'spa_card_price_ngn',
     PAYWALL_ENABLED: 'spa_paywall_enabled',
-    SCHOOLS: 'spa_schools_branches'
+    SCHOOLS: 'spa_schools_branches',
+    TV_BROADCAST: 'spa_tv_broadcast'
   };
 
   // No hardcoded ready-made schools. Only schools created by the Admin are shown.
@@ -233,6 +234,168 @@
       }
 
       return isEnabled;
+    },
+
+    // -----------------------------------------------------------------------
+    // Students Parliament TV (YouTube Embed & Live Stream Broadcast)
+    // -----------------------------------------------------------------------
+    getDefaultTvBroadcast() {
+      return {
+        enabled: false,
+        videoUrl: '',
+        videoId: '',
+        title: 'Students Parliament on TV',
+        tag: 'Official Broadcast',
+        description: 'Tune in to the official Students Parliament broadcast, youth debates, and legislative proceedings.',
+        scheduledAt: '',
+        scheduleEnabled: false,
+        updatedAt: new Date().toISOString()
+      };
+    },
+
+    /**
+     * Robust extractor supporting:
+     * - Standard URLs: https://www.youtube.com/watch?v=VIDEO_ID
+     * - Short URLs: https://youtu.be/VIDEO_ID
+     * - Embed URLs: https://www.youtube.com/embed/VIDEO_ID
+     * - Live URLs: https://www.youtube.com/live/VIDEO_ID
+     * - Shorts URLs: https://www.youtube.com/shorts/VIDEO_ID
+     * - Iframe embed codes: <iframe ... src="https://www.youtube.com/embed/VIDEO_ID" ...></iframe>
+     * - Raw 11-char YouTube ID
+     */
+    extractYouTubeId(input) {
+      if (!input || typeof input !== 'string') return '';
+      const str = input.trim();
+
+      // Check if raw iframe code was provided: extract src
+      const iframeSrcMatch = str.match(/src=["']([^"']+)["']/i);
+      const target = iframeSrcMatch ? iframeSrcMatch[1] : str;
+
+      const patterns = [
+        /(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:embed\/|v\/|live\/|shorts\/|watch\?v=|watch\?.+&v=))([\w-]{11})/i,
+        /^([\w-]{11})$/
+      ];
+
+      for (const pattern of patterns) {
+        const match = target.match(pattern);
+        if (match && match[1]) {
+          return match[1];
+        }
+      }
+      return '';
+    },
+
+    getTvBroadcast() {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEYS.TV_BROADCAST);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (parsed && typeof parsed === 'object') {
+            return {
+              ...this.getDefaultTvBroadcast(),
+              ...parsed
+            };
+          }
+        }
+      } catch (e) {
+        console.warn('[CloudDB] Failed to parse local TV broadcast data:', e);
+      }
+      return this.getDefaultTvBroadcast();
+    },
+
+    async setTvBroadcast(data = {}) {
+      const current = this.getTvBroadcast();
+      const videoUrl = typeof data.videoUrl === 'string' ? data.videoUrl.trim() : current.videoUrl;
+      const extractedId = this.extractYouTubeId(videoUrl);
+      const videoId = extractedId || (typeof data.videoId === 'string' ? data.videoId.trim() : current.videoId);
+
+      const updated = {
+        ...current,
+        ...data,
+        videoUrl,
+        videoId,
+        title: (data.title !== undefined ? data.title : current.title) || 'Students Parliament on TV',
+        tag: (data.tag !== undefined ? data.tag : current.tag) || 'Official Broadcast',
+        description: data.description !== undefined ? data.description : current.description,
+        scheduledAt: data.scheduledAt !== undefined ? data.scheduledAt : current.scheduledAt,
+        scheduleEnabled: data.scheduleEnabled !== undefined ? !!data.scheduleEnabled : current.scheduleEnabled,
+        enabled: data.enabled !== undefined ? !!data.enabled : current.enabled,
+        updatedAt: new Date().toISOString()
+      };
+
+      // Cache locally
+      try {
+        localStorage.setItem(STORAGE_KEYS.TV_BROADCAST, JSON.stringify(updated));
+      } catch (e) {}
+
+      // Sync to Supabase app_settings
+      try {
+        await supabaseRequest('app_settings', {
+          method: 'POST',
+          headers: { 'Prefer': 'resolution=merge-duplicates,return=representation' },
+          body: JSON.stringify({
+            key: 'spn_tv_broadcast',
+            value: JSON.stringify(updated),
+            updated_at: updated.updatedAt
+          })
+        });
+      } catch (err) {
+        console.warn('[CloudDB] Supabase TV broadcast sync deferred:', err);
+      }
+
+      return updated;
+    },
+
+    async deleteTvBroadcast() {
+      const reset = {
+        ...this.getDefaultTvBroadcast(),
+        enabled: false,
+        videoUrl: '',
+        videoId: '',
+        scheduledAt: '',
+        scheduleEnabled: false,
+        updatedAt: new Date().toISOString()
+      };
+
+      try {
+        localStorage.setItem(STORAGE_KEYS.TV_BROADCAST, JSON.stringify(reset));
+      } catch (e) {}
+
+      try {
+        await supabaseRequest('app_settings', {
+          method: 'POST',
+          headers: { 'Prefer': 'resolution=merge-duplicates,return=representation' },
+          body: JSON.stringify({
+            key: 'spn_tv_broadcast',
+            value: JSON.stringify(reset),
+            updated_at: reset.updatedAt
+          })
+        });
+      } catch (err) {
+        console.warn('[CloudDB] Supabase TV broadcast deletion deferred:', err);
+      }
+
+      return reset;
+    },
+
+    async loadTvBroadcast() {
+      try {
+        const res = await supabaseRequest('app_settings?key=eq.spn_tv_broadcast&select=*');
+        if (Array.isArray(res) && res.length > 0 && res[0].value) {
+          const parsed = JSON.parse(res[0].value);
+          const full = {
+            ...this.getDefaultTvBroadcast(),
+            ...parsed
+          };
+          try {
+            localStorage.setItem(STORAGE_KEYS.TV_BROADCAST, JSON.stringify(full));
+          } catch (e) {}
+          return full;
+        }
+      } catch (err) {
+        console.warn('[CloudDB] Supabase TV broadcast fetch deferred, using local cache:', err);
+      }
+      return this.getTvBroadcast();
     },
 
     // -----------------------------------------------------------------------
@@ -865,6 +1028,10 @@
               }
             } else if (s.key === 'payment_wall_enabled' && s.value !== undefined) {
               localStorage.setItem(STORAGE_KEYS.PAYWALL_ENABLED, s.value === 'false' ? 'false' : 'true');
+            } else if (s.key === 'spn_tv_broadcast' && s.value) {
+              try {
+                localStorage.setItem(STORAGE_KEYS.TV_BROADCAST, s.value);
+              } catch (e) {}
             }
           });
         }
