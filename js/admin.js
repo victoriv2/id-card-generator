@@ -1308,9 +1308,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // -------------------------------------------------------------------------
   const tvStatusPill = document.getElementById('tvStatusPill');
   const tvStatusText = document.getElementById('tvStatusText');
-  const tvVisibilitySummary = document.getElementById('tvVisibilitySummary');
-  const btnToggleTvVisibility = document.getElementById('btnToggleTvVisibility');
-  const btnToggleTvVisibilityLabel = document.getElementById('btnToggleTvVisibilityLabel');
+  const tvToggleCard = document.getElementById('tvToggleCard');
+  const tvToggleDesc = document.getElementById('tvToggleDesc');
+  const checkboxAdminTvEnabled = document.getElementById('checkboxAdminTvEnabled');
 
   const inputAdminTvVideoUrl = document.getElementById('inputAdminTvVideoUrl');
   const tvDetectedVideoIdBadge = document.getElementById('tvDetectedVideoIdBadge');
@@ -1318,8 +1318,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const inputAdminTvTitle = document.getElementById('inputAdminTvTitle');
   const inputAdminTvTag = document.getElementById('inputAdminTvTag');
   const inputAdminTvDesc = document.getElementById('inputAdminTvDesc');
-  const checkboxAdminTvSchedule = document.getElementById('checkboxAdminTvSchedule');
-  const inputAdminTvScheduleText = document.getElementById('inputAdminTvScheduleText');
 
   const btnSaveAdminTv = document.getElementById('btnSaveAdminTv');
   const btnDeleteAdminTv = document.getElementById('btnDeleteAdminTv');
@@ -1330,14 +1328,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   const adminTvPreviewBadge = document.getElementById('adminTvPreviewBadge');
   const adminTvPreviewTitle = document.getElementById('adminTvPreviewTitle');
   const adminTvPreviewDesc = document.getElementById('adminTvPreviewDesc');
-  const adminTvPreviewScheduleBanner = document.getElementById('adminTvPreviewScheduleBanner');
-  const adminTvPreviewScheduleText = document.getElementById('adminTvPreviewScheduleText');
 
   let activeTvData = CloudDB.getTvBroadcast();
 
   function updateTvToggleUI(isEnabled) {
-    if (!btnToggleTvVisibility) return;
-    btnToggleTvVisibility.setAttribute('data-enabled', isEnabled ? 'true' : 'false');
+    if (checkboxAdminTvEnabled) {
+      checkboxAdminTvEnabled.checked = !!isEnabled;
+    }
 
     if (tvStatusPill) {
       tvStatusPill.className = 'paywall-status-pill ' + (isEnabled ? 'active' : 'disabled');
@@ -1347,14 +1344,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         ? 'Broadcast: LIVE (Visible on Homepage)'
         : 'Broadcast: HIDDEN (Offline)';
     }
-    if (tvVisibilitySummary) {
-      tvVisibilitySummary.textContent = isEnabled
-        ? 'Section is currently LIVE on the homepage'
-        : 'Section is currently HIDDEN';
-      tvVisibilitySummary.style.color = isEnabled ? '#059669' : '#64748b';
+
+    if (tvToggleCard) {
+      tvToggleCard.classList.toggle('active', !!isEnabled);
     }
-    if (btnToggleTvVisibilityLabel) {
-      btnToggleTvVisibilityLabel.textContent = isEnabled ? 'Hide from Public Page' : 'Show on Public Page';
+    if (tvToggleDesc) {
+      tvToggleDesc.innerHTML = isEnabled
+        ? 'Broadcast is currently <strong>LIVE &amp; VISIBLE</strong> on the homepage below the Official Anthem.'
+        : 'Broadcast is currently <strong>HIDDEN / OFFLINE</strong> from the homepage. Turn switch ON to publish.';
     }
   }
 
@@ -1364,29 +1361,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     const title = (inputAdminTvTitle ? inputAdminTvTitle.value : '').trim() || 'Students Parliament on TV';
     const tag = (inputAdminTvTag ? inputAdminTvTag.value : '').trim() || 'Official Broadcast';
     const desc = (inputAdminTvDesc ? inputAdminTvDesc.value : '').trim() || 'Tune in to the official Students Parliament broadcast, youth debates, and legislative proceedings.';
-    const scheduleEnabled = !!(checkboxAdminTvSchedule && checkboxAdminTvSchedule.checked);
-    const scheduleText = (inputAdminTvScheduleText ? inputAdminTvScheduleText.value : '').trim();
 
     // 1. Update ID Detection Badge
     if (tvDetectedVideoIdBadge && tvDetectedVideoIdText) {
       if (detectedId) {
         tvDetectedVideoIdBadge.className = 'admin-tv-id-badge detected';
-        tvDetectedVideoIdText.textContent = `Valid YouTube Video ID: "${detectedId}" (Ready)`;
+        tvDetectedVideoIdText.textContent = `Valid YouTube Video ID: "${detectedId}" (Ready to show)`;
       } else if (rawUrl) {
         tvDetectedVideoIdBadge.className = 'admin-tv-id-badge not-detected';
-        tvDetectedVideoIdText.textContent = 'Could not detect a valid YouTube video ID from input. Please check link.';
+        tvDetectedVideoIdText.textContent = 'Could not detect a valid YouTube video ID from input. Please check link or embed code.';
       } else {
         tvDetectedVideoIdBadge.className = 'admin-tv-id-badge not-detected';
         tvDetectedVideoIdText.textContent = 'No YouTube video pasted yet. Paste a link or iframe code above.';
       }
     }
 
-    // 2. Update Preview Video Frame
+    // 2. Update Preview Video Frame (Uses official youtube.com embed URL)
     if (adminTvPreviewIframe && adminTvPreviewPlaceholder) {
       if (detectedId) {
         adminTvPreviewPlaceholder.style.display = 'none';
         adminTvPreviewIframe.style.display = 'block';
-        const expectedSrc = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(detectedId)}`;
+        const expectedSrc = `https://www.youtube.com/embed/${encodeURIComponent(detectedId)}?rel=0`;
         if (adminTvPreviewIframe.getAttribute('data-loaded-id') !== detectedId) {
           adminTvPreviewIframe.src = expectedSrc;
           adminTvPreviewIframe.setAttribute('data-loaded-id', detectedId);
@@ -1403,15 +1398,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (adminTvPreviewBadge) adminTvPreviewBadge.textContent = tag;
     if (adminTvPreviewTitle) adminTvPreviewTitle.textContent = title;
     if (adminTvPreviewDesc) adminTvPreviewDesc.textContent = desc;
-
-    if (adminTvPreviewScheduleBanner && adminTvPreviewScheduleText) {
-      if (scheduleEnabled && scheduleText) {
-        adminTvPreviewScheduleBanner.style.display = 'block';
-        adminTvPreviewScheduleText.textContent = scheduleText;
-      } else {
-        adminTvPreviewScheduleBanner.style.display = 'none';
-      }
-    }
   }
 
   function populateTvInputs(data) {
@@ -1422,10 +1408,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (inputAdminTvTitle) inputAdminTvTitle.value = data.title || 'Students Parliament on TV';
     if (inputAdminTvTag) inputAdminTvTag.value = data.tag || 'Official Broadcast';
     if (inputAdminTvDesc) inputAdminTvDesc.value = data.description || '';
-    if (checkboxAdminTvSchedule) checkboxAdminTvSchedule.checked = !!data.scheduleEnabled;
-    if (inputAdminTvScheduleText) inputAdminTvScheduleText.value = data.scheduledAt || '';
 
-    updateTvToggleUI(!!data.enabled);
+    // If there is a videoId/videoUrl and enabled is not explicitly false, show it
+    const isEnabled = data.enabled !== false && !!(data.videoId || data.videoUrl);
+    updateTvToggleUI(isEnabled);
     updateLivePreviewFromInputs();
   }
 
@@ -1446,34 +1432,26 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Real-time live input preview listeners
-  if (inputAdminTvVideoUrl) inputAdminTvVideoUrl.addEventListener('input', updateLivePreviewFromInputs);
+  if (inputAdminTvVideoUrl) {
+    inputAdminTvVideoUrl.addEventListener('input', () => {
+      // If user is pasting or typing a video and toggle was off, turn it ON automatically
+      const rawUrl = inputAdminTvVideoUrl.value.trim();
+      if (rawUrl && checkboxAdminTvEnabled && !checkboxAdminTvEnabled.checked) {
+        checkboxAdminTvEnabled.checked = true;
+        updateTvToggleUI(true);
+      }
+      updateLivePreviewFromInputs();
+    });
+  }
   if (inputAdminTvTitle) inputAdminTvTitle.addEventListener('input', updateLivePreviewFromInputs);
   if (inputAdminTvTag) inputAdminTvTag.addEventListener('input', updateLivePreviewFromInputs);
   if (inputAdminTvDesc) inputAdminTvDesc.addEventListener('input', updateLivePreviewFromInputs);
-  if (checkboxAdminTvSchedule) checkboxAdminTvSchedule.addEventListener('change', updateLivePreviewFromInputs);
-  if (inputAdminTvScheduleText) inputAdminTvScheduleText.addEventListener('input', updateLivePreviewFromInputs);
 
-  // Toggle Visibility Button
-  if (btnToggleTvVisibility) {
-    btnToggleTvVisibility.addEventListener('click', () => {
-      const isCurrentlyEnabled = btnToggleTvVisibility.getAttribute('data-enabled') === 'true';
-      const newState = !isCurrentlyEnabled;
-
-      if (newState) {
-        const rawUrl = (inputAdminTvVideoUrl ? inputAdminTvVideoUrl.value : '').trim();
-        const detectedId = CloudDB.extractYouTubeId(rawUrl);
-        if (!detectedId) {
-          showModalAlert('Please enter a valid YouTube video link or embed code first so the public page has content to show.', {
-            title: 'Video Required',
-            type: 'warning'
-          });
-          if (inputAdminTvVideoUrl) inputAdminTvVideoUrl.focus();
-          return;
-        }
-      }
-
-      activeTvData.enabled = newState;
-      updateTvToggleUI(newState);
+  // Toggle Switch Change
+  if (checkboxAdminTvEnabled) {
+    checkboxAdminTvEnabled.addEventListener('change', () => {
+      const isChecked = checkboxAdminTvEnabled.checked;
+      updateTvToggleUI(isChecked);
     });
   }
 
@@ -1482,11 +1460,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     btnSaveAdminTv.addEventListener('click', async () => {
       const rawUrl = (inputAdminTvVideoUrl ? inputAdminTvVideoUrl.value : '').trim();
       const detectedId = CloudDB.extractYouTubeId(rawUrl);
-      const isEnabled = btnToggleTvVisibility ? (btnToggleTvVisibility.getAttribute('data-enabled') === 'true') : false;
+      const isEnabled = !!(checkboxAdminTvEnabled && checkboxAdminTvEnabled.checked);
 
-      if (isEnabled && !detectedId) {
-        showModalAlert('Public visibility is enabled, but no valid YouTube video was provided. Please paste a valid YouTube video URL or embed code, or toggle visibility off.', {
-          title: 'Missing YouTube Video',
+      if (!detectedId) {
+        showModalAlert('Please enter a valid YouTube video link or embed code (e.g. from YouTube Share -> Embed, or a watch link).', {
+          title: 'YouTube Video Required',
           type: 'warning'
         });
         if (inputAdminTvVideoUrl) inputAdminTvVideoUrl.focus();
@@ -1503,9 +1481,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           videoId: detectedId,
           title: (inputAdminTvTitle ? inputAdminTvTitle.value : '').trim() || 'Students Parliament on TV',
           tag: (inputAdminTvTag ? inputAdminTvTag.value : '').trim() || 'Official Broadcast',
-          description: (inputAdminTvDesc ? inputAdminTvDesc.value : '').trim(),
-          scheduleEnabled: !!(checkboxAdminTvSchedule && checkboxAdminTvSchedule.checked),
-          scheduledAt: (inputAdminTvScheduleText ? inputAdminTvScheduleText.value : '').trim()
+          description: (inputAdminTvDesc ? inputAdminTvDesc.value : '').trim()
         };
 
         const saved = await CloudDB.setTvBroadcast(payload);
@@ -1513,10 +1489,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         showModalAlert(
           isEnabled
-            ? 'Students Parliament TV broadcast is now SAVED and LIVE on the public website!\n\nVisitors can now watch the video immediately below the Official Anthem.'
-            : 'TV broadcast settings have been saved successfully. The TV section remains HIDDEN on the public website.',
+            ? 'Students Parliament TV is now SAVED and LIVE on the public website!\n\nVisitors can now watch your YouTube broadcast immediately below the Official Anthem.'
+            : 'TV broadcast settings have been saved. The TV section is currently set to HIDDEN on the public website.',
           {
-            title: isEnabled ? 'Broadcast Live & Published' : 'Settings Saved (Offline Mode)',
+            title: isEnabled ? 'Broadcast Published & Live' : 'Settings Saved (Offline Mode)',
             type: 'success'
           }
         );
@@ -1525,7 +1501,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         showModalAlert(err.message || 'Error saving TV broadcast settings.', { type: 'error' });
       } finally {
         btnSaveAdminTv.disabled = false;
-        btnSaveAdminTv.innerText = 'Save Broadcast Changes';
+        btnSaveAdminTv.innerText = 'Save & Publish Changes';
       }
     });
   }

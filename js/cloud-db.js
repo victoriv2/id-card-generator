@@ -241,14 +241,12 @@
     // -----------------------------------------------------------------------
     getDefaultTvBroadcast() {
       return {
-        enabled: false,
+        enabled: true,
         videoUrl: '',
         videoId: '',
         title: 'Students Parliament on TV',
         tag: 'Official Broadcast',
         description: 'Tune in to the official Students Parliament broadcast, youth debates, and legislative proceedings.',
-        scheduledAt: '',
-        scheduleEnabled: false,
         updatedAt: new Date().toISOString()
       };
     },
@@ -267,7 +265,7 @@
       if (!input || typeof input !== 'string') return '';
       const str = input.trim();
 
-      // Check if raw iframe code was provided: extract src
+      // Check if raw iframe code was provided: extract src attribute
       const iframeSrcMatch = str.match(/src=["']([^"']+)["']/i);
       const target = iframeSrcMatch ? iframeSrcMatch[1] : str;
 
@@ -317,8 +315,6 @@
         title: (data.title !== undefined ? data.title : current.title) || 'Students Parliament on TV',
         tag: (data.tag !== undefined ? data.tag : current.tag) || 'Official Broadcast',
         description: data.description !== undefined ? data.description : current.description,
-        scheduledAt: data.scheduledAt !== undefined ? data.scheduledAt : current.scheduledAt,
-        scheduleEnabled: data.scheduleEnabled !== undefined ? !!data.scheduleEnabled : current.scheduleEnabled,
         enabled: data.enabled !== undefined ? !!data.enabled : current.enabled,
         updatedAt: new Date().toISOString()
       };
@@ -352,8 +348,6 @@
         enabled: false,
         videoUrl: '',
         videoId: '',
-        scheduledAt: '',
-        scheduleEnabled: false,
         updatedAt: new Date().toISOString()
       };
 
