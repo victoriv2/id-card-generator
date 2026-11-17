@@ -1077,6 +1077,80 @@
       .btn-contact-team { justify-content: center; }
     }
 
+    @media (max-width: 680px) {
+      .navbar {
+        padding: 0 14px;
+        height: 64px;
+      }
+      .nav-brand {
+        gap: 8px;
+        max-width: calc(100% - 44px);
+      }
+      .nav-logos-group {
+        gap: 6px;
+      }
+      .nav-logo {
+        width: 32px;
+        height: 32px;
+      }
+      .nav-logo-foundation {
+        width: 32px;
+        height: 32px;
+      }
+      .nav-logo-divider {
+        height: 18px;
+      }
+      .nav-brand-text {
+        min-width: 0;
+        overflow: hidden;
+      }
+      .nav-brand-name {
+        font-size: 0.76rem;
+        letter-spacing: 0.02em;
+        line-height: 1.15;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .nav-brand-sub {
+        font-size: 0.62rem;
+        letter-spacing: 0.01em;
+        line-height: 1.15;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: rgba(255, 255, 255, 0.7);
+      }
+    }
+
+    @media (max-width: 400px) {
+      .navbar {
+        padding: 0 10px;
+        height: 60px;
+      }
+      .nav-brand {
+        gap: 6px;
+        max-width: calc(100% - 38px);
+      }
+      .nav-logo {
+        width: 28px;
+        height: 28px;
+      }
+      .nav-logo-foundation {
+        width: 28px;
+        height: 28px;
+      }
+      .nav-logo-divider {
+        height: 16px;
+      }
+      .nav-brand-name {
+        font-size: 0.68rem;
+      }
+      .nav-brand-sub {
+        font-size: 0.58rem;
+      }
+    }
+
     @media (max-width: 560px) {
       .support-hero { padding: 110px 18px 60px; }
       .hero-quick-actions { flex-direction: column; align-items: stretch; }
@@ -1104,7 +1178,7 @@
       </div>
       <div class="nav-brand-text">
         <span class="nav-brand-name">Students Parliament Nigeria</span>
-        <span class="nav-brand-sub">Prince Umanah Foundation Appeal</span>
+        <span class="nav-brand-sub">Prince Umanah Foundation</span>
       </div>
     </a>
 
