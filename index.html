@@ -1718,6 +1718,106 @@
       margin: 14px auto 0;
     }
 
+    /* Students Parliament TV Foundation Appeal Banner */
+    .spn-tv-appeal-banner {
+      max-width: 1020px;
+      margin: 36px auto 0;
+      background: linear-gradient(135deg, rgba(7, 37, 24, 0.95) 0%, rgba(13, 56, 34, 0.95) 100%);
+      border: 1px solid rgba(201, 162, 39, 0.35);
+      border-radius: 14px;
+      padding: 24px 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .spn-tv-appeal-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex: 1 1 500px;
+    }
+
+    .spn-tv-appeal-logo {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 6px;
+      border: 1px solid rgba(201, 162, 39, 0.4);
+      flex-shrink: 0;
+    }
+
+    .spn-tv-appeal-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .spn-tv-appeal-tag {
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      margin-bottom: 4px;
+    }
+
+    .spn-tv-appeal-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 4px;
+    }
+
+    .spn-tv-appeal-desc {
+      font-size: 0.84rem;
+      color: rgba(255, 255, 255, 0.75);
+      line-height: 1.5;
+    }
+
+    .spn-tv-appeal-action {
+      flex-shrink: 0;
+    }
+
+    .btn-tv-appeal {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--gold);
+      color: var(--green-deep) !important;
+      font-weight: 700;
+      font-size: 0.86rem;
+      padding: 11px 22px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background .2s;
+    }
+
+    .btn-tv-appeal:hover {
+      background: var(--gold-light);
+    }
+
+    @media (max-width: 600px) {
+      .spn-tv-appeal-banner {
+        padding: 20px 18px;
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .spn-tv-appeal-left {
+        flex-direction: column;
+        text-align: center;
+      }
+      .btn-tv-appeal {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
     /* =====================================================================
        RESPONSIVE
     ===================================================================== */
@@ -1765,6 +1865,7 @@
   <ul class="nav-links">
     <li><a href="#anthem">Anthem</a></li>
     <li><a href="#tv" id="navLinkTv" style="display: none;">Parliament TV</a></li>
+    <li><a href="donate.html" style="color: var(--gold-light); font-weight: 700;">Support TV</a></li>
     <li><a href="#about">About</a></li>
     <li><a href="#program">Program</a></li>
     <li><a href="#gallery">Gallery</a></li>
@@ -1786,6 +1887,7 @@
 <div class="mobile-nav" id="mobileNav">
   <a href="#anthem" class="mobile-link">Official Anthem</a>
   <a href="#tv" class="mobile-link" id="mobileLinkTv" style="display: none;">Students Parliament TV</a>
+  <a href="donate.html" class="mobile-link" style="color: var(--gold-light); font-weight: 700;">Support TV Program</a>
   <a href="#about" class="mobile-link">About the Program</a>
   <a href="#program" class="mobile-link">Day Speaker Tips</a>
   <a href="#gallery" class="mobile-link">Event Gallery</a>
@@ -2068,6 +2170,26 @@
           referrerpolicy="strict-origin-when-cross-origin"
           allowfullscreen>
         </iframe>
+      </div>
+    </div>
+
+    <!-- Foundation Donor & Sponsorship Appeal Banner -->
+    <div class="spn-tv-appeal-banner">
+      <div class="spn-tv-appeal-left">
+        <img src="image/prince-umanah-foundation-logo.png" alt="Prince Umanah Future Leaders Development Foundation Crest" class="spn-tv-appeal-logo">
+        <div class="spn-tv-appeal-text">
+          <span class="spn-tv-appeal-tag">Donor &amp; Sponsorship Appeal</span>
+          <h3 class="spn-tv-appeal-title">Prince Umanah Future Leaders Development Foundation</h3>
+          <p class="spn-tv-appeal-desc">
+            Raising Tomorrow's Leaders Today. Support our nationwide television broadcasts, interschool parliamentary debates, and youth civic empowerment across Nigeria.
+          </p>
+        </div>
+      </div>
+      <div class="spn-tv-appeal-action">
+        <a href="donate.html" class="btn-tv-appeal">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+          <span>Support This Program</span>
+        </a>
       </div>
     </div>
   </div>
@@ -2606,6 +2728,7 @@
     </div>
     <ul class="footer-links">
       <li><a href="#anthem">Anthem</a></li>
+      <li><a href="donate.html" style="color: var(--gold-light); font-weight: 600;">Support &amp; Donate</a></li>
       <li><a href="#about">About</a></li>
       <li><a href="#gallery">Gallery</a></li>
       <li><a href="#contact">Contact</a></li>

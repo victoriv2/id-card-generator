@@ -1,0 +1,1601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Support Students Parliament Nigeria TV - Prince Umanah Future Leaders Development Foundation</title>
+  <meta name="description" content="Support and sponsor the Students Parliament Nigeria TV Program through the Prince Umanah Future Leaders Development Foundation. Raising Tomorrow's Leaders Today.">
+  <meta property="og:title" content="Support Students Parliament Nigeria TV Program">
+  <meta property="og:description" content="Support the Prince Umanah Future Leaders Development Foundation in empowering Nigerian students with parliamentary debate and civic leadership on television.">
+  <meta property="og:image" content="image/prince-umanah-foundation-logo.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#072518">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green-deep:   #072518;
+      --green-dark:   #0b3d23;
+      --green-mid:    #14532d;
+      --green-light:  #166534;
+      --gold:         #c9a227;
+      --gold-light:   #e4c04a;
+      --gold-pale:    #fdf8ec;
+      --white:        #ffffff;
+      --off-white:    #f8fafc;
+      --gray-50:      #f8fafc;
+      --gray-100:     #f1f5f9;
+      --gray-200:     #e2e8f0;
+      --gray-300:     #cbd5e1;
+      --gray-400:     #94a3b8;
+      --gray-600:     #475569;
+      --gray-700:     #334155;
+      --gray-800:     #1e293b;
+      --text:         #0f172a;
+      --radius:       12px;
+      --radius-lg:    18px;
+      --shadow-sm:    0 1px 3px rgba(0,0,0,.08);
+      --shadow-md:    0 6px 20px rgba(0,0,0,.10);
+      --shadow-lg:    0 16px 45px rgba(0,0,0,.15);
+      --shadow-gold:  0 8px 30px rgba(201,162,39,.22);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--text);
+      background: var(--off-white);
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Prevent any hover transform animations */
+    * {
+      transform: none !important;
+    }
+
+    /* =====================================================================
+       NAVBAR
+    ===================================================================== */
+    .navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      background: rgba(7, 37, 24, 0.98);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(201, 162, 39, 0.22);
+      padding: 0 24px;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    .nav-logos-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-logo {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+    }
+
+    .nav-logo-divider {
+      width: 1px;
+      height: 26px;
+      background: rgba(201, 162, 39, 0.35);
+    }
+
+    .nav-logo-foundation {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    }
+
+    .nav-brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .nav-brand-name {
+      font-family: 'Cinzel', serif;
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: var(--gold-light);
+      letter-spacing: 0.04em;
+      line-height: 1.15;
+    }
+
+    .nav-brand-sub {
+      font-size: 0.68rem;
+      color: rgba(255,255,255,0.65);
+      letter-spacing: 0.02em;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: rgba(255,255,255,0.82);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 8px 14px;
+      border-radius: 6px;
+      transition: color .2s, background .2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--gold-light);
+      background: rgba(201,162,39,0.12);
+    }
+
+    .btn-nav-portal {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(201, 162, 39, 0.15);
+      color: var(--gold-light) !important;
+      border: 1px solid rgba(201, 162, 39, 0.35);
+      font-weight: 600 !important;
+      padding: 8px 16px !important;
+      border-radius: 7px !important;
+      font-size: 0.82rem !important;
+      text-decoration: none;
+      transition: background .2s, border-color .2s;
+    }
+
+    .btn-nav-portal:hover {
+      background: rgba(201, 162, 39, 0.25) !important;
+      border-color: var(--gold-light) !important;
+    }
+
+    .btn-nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--gold);
+      color: var(--green-deep) !important;
+      font-weight: 700 !important;
+      padding: 9px 20px !important;
+      border-radius: 7px !important;
+      font-size: 0.84rem !important;
+      border: none;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background .2s;
+    }
+
+    .btn-nav-cta:hover {
+      background: var(--gold-light) !important;
+      color: var(--green-deep) !important;
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 6px;
+      background: none;
+      border: none;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--gold-light);
+      border-radius: 2px;
+      transition: all .3s;
+    }
+
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      top: 70px; left: 0; right: 0;
+      background: rgba(7, 37, 24, 0.98);
+      border-bottom: 1px solid rgba(201,162,39,0.25);
+      padding: 20px 24px;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 999;
+    }
+
+    .mobile-nav.open { display: flex; }
+
+    .mobile-nav a {
+      color: rgba(255,255,255,0.85);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .mobile-nav a:hover { color: var(--gold-light); }
+
+    /* =====================================================================
+       HERO & APPEAL HEADER
+    ===================================================================== */
+    .support-hero {
+      background: linear-gradient(160deg, var(--green-deep) 0%, var(--green-dark) 50%, #0d3320 100%);
+      padding: 130px 24px 80px;
+      position: relative;
+      overflow: hidden;
+      color: var(--white);
+      text-align: center;
+    }
+
+    .support-hero-pattern {
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 15% 25%, rgba(201,162,39,0.08) 0%, transparent 45%),
+        radial-gradient(circle at 85% 75%, rgba(201,162,39,0.06) 0%, transparent 50%),
+        linear-gradient(180deg, transparent 65%, rgba(0,0,0,0.3) 100%);
+      pointer-events: none;
+    }
+
+    .support-hero-inner {
+      max-width: 860px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .appeal-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(201, 162, 39, 0.15);
+      border: 1px solid rgba(201, 162, 39, 0.35);
+      color: var(--gold-light);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 7px 18px;
+      border-radius: 50px;
+      margin-bottom: 24px;
+    }
+
+    .appeal-badge-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--gold-light);
+    }
+
+    .support-hero h1 {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(2rem, 4.5vw, 3.2rem);
+      font-weight: 800;
+      color: var(--white);
+      line-height: 1.2;
+      margin-bottom: 20px;
+      letter-spacing: 0.02em;
+    }
+
+    .support-hero h1 span {
+      color: var(--gold-light);
+      display: block;
+    }
+
+    .support-hero-desc {
+      font-size: clamp(1rem, 1.8vw, 1.15rem);
+      color: rgba(255, 255, 255, 0.85);
+      max-width: 720px;
+      margin: 0 auto 36px;
+      line-height: 1.7;
+    }
+
+    .hero-quick-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn-hero-donate {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      background: var(--gold);
+      color: var(--green-deep);
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding: 13px 28px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background .2s;
+      box-shadow: 0 4px 20px rgba(201,162,39,0.3);
+    }
+
+    .btn-hero-donate:hover {
+      background: var(--gold-light);
+      color: var(--green-deep);
+    }
+
+    .btn-hero-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.10);
+      color: var(--white);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 13px 26px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background .2s, border-color .2s;
+    }
+
+    .btn-hero-secondary:hover {
+      background: rgba(255, 255, 255, 0.18);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    /* =====================================================================
+       MAIN LAYOUT CONTAINER
+    ===================================================================== */
+    .container {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* =====================================================================
+       FOUNDATION CREST CARD SECTION
+    ===================================================================== */
+    .foundation-card-section {
+      margin-top: -45px;
+      position: relative;
+      z-index: 10;
+      padding-bottom: 50px;
+    }
+
+    .foundation-seal-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(201, 162, 39, 0.35);
+      box-shadow: var(--shadow-lg);
+      padding: 40px 48px;
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 40px;
+      align-items: center;
+      position: relative;
+    }
+
+    .foundation-logo-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px 10px;
+      background: linear-gradient(145deg, #ffffff 0%, #f7f9f7 100%);
+      border-radius: var(--radius);
+      border: 1px solid var(--gray-200);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .foundation-logo-img {
+      width: 100%;
+      max-width: 190px;
+      height: auto;
+      object-fit: contain;
+    }
+
+    .foundation-seal-pill {
+      margin-top: 14px;
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--green-mid);
+      background: rgba(20, 83, 45, 0.08);
+      padding: 4px 12px;
+      border-radius: 30px;
+    }
+
+    .foundation-details {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .foundation-subhead {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 6px;
+    }
+
+    .foundation-title {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+      font-weight: 800;
+      color: var(--green-deep);
+      line-height: 1.25;
+      margin-bottom: 8px;
+    }
+
+    .foundation-motto {
+      font-family: 'Cinzel', serif;
+      font-size: 1.02rem;
+      font-style: italic;
+      font-weight: 600;
+      color: var(--green-mid);
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .foundation-motto::before,
+    .foundation-motto::after {
+      content: '';
+      display: inline-block;
+      width: 24px;
+      height: 1px;
+      background: var(--gold);
+    }
+
+    .foundation-statement {
+      font-size: 0.96rem;
+      color: var(--gray-600);
+      line-height: 1.7;
+      margin-bottom: 22px;
+    }
+
+    .foundation-highlights {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+    }
+
+    .foundation-highlight-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--green-deep);
+      background: rgba(11, 61, 35, 0.05);
+      padding: 6px 14px;
+      border-radius: 6px;
+      border-left: 3px solid var(--gold);
+    }
+
+    .foundation-highlight-item svg {
+      color: var(--gold);
+      flex-shrink: 0;
+    }
+
+    /* =====================================================================
+       DONATION / BANK TRANSFER SPOTLIGHT
+    ===================================================================== */
+    .bank-spotlight-section {
+      padding: 40px 0 80px;
+    }
+
+    .bank-card-outer {
+      background: linear-gradient(135deg, var(--green-deep) 0%, #0d3822 60%, var(--green-dark) 100%);
+      border-radius: var(--radius-lg);
+      padding: 45px 50px;
+      color: var(--white);
+      box-shadow: var(--shadow-gold), 0 20px 40px rgba(7, 37, 24, 0.35);
+      border: 1px solid rgba(201, 162, 39, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bank-card-pattern {
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 90% 20%, rgba(201,162,39,0.12) 0%, transparent 40%),
+        radial-gradient(circle at 10% 80%, rgba(201,162,39,0.08) 0%, transparent 40%);
+      pointer-events: none;
+    }
+
+    .bank-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 35px;
+      position: relative;
+      z-index: 1;
+      flex-wrap: wrap;
+      gap: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      padding-bottom: 24px;
+    }
+
+    .bank-header-left h2 {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(1.4rem, 2.3vw, 1.9rem);
+      font-weight: 800;
+      color: var(--white);
+      margin-bottom: 6px;
+    }
+
+    .bank-header-left p {
+      color: rgba(255, 255, 255, 0.75);
+      font-size: 0.92rem;
+    }
+
+    .bank-badge-verified {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(201, 162, 39, 0.18);
+      border: 1px solid var(--gold);
+      color: var(--gold-light);
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 8px 18px;
+      border-radius: 50px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .bank-details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 28px;
+      position: relative;
+      z-index: 1;
+      margin-bottom: 35px;
+    }
+
+    .bank-detail-box {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius);
+      padding: 22px 24px;
+      transition: background .2s, border-color .2s;
+    }
+
+    .bank-detail-box.featured {
+      background: rgba(201, 162, 39, 0.12);
+      border: 1px solid rgba(201, 162, 39, 0.5);
+      box-shadow: inset 0 0 15px rgba(201, 162, 39, 0.08);
+    }
+
+    .bank-field-label {
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.65);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .bank-detail-box.featured .bank-field-label {
+      color: var(--gold-light);
+    }
+
+    .bank-field-value {
+      font-size: 1.12rem;
+      font-weight: 700;
+      color: var(--white);
+      word-break: break-word;
+    }
+
+    .bank-account-number-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .bank-account-num {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(1.8rem, 3.2vw, 2.4rem);
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      color: var(--gold-light);
+      user-select: all;
+    }
+
+    .btn-copy-account {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--gold);
+      color: var(--green-deep);
+      border: none;
+      padding: 11px 20px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .2s;
+    }
+
+    .btn-copy-account:hover {
+      background: var(--gold-light);
+    }
+
+    .btn-copy-account.copied {
+      background: #10b981;
+      color: var(--white);
+    }
+
+    .bank-card-footer {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+      background: rgba(0, 0, 0, 0.22);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .bank-footer-note {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 0.88rem;
+    }
+
+    .bank-footer-note svg {
+      color: var(--gold-light);
+      flex-shrink: 0;
+    }
+
+    .btn-whatsapp-notify {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      background: #25d366;
+      color: #072518;
+      font-size: 0.88rem;
+      font-weight: 700;
+      padding: 11px 22px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background .2s;
+    }
+
+    .btn-whatsapp-notify:hover {
+      background: #20bd5a;
+      color: #072518;
+    }
+
+    /* =====================================================================
+       WHY YOUR DONATION MATTERS (IMPACT PILLARS)
+    ===================================================================== */
+    .impact-section {
+      padding: 40px 0 80px;
+    }
+
+    .section-header-center {
+      text-align: center;
+      max-width: 720px;
+      margin: 0 auto 50px;
+    }
+
+    .section-label {
+      display: inline-block;
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 8px;
+    }
+
+    .section-title {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(1.6rem, 2.8vw, 2.2rem);
+      font-weight: 800;
+      color: var(--green-deep);
+      line-height: 1.25;
+      margin-bottom: 14px;
+    }
+
+    .gold-divider {
+      width: 50px;
+      height: 3px;
+      background: var(--gold);
+      border-radius: 2px;
+      margin: 0 auto 16px;
+    }
+
+    .section-subtitle {
+      font-size: 1rem;
+      color: var(--gray-600);
+      line-height: 1.65;
+    }
+
+    .impact-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 26px;
+    }
+
+    .impact-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      border: 1px solid var(--gray-200);
+      padding: 32px 26px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    .impact-card:hover {
+      border-color: rgba(201, 162, 39, 0.5);
+      box-shadow: var(--shadow-md);
+    }
+
+    .impact-icon-wrap {
+      width: 52px;
+      height: 52px;
+      border-radius: 10px;
+      background: rgba(11, 61, 35, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      color: var(--green-dark);
+    }
+
+    .impact-card-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.12rem;
+      font-weight: 700;
+      color: var(--green-deep);
+      margin-bottom: 12px;
+      line-height: 1.35;
+    }
+
+    .impact-card-body {
+      font-size: 0.9rem;
+      color: var(--gray-600);
+      line-height: 1.65;
+      flex-grow: 1;
+    }
+
+    /* =====================================================================
+       SPONSORSHIP CATEGORIES / TIERS
+    ===================================================================== */
+    .tiers-section {
+      padding: 40px 0 80px;
+      background: var(--white);
+      border-top: 1px solid var(--gray-200);
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .tiers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+    }
+
+    .tier-box {
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 30px 24px;
+      background: var(--off-white);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .tier-box.featured-tier {
+      background: var(--white);
+      border: 2px solid var(--gold);
+      box-shadow: var(--shadow-md);
+    }
+
+    .tier-ribbon {
+      position: absolute;
+      top: -12px;
+      left: 24px;
+      background: var(--gold);
+      color: var(--green-deep);
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      border-radius: 30px;
+    }
+
+    .tier-header {
+      margin-bottom: 16px;
+    }
+
+    .tier-name {
+      font-family: 'Cinzel', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--green-deep);
+      margin-bottom: 6px;
+    }
+
+    .tier-focus {
+      font-size: 0.8rem;
+      color: var(--gold);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .tier-desc {
+      font-size: 0.88rem;
+      color: var(--gray-600);
+      line-height: 1.6;
+      margin-bottom: 20px;
+      flex-grow: 1;
+    }
+
+    .tier-benefits {
+      list-style: none;
+      margin-bottom: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .tier-benefits li {
+      font-size: 0.84rem;
+      color: var(--gray-700);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      line-height: 1.45;
+    }
+
+    .tier-benefits li svg {
+      color: var(--green-mid);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .btn-tier-select {
+      display: block;
+      width: 100%;
+      text-align: center;
+      padding: 10px 16px;
+      border-radius: 7px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: background .2s;
+      background: rgba(11, 61, 35, 0.08);
+      color: var(--green-deep);
+      border: 1px solid rgba(11, 61, 35, 0.2);
+    }
+
+    .btn-tier-select:hover {
+      background: var(--green-deep);
+      color: var(--gold-light);
+    }
+
+    .tier-box.featured-tier .btn-tier-select {
+      background: var(--gold);
+      color: var(--green-deep);
+      border: none;
+    }
+
+    .tier-box.featured-tier .btn-tier-select:hover {
+      background: var(--gold-light);
+    }
+
+    /* =====================================================================
+       CONFIRMATION & TRANSPARENCY NOTICE
+    ===================================================================== */
+    .transparency-section {
+      padding: 70px 0;
+    }
+
+    .transparency-card {
+      background: linear-gradient(145deg, #ffffff 0%, #f7f9f7 100%);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      padding: 36px 40px;
+      box-shadow: var(--shadow-sm);
+      display: grid;
+      grid-template-columns: 80px 1fr auto;
+      gap: 30px;
+      align-items: center;
+    }
+
+    .transparency-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(201, 162, 39, 0.14);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gold);
+    }
+
+    .transparency-text h3 {
+      font-family: 'Cinzel', serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--green-deep);
+      margin-bottom: 6px;
+    }
+
+    .transparency-text p {
+      font-size: 0.92rem;
+      color: var(--gray-600);
+      line-height: 1.6;
+    }
+
+    .btn-contact-team {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--green-deep);
+      color: var(--gold-light);
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: background .2s;
+      white-space: nowrap;
+    }
+
+    .btn-contact-team:hover {
+      background: var(--green-dark);
+      color: var(--white);
+    }
+
+    /* =====================================================================
+       FOOTER
+    ===================================================================== */
+    footer {
+      background: var(--green-deep);
+      border-top: 1px solid rgba(201,162,39,0.2);
+      padding: 40px 24px;
+      color: rgba(255,255,255,0.7);
+      font-size: 0.82rem;
+    }
+
+    .footer-inner {
+      max-width: 1140px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .footer-logo {
+      width: 34px;
+      height: 34px;
+      object-fit: contain;
+    }
+
+    .footer-brand-name {
+      font-family: 'Cinzel', serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--gold-light);
+    }
+
+    .footer-copy {
+      color: rgba(255,255,255,0.55);
+      font-size: 0.8rem;
+    }
+
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      list-style: none;
+    }
+
+    .footer-links a {
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      font-size: 0.82rem;
+      transition: color .2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--gold-light);
+    }
+
+    /* =====================================================================
+       RESPONSIVE ADJUSTMENTS
+    ===================================================================== */
+    @media (max-width: 900px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .foundation-seal-card {
+        grid-template-columns: 1fr;
+        text-align: center;
+        padding: 32px 24px;
+      }
+      .foundation-motto { justify-content: center; }
+      .foundation-highlights { justify-content: center; }
+      .bank-card-outer { padding: 32px 24px; }
+      .transparency-card {
+        grid-template-columns: 1fr;
+        text-align: center;
+        padding: 30px 24px;
+      }
+      .transparency-icon { margin: 0 auto; }
+      .btn-contact-team { justify-content: center; }
+    }
+
+    @media (max-width: 560px) {
+      .support-hero { padding: 110px 18px 60px; }
+      .hero-quick-actions { flex-direction: column; align-items: stretch; }
+      .btn-hero-donate, .btn-hero-secondary { justify-content: center; }
+      .bank-account-number-row { flex-direction: column; align-items: flex-start; }
+      .btn-copy-account { width: 100%; justify-content: center; }
+      .bank-card-footer { flex-direction: column; align-items: stretch; }
+      .btn-whatsapp-notify { justify-content: center; }
+      .footer-inner { flex-direction: column; text-align: center; }
+      .footer-links { flex-wrap: wrap; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- =========================================================
+       NAVBAR
+  ========================================================= -->
+  <nav class="navbar" id="navbar">
+    <a href="index.html" class="nav-brand">
+      <div class="nav-logos-group">
+        <img src="image/image-3.png" alt="Students Parliament Nigeria Logo" class="nav-logo">
+        <div class="nav-logo-divider"></div>
+        <img src="image/prince-umanah-foundation-logo.png" alt="Prince Umanah Foundation Crest" class="nav-logo-foundation">
+      </div>
+      <div class="nav-brand-text">
+        <span class="nav-brand-name">Students Parliament Nigeria</span>
+        <span class="nav-brand-sub">Prince Umanah Foundation Appeal</span>
+      </div>
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="index.html#anthem">Anthem</a></li>
+      <li><a href="index.html#tv">Parliament TV</a></li>
+      <li><a href="index.html#about">About Program</a></li>
+      <li><a href="id-portal.html" class="btn-nav-portal">ID Card Portal</a></li>
+      <li><a href="#bank-account" class="btn-nav-cta">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+        Bank Details
+      </a></li>
+    </ul>
+
+    <button class="hamburger" id="hamburger" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- Mobile Nav -->
+  <div class="mobile-nav" id="mobileNav">
+    <a href="index.html">Main Website</a>
+    <a href="index.html#anthem">Official Anthem</a>
+    <a href="index.html#tv">Students Parliament TV</a>
+    <a href="index.html#about">About the Program</a>
+    <a href="id-portal.html">Generate ID Card</a>
+    <a href="#bank-account">Zenith Bank Details</a>
+  </div>
+
+  <!-- =========================================================
+       HERO / APPEAL HEADER
+  ========================================================= -->
+  <header class="support-hero">
+    <div class="support-hero-pattern"></div>
+    <div class="support-hero-inner">
+      <div class="appeal-badge">
+        <span class="appeal-badge-dot"></span>
+        <span>Official Foundation Donor &amp; Sponsorship Appeal</span>
+      </div>
+
+      <h1>
+        Support the Students Parliament
+        <span>Nigeria TV Program</span>
+      </h1>
+
+      <p class="support-hero-desc">
+        Empowering young minds across Nigerian secondary schools with hands-on parliamentary proceedings, civic responsibility, and televised debate on national television.
+      </p>
+
+      <div class="hero-quick-actions">
+        <a href="#bank-account" class="btn-hero-donate">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+          <span>View Bank Details</span>
+        </a>
+        <a href="https://wa.me/2348088882028?text=Hello%2C%20I%20would%20like%20to%20support%2Fpartner%20with%20the%20Prince%20Umanah%20Future%20Leaders%20Development%20Foundation%20for%20the%20Students%20Parliament%20Nigeria%20TV%20program." target="_blank" rel="noopener noreferrer" class="btn-hero-secondary">
+          <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2zm.01 18.06c-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.13 8.13 0 0 1-1.25-4.29c0-4.5 3.66-8.16 8.17-8.16 2.18 0 4.23.85 5.77 2.39a8.1 8.1 0 0 1 2.4 5.77c-.01 4.5-3.67 8.15-8.16 8.15z"/></svg>
+          <span>Contact via WhatsApp</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================
+       FOUNDATION CREST CARD SPOTLIGHT
+  ========================================================= -->
+  <section class="foundation-card-section">
+    <div class="container">
+      <div class="foundation-seal-card">
+        <div class="foundation-logo-wrap">
+          <img src="image/prince-umanah-foundation-logo.png" alt="Prince Umanah Future Leaders Development Foundation Official Crest" class="foundation-logo-img">
+          <span class="foundation-seal-pill">Official Foundation</span>
+        </div>
+
+        <div class="foundation-details">
+          <span class="foundation-subhead">Partnering For Youth Leadership</span>
+          <h2 class="foundation-title">Prince Umanah Future Leaders Development Foundation</h2>
+          <div class="foundation-motto">Raising Tomorrow's Leaders Today</div>
+
+          <p class="foundation-statement">
+            The Prince Umanah Future Leaders Development Foundation is dedicated to identifying, mentoring, and equipping young Nigerians with democratic values, legislative knowledge, and self-confidence. Through our flagship sponsorship of the <strong>Students Parliament Nigeria TV Program</strong>, we bridge the gap between classroom civics and real-world national governance.
+          </p>
+
+          <div class="foundation-highlights">
+            <div class="foundation-highlight-item">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Parliamentary Education</span>
+            </div>
+            <div class="foundation-highlight-item">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Youth Public Speaking</span>
+            </div>
+            <div class="foundation-highlight-item">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Televised Interschool Debates</span>
+            </div>
+            <div class="foundation-highlight-item">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>National Civic Leadership</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       BANK TRANSFER SPOTLIGHT CARD
+  ========================================================= -->
+  <section class="bank-spotlight-section" id="bank-account">
+    <div class="container">
+      <div class="bank-card-outer">
+        <div class="bank-card-pattern"></div>
+
+        <div class="bank-card-header">
+          <div class="bank-header-left">
+            <h2>Official Foundation Bank Details</h2>
+            <p>Direct bank transfers, donor contributions, and corporate sponsorships.</p>
+          </div>
+          <div class="bank-badge-verified">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            <span>Verified Foundation Account</span>
+          </div>
+        </div>
+
+        <div class="bank-details-grid">
+          <!-- Bank Name -->
+          <div class="bank-detail-box">
+            <div class="bank-field-label">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+              <span>Bank Name</span>
+            </div>
+            <div class="bank-field-value">Zenith Bank Plc</div>
+          </div>
+
+          <!-- Account Name -->
+          <div class="bank-detail-box">
+            <div class="bank-field-label">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              <span>Account Name</span>
+            </div>
+            <div class="bank-field-value">PRINCE UMANAH FUTURE LEADERS DEVELOPMENT FOUNDATION</div>
+          </div>
+
+          <!-- Account Number (Featured with 1-Click Copy) -->
+          <div class="bank-detail-box featured" style="grid-column: 1 / -1;">
+            <div class="bank-field-label">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+              <span>Official Account Number (NUBAN)</span>
+            </div>
+            <div class="bank-account-number-row">
+              <div class="bank-account-num" id="accountNumberText">1312692082</div>
+              <button class="btn-copy-account" id="btnCopyAccount" type="button" aria-label="Copy Account Number">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" id="copyIcon"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                <span id="copyButtonLabel">Copy Account Number</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Purpose / Narration Tag -->
+          <div class="bank-detail-box">
+            <div class="bank-field-label">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+              <span>Payment Purpose / Narration</span>
+            </div>
+            <div class="bank-field-value">Support Students Parliament TV</div>
+          </div>
+
+          <!-- Target Impact -->
+          <div class="bank-detail-box">
+            <div class="bank-field-label">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              <span>Scope of Impact</span>
+            </div>
+            <div class="bank-field-value">Nationwide School Debates &amp; TV Broadcast</div>
+          </div>
+        </div>
+
+        <div class="bank-card-footer">
+          <div class="bank-footer-note">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <span>After your transfer, kindly notify our team with your payment confirmation so we can issue your official foundation acknowledgment.</span>
+          </div>
+
+          <a href="https://wa.me/2348088882028?text=Hello%2C%20I%20have%20transferred%20a%20donation%20to%20the%20PRINCE%20UMANAH%20FUTURE%20LEADERS%20DEVELOPMENT%20FOUNDATION%20(Zenith%20Bank%201312692082)%20to%20support%20Students%20Parliament%20Nigeria%20TV.%20Here%20is%20my%20payment%20confirmation." target="_blank" rel="noopener noreferrer" class="btn-whatsapp-notify">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2zm.01 18.06c-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.13 8.13 0 0 1-1.25-4.29c0-4.5 3.66-8.16 8.17-8.16 2.18 0 4.23.85 5.77 2.39a8.1 8.1 0 0 1 2.4 5.77c-.01 4.5-3.67 8.15-8.16 8.15z"/></svg>
+            <span>Notify Us via WhatsApp</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       WHY YOUR DONATION MATTERS (IMPACT PILLARS)
+  ========================================================= -->
+  <section class="impact-section">
+    <div class="container">
+      <div class="section-header-center">
+        <span class="section-label">Targeted Impact</span>
+        <h2 class="section-title">Where Your Support Goes</h2>
+        <div class="gold-divider"></div>
+        <p class="section-subtitle">
+          Every contribution directly finances vital aspects of the Students Parliament program, giving young Nigerian students the platform they need to excel.
+        </p>
+      </div>
+
+      <div class="impact-grid">
+        <!-- 1. Television Broadcast & Production -->
+        <div class="impact-card">
+          <div class="impact-icon-wrap">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+          </div>
+          <h3 class="impact-card-title">Televised Studio Broadcasts</h3>
+          <p class="impact-card-body">
+            Funds camera production, sound engineering, multi-angle coverage, and airtime broadcast so school parliamentary debates reach living rooms across Nigeria.
+          </p>
+        </div>
+
+        <!-- 2. School Chambers & Debate Logistics -->
+        <div class="impact-card">
+          <div class="impact-icon-wrap">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          </div>
+          <h3 class="impact-card-title">Interschool Parliamentary Contests</h3>
+          <p class="impact-card-body">
+            Sponsors student delegations, interschool legislative tourneys, debate maces, and transportation for student parliamentarians visiting official assemblies.
+          </p>
+        </div>
+
+        <!-- 3. Leadership Mentorship & Civic Kits -->
+        <div class="impact-card">
+          <div class="impact-icon-wrap">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+          </div>
+          <h3 class="impact-card-title">Civic Literacy &amp; Leadership Kits</h3>
+          <p class="impact-card-body">
+            Supplies legislative rulebooks, public speaking guides, and constitution handbooks to establish vibrant Students Parliament Clubs in government and private secondary schools.
+          </p>
+        </div>
+
+        <!-- 4. Recognition & Day Parliamentarian Prizes -->
+        <div class="impact-card">
+          <div class="impact-icon-wrap">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+          </div>
+          <h3 class="impact-card-title">Day Parliamentarian Awards</h3>
+          <p class="impact-card-body">
+            Honors standout student speakers with medals, leadership certificates, and the prestigious opportunity to serve as an honorary Day Speaker or Day Parliamentarian.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       SPONSORSHIP CATEGORIES / TIERS
+  ========================================================= -->
+  <section class="tiers-section">
+    <div class="container">
+      <div class="section-header-center">
+        <span class="section-label">Partnership Options</span>
+        <h2 class="section-title">Donor &amp; Sponsorship Categories</h2>
+        <div class="gold-divider"></div>
+        <p class="section-subtitle">
+          Individuals, philanthropists, educational advocates, and corporate organizations are warmly invited to choose a sponsorship category or give any voluntary amount.
+        </p>
+      </div>
+
+      <div class="tiers-grid">
+        <!-- Tier 1 -->
+        <div class="tier-box">
+          <div class="tier-header">
+            <h3 class="tier-name">Friend of the Parliament</h3>
+            <span class="tier-focus">Voluntary Donor</span>
+          </div>
+          <p class="tier-desc">Open contribution of any amount to support student debate kits, school supplies, and program materials.</p>
+          <ul class="tier-benefits">
+            <li>
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Donor acknowledgment on our roll of honor</span>
+            </li>
+            <li>
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Official digital certificate of appreciation</span>
+            </li>
+            <li>
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Quarterly program impact newsletter</span>
+            </li>
+          </ul>
+          <a href="#bank-account" class="btn-tier-select">Donate Any Amount</a>
+        </div>
+
+        <!-- Tier 2 -->
+        <div class="tier-box">
+          <div class="tier-header">
+            <h3 class="tier-name">School Chapter Sponsor</h3>
+            <span class="tier-focus">Grassroots Education</span>
+          </div>
+          <p class="tier-desc">Sponsors a full secondary school delegation, providing ID cards, debate materials, and assembly travel.</p>
+          <ul class="tier-benefits">
+            <li>
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Sponsors 1 public or rural school delegation</span>
+            </li>
+            <li>
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>On-screen mention during school debate round</span>
+            </li>
+            <li>
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>VIP invite to interschool debate finals</span>
+            </li>
+          </ul>
+          <a href="#bank-account" class="btn-tier-select">Sponsor a School</a>
+        </div>
+
+        <!-- Tier 3 (Featured) -->
+        <div class="tier-box featured-tier">
+          <div class="tier-ribbon">Recommended</div>
+          <div class="tier-header">
+            <h3 class="tier-name">TV Broadcast Patron</h3>
+            <span class="tier-focus">Television Production</span>
+          </div>
+          <p class="tier-desc">Underwrites television recording airtime, studio production, and national broadcasting of youth legislative sessions.</p>
+          <ul class="tier-benefits">
+            <li>
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Televised sponsor mention during episode credits</span>
+            </li>
+            <li>
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Logo &amp; patron recognition on website TV portal</span>
+            </li>
+            <li>
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Official Foundation Patron Plaque</span>
+            </li>
+          </ul>
+          <a href="#bank-account" class="btn-tier-select">Become a Broadcast Patron</a>
+        </div>
+
+        <!-- Tier 4 -->
+        <div class="tier-box">
+          <div class="tier-header">
+            <h3 class="tier-name">Corporate Partner</h3>
+            <span class="tier-focus">Strategic Alliance</span>
+          </div>
+          <p class="tier-desc">Comprehensive brand alliance supporting state-wide tours, scholarship prizes, and high-level youth parliamentary summits.</p>
+          <ul class="tier-benefits">
+            <li>
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Prominent brand integration on TV broadcast &amp; website</span>
+            </li>
+            <li>
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Award presentation during national parliamentary summit</span>
+            </li>
+            <li>
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Executive partnership memorandum with Foundation</span>
+            </li>
+          </ul>
+          <a href="https://wa.me/2348088882028?text=Hello%2C%20our%20organization%20would%20like%20to%20discuss%20a%20Corporate%20Partnership%20with%20the%20Prince%20Umanah%20Future%20Leaders%20Development%20Foundation%20for%20the%20Students%20Parliament%20Nigeria%20TV%20program." target="_blank" rel="noopener noreferrer" class="btn-tier-select">Partner With Us</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       TRANSPARENCY & ACKNOWLEDGMENT NOTICE
+  ========================================================= -->
+  <section class="transparency-section">
+    <div class="container">
+      <div class="transparency-card">
+        <div class="transparency-icon">
+          <svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        </div>
+
+        <div class="transparency-text">
+          <h3>Integrity, Acknowledgment &amp; Accountability</h3>
+          <p>
+            The Prince Umanah Future Leaders Development Foundation operates with complete dedication to youth advancement. Every contribution is deployed directly to student television production, awards, and school outreach. Official receipts and letters of appreciation are issued for every donation.
+          </p>
+        </div>
+
+        <div>
+          <a href="tel:08088882028" class="btn-contact-team">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 3.07 8.67 19.79 19.79 0 0 1 .03 2.1 2 2 0 0 1 2 0h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L6.09 7.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 14v2.92z"></path></svg>
+            <span>Call 08088882028</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       FOOTER
+  ========================================================= -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <img src="image/image-3.png" alt="Students Parliament Nigeria Logo" class="footer-logo">
+        <span class="footer-brand-name">Students Parliament Nigeria</span>
+      </div>
+
+      <div class="footer-copy">
+        &copy; 2026 Students Parliament Nigeria &amp; Prince Umanah Future Leaders Development Foundation. All rights reserved.
+      </div>
+
+      <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="index.html#anthem">Anthem</a></li>
+        <li><a href="index.html#tv">Parliament TV</a></li>
+        <li><a href="id-portal.html">ID Portal</a></li>
+        <li><a href="#bank-account">Zenith Bank Details</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <!-- =========================================================
+       SCRIPTS: 1-Click Copy & Mobile Nav
+  ========================================================= -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // 1. Mobile Menu Toggle
+      var hamburger = document.getElementById('hamburger');
+      var mobileNav = document.getElementById('mobileNav');
+      if (hamburger && mobileNav) {
+        hamburger.addEventListener('click', function () {
+          mobileNav.classList.toggle('open');
+        });
+        document.querySelectorAll('.mobile-nav a').forEach(function (link) {
+          link.addEventListener('click', function () {
+            mobileNav.classList.remove('open');
+          });
+        });
+      }
+
+      // 2. One-Click Copy Account Number to Clipboard
+      var btnCopy = document.getElementById('btnCopyAccount');
+      var accText = document.getElementById('accountNumberText');
+      var copyLabel = document.getElementById('copyButtonLabel');
+      var copyIcon = document.getElementById('copyIcon');
+
+      if (btnCopy && accText) {
+        btnCopy.addEventListener('click', function () {
+          var numberToCopy = accText.textContent.trim().replace(/\s+/g, '');
+
+          function showSuccess() {
+            btnCopy.classList.add('copied');
+            if (copyLabel) copyLabel.textContent = 'Copied to Clipboard!';
+            if (copyIcon) {
+              copyIcon.innerHTML = '<polyline points="20 6 9 17 4 12"></polyline>';
+            }
+            setTimeout(function () {
+              btnCopy.classList.remove('copied');
+              if (copyLabel) copyLabel.textContent = 'Copy Account Number';
+              if (copyIcon) {
+                copyIcon.innerHTML = '<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>';
+              }
+            }, 3000);
+          }
+
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(numberToCopy).then(showSuccess).catch(function () {
+              fallbackCopy(numberToCopy);
+            });
+          } else {
+            fallbackCopy(numberToCopy);
+          }
+
+          function fallbackCopy(text) {
+            var tempInput = document.createElement('input');
+            tempInput.value = text;
+            tempInput.style.position = 'fixed';
+            tempInput.style.opacity = '0';
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            try {
+              document.execCommand('copy');
+              showSuccess();
+            } catch (e) {
+              alert('Account number: ' + text);
+            }
+            document.body.removeChild(tempInput);
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
