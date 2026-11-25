@@ -51,7 +51,7 @@
       if (typeof window !== 'undefined' && 'caches' in window) {
         caches.keys().then(keys => {
           keys.forEach(k => {
-            if (k !== 'spn-pwa-v6') {
+            if (k !== 'spn-pwa-v8') {
               caches.delete(k);
             }
           });
