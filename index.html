@@ -1249,6 +1249,154 @@
       line-height: 1.3;
     }
 
+    /* =====================================================================
+       SCHOOL PARLIAMENT CLUBS CARDS
+    ===================================================================== */
+    .school-clubs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 22px;
+    }
+
+    .school-club-card {
+      background: var(--white);
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--gray-200);
+      box-shadow: 0 4px 16px rgba(7, 37, 24, 0.06);
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      transform: none !important;
+      transition: border-color .2s ease, box-shadow .2s ease;
+    }
+
+    .school-club-card:hover {
+      border-color: rgba(228, 192, 74, 0.6);
+      box-shadow: 0 8px 24px rgba(7, 37, 24, 0.12);
+    }
+
+    .school-club-img-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #072518;
+      overflow: hidden;
+    }
+
+    .school-club-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform .35s ease;
+    }
+
+    .school-club-card:hover .school-club-img-wrap img {
+      transform: scale(1.03);
+    }
+
+    .school-club-zoom-badge {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(7, 37, 24, 0.88);
+      backdrop-filter: blur(4px);
+      color: #e4c04a;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border: 1px solid rgba(228, 192, 74, 0.35);
+      pointer-events: none;
+    }
+
+    .school-club-info {
+      padding: 18px 20px 22px;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .school-club-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .school-badge {
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      padding: 4px 11px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .badge-district-ii {
+      background: #e6f4ea;
+      color: #137333;
+      border: 1px solid #a8dab5;
+    }
+
+    .badge-district-iii {
+      background: #e8f0fe;
+      color: #1a73e8;
+      border: 1px solid #b6d4fe;
+    }
+
+    .badge-private {
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #fde68a;
+    }
+
+    .school-club-name {
+      font-family: 'Cinzel', serif;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--green-dark);
+      margin: 0 0 4px;
+      line-height: 1.35;
+    }
+
+    .school-club-role {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #b45309;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    .school-club-caption {
+      font-size: 0.83rem;
+      color: var(--gray-600);
+      line-height: 1.48;
+      margin: 0;
+      flex-grow: 1;
+    }
+
+    @media (max-width: 640px) {
+      .school-clubs-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      .school-club-info {
+        padding: 14px 16px 18px;
+      }
+      .school-club-name {
+        font-size: 0.98rem;
+      }
+    }
+
     /* Lightbox */
     .lightbox {
       display: none;
@@ -2438,14 +2586,154 @@
     <p class="section-subtitle">A glimpse into the energy, prestige, and purpose behind every Students Parliament session — from plenary debates to medal ceremonies.</p>
 
     <div class="gallery-tabs">
-      <button class="gallery-tab active" data-event="ev1">Parliamentary Sessions</button>
+      <button class="gallery-tab active" data-event="ev-schools">School Parliament Clubs</button>
+      <button class="gallery-tab" data-event="ev1">Parliamentary Sessions</button>
       <button class="gallery-tab" data-event="ev2">Students Parliament on TV</button>
       <button class="gallery-tab" data-event="ev3">Medal Award Ceremony</button>
       <button class="gallery-tab" data-event="ev4">Senate Chamber Plenary</button>
     </div>
 
+    <!-- Event: School Parliament Clubs -->
+    <div class="gallery-event active" id="gallery-ev-schools">
+      <div class="gallery-event-header">
+        <h3 class="gallery-event-title">School Parliament Clubs</h3>
+        <p class="gallery-event-caption">
+          Empowering student parliamentarians across Lagos State public education districts and approved private schools — cultivating debate skills, democratic ethics, and leadership in school clubs.
+        </p>
+      </div>
+      <div class="school-clubs-grid">
+
+        <!-- 1. Isheri Grammar School -->
+        <div class="school-club-card" onclick="openLightbox(this)" data-src="gallery/school-isheri.jpeg" data-caption="Isheri Grammar School — Students Parliament Club (Education District II, Lagos State)">
+          <div class="school-club-img-wrap">
+            <img src="gallery/school-isheri.jpeg" alt="Isheri Grammar School Students Parliament Club" loading="lazy">
+            <div class="school-club-zoom-badge">
+              <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+              <span>View Photo</span>
+            </div>
+          </div>
+          <div class="school-club-info">
+            <div class="school-club-meta">
+              <span class="school-badge badge-district-ii">Education District II</span>
+            </div>
+            <h4 class="school-club-name">Isheri Grammar School</h4>
+            <div class="school-club-role">Students Parliament Club</div>
+            <p class="school-club-caption">
+              Active student parliamentarians in Lagos State Education District II cultivating chamber decorum, civic responsibility, and debate excellence.
+            </p>
+          </div>
+        </div>
+
+        <!-- 2. Vincollins Schools -->
+        <div class="school-club-card" onclick="openLightbox(this)" data-src="gallery/school-vincollins.jpeg" data-caption="Vincollins Schools — Students Parliament Club (Private School Chapter)">
+          <div class="school-club-img-wrap">
+            <img src="gallery/school-vincollins.jpeg" alt="Vincollins Schools Students Parliament Club" loading="lazy">
+            <div class="school-club-zoom-badge">
+              <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+              <span>View Photo</span>
+            </div>
+          </div>
+          <div class="school-club-info">
+            <div class="school-club-meta">
+              <span class="school-badge badge-private">Private School</span>
+            </div>
+            <h4 class="school-club-name">Vincollins Schools</h4>
+            <div class="school-club-role">Students Parliament Club</div>
+            <p class="school-club-caption">
+              An inspiring private school parliamentary chapter nurturing tomorrow's leaders through structured debate, moral discipline, and public presentation.
+            </p>
+          </div>
+        </div>
+
+        <!-- 3. Falomo High School -->
+        <div class="school-club-card" onclick="openLightbox(this)" data-src="gallery/school-falomo.jpeg" data-caption="Falomo High School, Ikoyi — Students Parliament Club (Education District III)">
+          <div class="school-club-img-wrap">
+            <img src="gallery/school-falomo.jpeg" alt="Falomo High School Students Parliament Club" loading="lazy">
+            <div class="school-club-zoom-badge">
+              <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+              <span>View Photo</span>
+            </div>
+          </div>
+          <div class="school-club-info">
+            <div class="school-club-meta">
+              <span class="school-badge badge-district-iii">Education District III</span>
+            </div>
+            <h4 class="school-club-name">Falomo High School</h4>
+            <div class="school-club-role">Students Parliament Club</div>
+            <p class="school-club-caption">
+              Dedicated student parliamentarians in Ikoyi mastering legislative motions, floor etiquette, and youth leadership under Education District III.
+            </p>
+          </div>
+        </div>
+
+        <!-- 4. Government College Maroko -->
+        <div class="school-club-card" onclick="openLightbox(this)" data-src="gallery/school-maroko.jpeg" data-caption="Government College Maroko — Students Parliament Club (Education District III)">
+          <div class="school-club-img-wrap">
+            <img src="gallery/school-maroko.jpeg" alt="Government College Maroko Students Parliament Club" loading="lazy">
+            <div class="school-club-zoom-badge">
+              <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+              <span>View Photo</span>
+            </div>
+          </div>
+          <div class="school-club-info">
+            <div class="school-club-meta">
+              <span class="school-badge badge-district-iii">Education District III</span>
+            </div>
+            <h4 class="school-club-name">Government College Maroko</h4>
+            <div class="school-club-role">Students Parliament Club</div>
+            <p class="school-club-caption">
+              Distinguished student delegates decorated with medals for exceptional performance and composure during interschool parliamentary proceedings.
+            </p>
+          </div>
+        </div>
+
+        <!-- 5. Okesuna High School -->
+        <div class="school-club-card" onclick="openLightbox(this)" data-src="gallery/school-okesuna.jpeg" data-caption="Okesuna High School — Students Parliament Club (Education District III)">
+          <div class="school-club-img-wrap">
+            <img src="gallery/school-okesuna.jpeg" alt="Okesuna High School Students Parliament Club" loading="lazy">
+            <div class="school-club-zoom-badge">
+              <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+              <span>View Photo</span>
+            </div>
+          </div>
+          <div class="school-club-info">
+            <div class="school-club-meta">
+              <span class="school-badge badge-district-iii">Education District III</span>
+            </div>
+            <h4 class="school-club-name">Okesuna High School</h4>
+            <div class="school-club-role">Students Parliament Club</div>
+            <p class="school-club-caption">
+              Enthusiastic youth parliamentarians representing Lagos Island, championing child rights, educational advocacy, and democratic governance.
+            </p>
+          </div>
+        </div>
+
+        <!-- 6. Egbin Kingdom School -->
+        <div class="school-club-card" onclick="openLightbox(this)" data-src="gallery/ev1-01.jpeg" data-caption="Egbin Kingdom School — Students Parliament Club (Education District II)">
+          <div class="school-club-img-wrap">
+            <img src="gallery/ev1-01.jpeg" alt="Egbin Kingdom School Parliamentarians" loading="lazy">
+            <div class="school-club-zoom-badge">
+              <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+              <span>View Photo</span>
+            </div>
+          </div>
+          <div class="school-club-info">
+            <div class="school-club-meta">
+              <span class="school-badge badge-district-ii">Education District II</span>
+            </div>
+            <h4 class="school-club-name">Egbin Kingdom School</h4>
+            <div class="school-club-role">Students Parliament Club</div>
+            <p class="school-club-caption">
+              Pioneering school parliamentarians from Ikorodu setting the benchmark for chamber discipline, parliamentary address, and democratic student representation.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
     <!-- Event 1 -->
-    <div class="gallery-event active" id="gallery-ev1">
+    <div class="gallery-event" id="gallery-ev1">
       <div class="gallery-event-header">
         <h3 class="gallery-event-title">Parliamentary Sessions</h3>
         <p class="gallery-event-caption">Students participating in full parliamentary proceedings — engaging in formal debates, motions, and legislative exercises that mirror Nigeria's real chambers.</p>
@@ -2777,14 +3065,14 @@
         tab.classList.add('active');
         var panel = document.getElementById('gallery-' + target);
         if (panel) { panel.classList.add('active'); }
-        currentGallery = Array.from(document.querySelectorAll('#gallery-' + target + ' .gallery-item'));
+        currentGallery = Array.from(document.querySelectorAll('#gallery-' + target + ' .gallery-item, #gallery-' + target + ' .school-club-card'));
       });
     });
 
     // =====================================================
     // LIGHTBOX
     // =====================================================
-    var currentGallery = Array.from(document.querySelectorAll('#gallery-ev1 .gallery-item'));
+    var currentGallery = Array.from(document.querySelectorAll('#gallery-ev-schools .school-club-card, #gallery-ev1 .gallery-item'));
     var currentIdx = 0;
     var lightbox = document.getElementById('lightbox');
     var lightboxImg = document.getElementById('lightboxImg');
@@ -2793,7 +3081,7 @@
     window.openLightbox = function (el) {
       var activeEvent = document.querySelector('.gallery-event.active');
       if (activeEvent) {
-        currentGallery = Array.from(activeEvent.querySelectorAll('.gallery-item'));
+        currentGallery = Array.from(activeEvent.querySelectorAll('.gallery-item, .school-club-card'));
       }
       currentIdx = currentGallery.indexOf(el);
       showLightboxAt(currentIdx);
