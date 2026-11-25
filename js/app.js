@@ -1635,6 +1635,29 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    const hasPaymentParamInUrl = urlParams.has('ref') || 
+                                 urlParams.has('merchantTxnref') || 
+                                 urlParams.has('merchantTransactionReference') || 
+                                 urlParams.has('txnRef') || 
+                                 urlParams.has('transactionReference') || 
+                                 urlParams.has('reference') || 
+                                 urlParams.has('status') || 
+                                 urlParams.has('isSuccessful');
+
+    // If the user visited or refreshed the page normally (no payment gateway params in URL),
+    // do NOT treat this as a payment return! Purge any leftover stale pending tokens and exit cleanly.
+    if (!hasPaymentParamInUrl) {
+      try {
+        sessionStorage.removeItem('spa_pending_payment_card');
+        sessionStorage.removeItem('spa_pending_payment_ref');
+        sessionStorage.removeItem('spa_globalpay_txn_ref');
+        localStorage.removeItem('spa_pending_payment_card');
+        localStorage.removeItem('spa_pending_payment_ref');
+        localStorage.removeItem('spa_globalpay_txn_ref');
+      } catch (e) {}
+      return;
+    }
+
     const merchantRef = urlParams.get('ref') || urlParams.get('merchantTxnref') || urlParams.get('merchantTransactionReference') || sessionStorage.getItem('spa_pending_payment_ref') || localStorage.getItem('spa_pending_payment_ref');
     const globalPayRef = urlParams.get('txnRef') || urlParams.get('transactionReference') || urlParams.get('reference') || sessionStorage.getItem('spa_globalpay_txn_ref') || localStorage.getItem('spa_globalpay_txn_ref');
 
@@ -1642,6 +1665,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const processedRef = sessionStorage.getItem('spa_last_processed_ref');
     if (processedRef && processedRef === (merchantRef || globalPayRef)) {
+      try {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } catch (e) {}
       return;
     }
 
@@ -1807,12 +1833,22 @@ document.addEventListener('DOMContentLoaded', () => {
         scrollToDownloadsAndHighlight();
       }, 350);
     } else {
+      // Regardless of failure/cancel outcome, clean pending payment storage and mark as processed
+      // so this modal NEVER recurs on subsequent visits or page reloads.
+      try {
+        sessionStorage.setItem('spa_last_processed_ref', merchantRef || globalPayRef || 'failed');
+        sessionStorage.removeItem('spa_pending_payment_card');
+        sessionStorage.removeItem('spa_pending_payment_ref');
+        sessionStorage.removeItem('spa_globalpay_txn_ref');
+        localStorage.removeItem('spa_pending_payment_card');
+        localStorage.removeItem('spa_pending_payment_ref');
+        localStorage.removeItem('spa_globalpay_txn_ref');
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } catch (e) {}
+
       // If transaction failed or was cancelled
       const status = (paymentDetails && (paymentDetails.transactionStatus || paymentDetails.status)) ? (paymentDetails.transactionStatus || paymentDetails.status).toLowerCase() : '';
-      if (status === 'failed' || status === 'declined' || status === 'cancelled') {
-        try {
-          window.history.replaceState({}, document.title, window.location.pathname);
-        } catch (e) {}
+      if (status === 'failed' || status === 'declined' || status === 'cancelled' || urlParams.get('status') === 'failed' || urlParams.get('status') === 'declined' || urlParams.get('status') === 'cancelled') {
         showModalAlert('GlobalPay transaction was not completed or was declined. Please try again when ready.', {
           title: 'Payment Incomplete',
           type: 'warning'
