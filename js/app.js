@@ -1887,6 +1887,22 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
 
       try {
+        // Ensure Paystack's cross-origin checkout iframe receives clipboard-write permission
+        // BEFORE its src loads, fixing "Copy failed!" on bank transfer account numbers.
+        if (!window.__spnIframeClipboardPatched) {
+          window.__spnIframeClipboardPatched = true;
+          const origCreateElement = document.createElement.bind(document);
+          document.createElement = function (tagName, options) {
+            const el = origCreateElement(tagName, options);
+            if (typeof tagName === 'string' && tagName.toLowerCase() === 'iframe') {
+              try {
+                el.setAttribute('allow', 'clipboard-write; clipboard-read; payment');
+              } catch (e) {}
+            }
+            return el;
+          };
+        }
+
         const handler = PaystackPop.setup({
           key: publicKey,
           email: email,

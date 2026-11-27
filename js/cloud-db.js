@@ -30,7 +30,7 @@
   // Automated Client Storage & Cache Versioning (Clears obsolete session tokens & caches)
   // NEVER wipes valid member records! Resyncs authoritative data from Supabase Cloud.
   // ---------------------------------------------------------------------------
-  const CURRENT_STORAGE_BUILD = 'SPN_BUILD_2026_11_27_PAYSTACK_V11';
+  const CURRENT_STORAGE_BUILD = 'SPN_BUILD_2026_11_27_PAYSTACK_V12';
   try {
     const activeBuild = localStorage.getItem('spa_build_revision');
     if (activeBuild !== CURRENT_STORAGE_BUILD) {
@@ -50,7 +50,7 @@
       if (typeof window !== 'undefined' && 'caches' in window) {
         caches.keys().then(keys => {
           keys.forEach(k => {
-            if (k !== 'spn-pwa-v11') {
+            if (k !== 'spn-pwa-v12') {
               caches.delete(k);
             }
           });

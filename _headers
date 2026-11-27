@@ -1,5 +1,6 @@
 /*
   X-Content-Type-Options: nosniff
+  Permissions-Policy: clipboard-write=*
 
 /sw.js
   Cache-Control: no-cache, no-store, must-revalidate
