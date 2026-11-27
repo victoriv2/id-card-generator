@@ -518,8 +518,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         updatePaywallToggleUI(newState);
         showModalAlert(
           newState 
-            ? 'GlobalPay Payment Wall is now ENABLED. Members must pay the official fee before downloading or printing.' 
-            : 'GlobalPay Payment Wall is now DISABLED. All members can now download and print their ID cards for FREE!',
+            ? 'Paystack Payment Wall is now ENABLED. Members must pay the official fee before downloading or printing.' 
+            : 'Paystack Payment Wall is now DISABLED. All members can now download and print their ID cards for FREE!',
           {
             title: newState ? 'Payment Wall Enabled' : 'Payment Wall Disabled (Free Mode)',
             type: newState ? 'info' : 'success'

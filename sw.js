@@ -1,9 +1,9 @@
 /**
  * Students Parliament Nigeria - Progressive Web App Service Worker
- * Version: 2026.11.25-v10
+ * Version: 2026.11.27-v11
  */
 
-const CACHE_NAME = 'spn-pwa-v10';
+const CACHE_NAME = 'spn-pwa-v11';
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',

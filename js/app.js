@@ -1627,6 +1627,113 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  async function finalizePaidCardUnlock(cardData, effectiveRef, price, email) {
+    let verifiedId = cardData.id;
+    if (window.CloudDB && typeof CloudDB.resolveUniqueCardId === 'function') {
+      try {
+        const catVal = cardData.category || 'MEMBER';
+        const catCode = CATEGORY_CODES[catVal] || 'MEM';
+        const { year2Digits } = getSystemDates();
+        const res = await CloudDB.resolveUniqueCardId(cardData.id, catCode, year2Digits, cardData.name);
+        if (res && res.id && res.id !== cardData.id) {
+          verifiedId = res.id;
+          cardData.id = verifiedId;
+        }
+      } catch (e) {
+        console.warn('[Payment] Post-payment collision check deferred:', e);
+      }
+    }
+
+    // Restore card details into generator form
+    if (cardData.name && inputName) inputName.value = cardData.name;
+    if (verifiedId && inputId) inputId.value = verifiedId;
+    if (cardData.category && inputCategory) {
+      inputCategory.value = cardData.category;
+      if (selectedCategoryText) {
+        selectedCategoryText.textContent = cardData.category;
+        selectedCategoryText.classList.remove('placeholder-text');
+      }
+    }
+    if (cardData.school !== undefined && inputSchool) {
+      inputSchool.value = cardData.school;
+      if (selectedSchoolText) {
+        selectedSchoolText.textContent = cardData.school || 'Select School / Chapter / Branch';
+        if (cardData.school) selectedSchoolText.classList.remove('placeholder-text');
+      }
+    }
+    if (cardData.state && inputState) {
+      inputState.value = cardData.state;
+      if (selectedStateText) {
+        selectedStateText.textContent = cardData.state;
+        selectedStateText.classList.remove('placeholder-text');
+      }
+    }
+    if (cardData.dateIssued && inputDateIssued) inputDateIssued.value = cardData.dateIssued;
+    if (cardData.photo && passportImg && !cardData.photo.includes('[cached_locally]')) {
+      passportImg.onload = () => {
+        fitPassportImage(passportImg);
+        resetPhotoFraming();
+      };
+      passportImg.src = cardData.photo;
+      passportImg.style.display = 'block';
+      if (passportEmptyHint) passportEmptyHint.style.display = 'none';
+      hasPassport = true;
+      if (photoAdjustBox) photoAdjustBox.style.display = 'flex';
+    }
+
+    const verifiedRecord = {
+      ...cardData,
+      id: verifiedId,
+      status: 'ACTIVE',
+      isPaid: true,
+      paymentRef: effectiveRef,
+      amountPaid: price,
+      paidAt: new Date().toISOString(),
+      savedAt: new Date().toISOString()
+    };
+    activeVerifiedCard = verifiedRecord;
+    try {
+      sessionStorage.setItem('spa_active_verified_card', JSON.stringify(verifiedRecord));
+      localStorage.setItem('spa_active_verified_card', JSON.stringify(verifiedRecord));
+      localStorage.setItem('spa_last_paid_card', JSON.stringify(verifiedRecord));
+      sessionStorage.removeItem('spa_pending_payment_card');
+      sessionStorage.removeItem('spa_pending_payment_ref');
+      sessionStorage.removeItem('spa_globalpay_txn_ref');
+      localStorage.removeItem('spa_pending_payment_card');
+      localStorage.removeItem('spa_pending_payment_ref');
+      localStorage.removeItem('spa_globalpay_txn_ref');
+    } catch (e) {}
+
+    advanceCardSequenceIfCurrent(verifiedRecord.id);
+
+    if (window.CloudDB) {
+      await CloudDB.saveCard(verifiedRecord);
+      await CloudDB.markCardPaid(verifiedRecord.id, {
+        reference: effectiveRef,
+        amount: price,
+        email: email
+      }, verifiedRecord);
+    }
+
+    syncOverlay();
+    updatePaywallState();
+
+    // Clean query parameters from URL without page reload
+    try {
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } catch (e) {}
+
+    setTimeout(async () => {
+      scrollToDownloadsAndHighlight();
+      await showModalAlert(`Official card issuance fee confirmed via Paystack (Ref: ${effectiveRef}). Your ID card is officially unlocked! You can now continue and download your high-resolution card files or print below.`, {
+        title: 'Payment Successful!',
+        btnText: 'Continue & Download Card',
+        type: 'success'
+      });
+      scrollToDownloadsAndHighlight();
+    }, 350);
+  }
+
   async function handlePaymentRedirectReturn() {
     let urlParams;
     try {
@@ -1635,13 +1742,10 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    const hasPaymentParamInUrl = urlParams.has('ref') || 
-                                 urlParams.has('merchantTxnref') || 
-                                 urlParams.has('merchantTransactionReference') || 
-                                 urlParams.has('txnRef') || 
-                                 urlParams.has('transactionReference') || 
-                                 urlParams.has('reference') || 
-                                 urlParams.has('status') || 
+    const hasPaymentParamInUrl = urlParams.has('trxref') ||
+                                 urlParams.has('reference') ||
+                                 urlParams.has('ref') ||
+                                 urlParams.has('status') ||
                                  urlParams.has('isSuccessful');
 
     // If the user visited or refreshed the page normally (no payment gateway params in URL),
@@ -1658,20 +1762,18 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    const merchantRef = urlParams.get('ref') || urlParams.get('merchantTxnref') || urlParams.get('merchantTransactionReference') || sessionStorage.getItem('spa_pending_payment_ref') || localStorage.getItem('spa_pending_payment_ref');
-    const globalPayRef = urlParams.get('txnRef') || urlParams.get('transactionReference') || urlParams.get('reference') || sessionStorage.getItem('spa_globalpay_txn_ref') || localStorage.getItem('spa_globalpay_txn_ref');
-
-    if (!merchantRef && !globalPayRef) return;
+    const paystackRef = urlParams.get('reference') || urlParams.get('trxref') || urlParams.get('ref') || sessionStorage.getItem('spa_pending_payment_ref') || localStorage.getItem('spa_pending_payment_ref');
+    if (!paystackRef) return;
 
     const processedRef = sessionStorage.getItem('spa_last_processed_ref');
-    if (processedRef && processedRef === (merchantRef || globalPayRef)) {
+    if (processedRef && processedRef === paystackRef) {
       try {
         window.history.replaceState({}, document.title, window.location.pathname);
       } catch (e) {}
       return;
     }
 
-    // Retrieve pending card state saved prior to payment redirect
+    // Retrieve pending card state saved prior to payment
     let pendingCard = null;
     try {
       const rawPending = sessionStorage.getItem('spa_pending_payment_card') || localStorage.getItem('spa_pending_payment_card');
@@ -1682,179 +1784,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!pendingCard && window.CloudDB && typeof CloudDB.getLocalCards === 'function') {
       const local = CloudDB.getLocalCards() || [];
-      pendingCard = local.find(c => (merchantRef && c.paymentRef === merchantRef) || (c.id && merchantRef && merchantRef.includes(c.id.replace(/[^a-zA-Z0-9]/g, ''))));
+      pendingCard = local.find(c => c.paymentRef === paystackRef || (c.id && paystackRef.includes(c.id.replace(/[^a-zA-Z0-9]/g, ''))));
     }
 
     if (!pendingCard) return;
 
-    // Check transaction status on GlobalPay
-    let isApproved = false;
-    let paymentDetails = null;
-
-    if (window.CloudDB && typeof CloudDB.queryGlobalPayTransaction === 'function') {
-      try {
-        paymentDetails = await CloudDB.queryGlobalPayTransaction(merchantRef, globalPayRef);
-        if (paymentDetails) {
-          const status = (paymentDetails.transactionStatus || paymentDetails.status || '').toLowerCase();
-          if (status === 'successful' || status === 'approved' || status === 'completed') {
-            isApproved = true;
-          } else if (status === 'pending') {
-            // Give bank gateway a 1.5s grace period to settle and re-check once
-            await new Promise(r => setTimeout(r, 1500));
-            paymentDetails = await CloudDB.queryGlobalPayTransaction(merchantRef, globalPayRef);
-            if (paymentDetails && ['successful', 'approved', 'completed'].includes((paymentDetails.transactionStatus || paymentDetails.status || '').toLowerCase())) {
-              isApproved = true;
-            }
-          }
-        }
-      } catch (e) {
-        console.warn('[GlobalPay] Query error:', e);
-      }
-    }
-
-    // If query was successful or user returned with explicit success param
     const explicitStatus = (urlParams.get('status') || urlParams.get('isSuccessful') || '').toLowerCase();
-    if (explicitStatus === 'successful' || explicitStatus === 'true' || explicitStatus === 'approved') {
-      isApproved = true;
+    const isFailed = explicitStatus === 'failed' || explicitStatus === 'declined' || explicitStatus === 'cancelled' || explicitStatus === 'false';
+
+    if (isFailed) {
+      try {
+        sessionStorage.setItem('spa_last_processed_ref', paystackRef);
+        sessionStorage.removeItem('spa_pending_payment_card');
+        sessionStorage.removeItem('spa_pending_payment_ref');
+        localStorage.removeItem('spa_pending_payment_card');
+        localStorage.removeItem('spa_pending_payment_ref');
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } catch (e) {}
+
+      showModalAlert('Paystack transaction was not completed or was declined. Please try again when ready.', {
+        title: 'Payment Incomplete',
+        type: 'warning'
+      });
+      return;
     }
 
+    sessionStorage.setItem('spa_last_processed_ref', paystackRef);
     const price = window.CloudDB ? CloudDB.getPrice() : 1000;
     const email = (window.CloudDB && CloudDB.defaultPaymentEmail) ? CloudDB.defaultPaymentEmail : 'we.are.danithuga@gmail.com';
-    const effectiveRef = (paymentDetails && paymentDetails.retrievalReferenceNumber) ? paymentDetails.retrievalReferenceNumber : (globalPayRef || merchantRef || `GP-${Date.now()}`);
-
-    if (isApproved) {
-      sessionStorage.setItem('spa_last_processed_ref', merchantRef || globalPayRef);
-
-      // Post-Payment Re-verification & Collision Resolution:
-      // Guarantee that if multiple users checked out concurrently,
-      // this bearer's ID is verified and auto-corrected to an available unique ID.
-      let verifiedId = pendingCard.id;
-      if (window.CloudDB && typeof CloudDB.resolveUniqueCardId === 'function') {
-        try {
-          const catVal = pendingCard.category || 'MEMBER';
-          const catCode = CATEGORY_CODES[catVal] || 'MEM';
-          const { year2Digits } = getSystemDates();
-          const res = await CloudDB.resolveUniqueCardId(pendingCard.id, catCode, year2Digits, pendingCard.name);
-          if (res && res.id && res.id !== pendingCard.id) {
-            verifiedId = res.id;
-            pendingCard.id = verifiedId;
-          }
-        } catch (e) {
-          console.warn('[Payment Return] Post-payment collision check deferred:', e);
-        }
-      }
-
-      // Restore card details into generator form
-      if (pendingCard.name && inputName) inputName.value = pendingCard.name;
-      if (verifiedId && inputId) inputId.value = verifiedId;
-      if (pendingCard.category && inputCategory) {
-        inputCategory.value = pendingCard.category;
-        if (selectedCategoryText) {
-          selectedCategoryText.textContent = pendingCard.category;
-          selectedCategoryText.classList.remove('placeholder-text');
-        }
-      }
-      if (pendingCard.school !== undefined && inputSchool) {
-        inputSchool.value = pendingCard.school;
-        if (selectedSchoolText) {
-          selectedSchoolText.textContent = pendingCard.school || 'Select School / Chapter / Branch';
-          if (pendingCard.school) selectedSchoolText.classList.remove('placeholder-text');
-        }
-      }
-      if (pendingCard.state && inputState) {
-        inputState.value = pendingCard.state;
-        if (selectedStateText) {
-          selectedStateText.textContent = pendingCard.state;
-          selectedStateText.classList.remove('placeholder-text');
-        }
-      }
-      if (pendingCard.dateIssued && inputDateIssued) inputDateIssued.value = pendingCard.dateIssued;
-      if (pendingCard.photo && passportImg && !pendingCard.photo.includes('[cached_locally]')) {
-        passportImg.onload = () => {
-          fitPassportImage(passportImg);
-          resetPhotoFraming();
-        };
-        passportImg.src = pendingCard.photo;
-        passportImg.style.display = 'block';
-        if (passportEmptyHint) passportEmptyHint.style.display = 'none';
-        hasPassport = true;
-        if (photoAdjustBox) photoAdjustBox.style.display = 'flex';
-      }
-
-      const verifiedRecord = {
-        ...pendingCard,
-        id: verifiedId,
-        status: 'ACTIVE',
-        isPaid: true,
-        paymentRef: effectiveRef,
-        amountPaid: price,
-        paidAt: new Date().toISOString(),
-        savedAt: new Date().toISOString()
-      };
-      activeVerifiedCard = verifiedRecord;
-      try {
-        sessionStorage.setItem('spa_active_verified_card', JSON.stringify(verifiedRecord));
-        localStorage.setItem('spa_active_verified_card', JSON.stringify(verifiedRecord));
-        localStorage.setItem('spa_last_paid_card', JSON.stringify(verifiedRecord));
-        sessionStorage.removeItem('spa_pending_payment_card');
-        sessionStorage.removeItem('spa_pending_payment_ref');
-        sessionStorage.removeItem('spa_globalpay_txn_ref');
-        localStorage.removeItem('spa_pending_payment_card');
-        localStorage.removeItem('spa_pending_payment_ref');
-        localStorage.removeItem('spa_globalpay_txn_ref');
-      } catch (e) {}
-
-      advanceCardSequenceIfCurrent(verifiedRecord.id);
-
-      if (window.CloudDB) {
-        await CloudDB.saveCard(verifiedRecord);
-        await CloudDB.markCardPaid(verifiedRecord.id, {
-          reference: effectiveRef,
-          amount: price,
-          email: email
-        }, verifiedRecord);
-      }
-
-      syncOverlay();
-      updatePaywallState();
-
-      // Clean query parameters from URL without page reload
-      try {
-        window.history.replaceState({}, document.title, window.location.pathname);
-      } catch (e) {}
-
-      setTimeout(async () => {
-        scrollToDownloadsAndHighlight();
-        await showModalAlert(`Official card issuance fee confirmed via GlobalPay (Ref: ${effectiveRef}). Your ID card is officially unlocked! You can now continue and download your high-resolution card files or print below.`, {
-          title: 'Payment Successful!',
-          btnText: 'Continue & Download Card',
-          type: 'success'
-        });
-        scrollToDownloadsAndHighlight();
-      }, 350);
-    } else {
-      // Regardless of failure/cancel outcome, clean pending payment storage and mark as processed
-      // so this modal NEVER recurs on subsequent visits or page reloads.
-      try {
-        sessionStorage.setItem('spa_last_processed_ref', merchantRef || globalPayRef || 'failed');
-        sessionStorage.removeItem('spa_pending_payment_card');
-        sessionStorage.removeItem('spa_pending_payment_ref');
-        sessionStorage.removeItem('spa_globalpay_txn_ref');
-        localStorage.removeItem('spa_pending_payment_card');
-        localStorage.removeItem('spa_pending_payment_ref');
-        localStorage.removeItem('spa_globalpay_txn_ref');
-        window.history.replaceState({}, document.title, window.location.pathname);
-      } catch (e) {}
-
-      // If transaction failed or was cancelled
-      const status = (paymentDetails && (paymentDetails.transactionStatus || paymentDetails.status)) ? (paymentDetails.transactionStatus || paymentDetails.status).toLowerCase() : '';
-      if (status === 'failed' || status === 'declined' || status === 'cancelled' || urlParams.get('status') === 'failed' || urlParams.get('status') === 'declined' || urlParams.get('status') === 'cancelled') {
-        showModalAlert('GlobalPay transaction was not completed or was declined. Please try again when ready.', {
-          title: 'Payment Incomplete',
-          type: 'warning'
-        });
-      }
-    }
+    await finalizePaidCardUnlock(pendingCard, paystackRef, price, email);
   }
 
   if (btnPaystackPayNow) {
@@ -1867,6 +1825,14 @@ document.addEventListener('DOMContentLoaded', () => {
           type: 'warning'
         });
         if (inputName) inputName.focus();
+        return;
+      }
+
+      if (typeof PaystackPop === 'undefined') {
+        showModalAlert('Paystack gateway is currently initializing. Please check your internet connection and try again.', {
+          title: 'Gateway Connecting',
+          type: 'warning'
+        });
         return;
       }
 
@@ -1885,7 +1851,7 @@ document.addEventListener('DOMContentLoaded', () => {
             syncOverlay();
           }
         } catch (e) {
-          console.warn('[Pay] Pre-payment collision check deferred:', e);
+          console.warn('[Paystack] Pre-payment collision check deferred:', e);
         }
       }
 
@@ -1893,13 +1859,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const price = window.CloudDB ? CloudDB.getPrice() : 1000;
       const cleanIdAlpha = id.replace(/[^a-zA-Z0-9]/g, '');
       const ref = 'SPN-' + (cleanIdAlpha ? cleanIdAlpha + '-' : '') + Date.now();
+      const publicKey = (window.CloudDB && CloudDB.paystackPublicKey) ? CloudDB.paystackPublicKey : 'pk_live_00d128b21cf0dd99c7f68f5e2f63a0319a1613d8';
 
-      // Split full name into first and last name for GlobalPay customer object
-      const nameParts = name.trim().split(/\s+/);
-      const firstName = nameParts[0] || 'Member';
-      const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : 'Member';
-
-      // Persist full current card state before opening GlobalPay checkout
+      // Persist full current card state before opening Paystack checkout
       saveCardRecord();
       const currentCardData = {
         id: id || (inputId ? inputId.value.trim() : ''),
@@ -1921,60 +1883,51 @@ document.addEventListener('DOMContentLoaded', () => {
       btnPaystackPayNow.disabled = true;
       btnPaystackPayNow.innerHTML = `
         <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24" style="animation: portalSpin 0.7s linear infinite;"><path d="M12 4V2C6.48 2 2 6.48 2 12h2c0-4.41 3.59-8 8-8z"/></svg>
-        Connecting to GlobalPay...
+        Opening Paystack...
       `;
 
-      const redirectUrl = window.location.origin + window.location.pathname + `?ref=${encodeURIComponent(ref)}`;
-
-      const payload = {
-        amount: price,
-        merchantTransactionReference: ref,
-        redirectUrl: redirectUrl,
-        customer: {
-          lastName: lastName,
-          firstName: firstName,
-          currency: 'NGN',
-          phoneNumber: '08000000000',
-          address: (inputState && inputState.value.trim() ? inputState.value.trim() : 'Lagos') + ', Nigeria',
-          emailAddress: email,
-          paymentFormCustomFields: [
-            { name: 'Card ID', value: id },
-            { name: 'Category', value: inputCategory ? inputCategory.value : 'MEMBER' },
-            { name: 'Full Name', value: name }
-          ]
-        }
-      };
-
       try {
-        if (!window.CloudDB || typeof CloudDB.generateGlobalPayLink !== 'function') {
-          throw new Error('GlobalPay integration module not loaded.');
-        }
-
-        const result = await CloudDB.generateGlobalPayLink(payload);
-        if (result && result.isSuccessful && result.data && result.data.checkoutUrl) {
-          if (result.data.transactionReference) {
+        const handler = PaystackPop.setup({
+          key: publicKey,
+          email: email,
+          amount: price * 100, // Paystack amount is in Kobo
+          currency: 'NGN',
+          ref: ref,
+          metadata: {
+            custom_fields: [
+              { display_name: 'Member Name', variable_name: 'member_name', value: name },
+              { display_name: 'Card ID', variable_name: 'card_id', value: id },
+              { display_name: 'Category', variable_name: 'category', value: inputCategory ? inputCategory.value : 'MEMBER' },
+              { display_name: 'State', variable_name: 'state', value: inputState ? inputState.value : '' }
+            ]
+          },
+          callback: function (response) {
+            const confirmedRef = (response && response.reference) ? response.reference : ref;
+            sessionStorage.setItem('spa_last_processed_ref', confirmedRef);
+            btnPaystackPayNow.disabled = false;
+            btnPaystackPayNow.innerHTML = originalBtnHtml;
+            finalizePaidCardUnlock(currentCardData, confirmedRef, price, email);
+          },
+          onClose: function () {
+            btnPaystackPayNow.disabled = false;
+            btnPaystackPayNow.innerHTML = originalBtnHtml;
             try {
-              sessionStorage.setItem('spa_globalpay_txn_ref', result.data.transactionReference);
-              localStorage.setItem('spa_globalpay_txn_ref', result.data.transactionReference);
+              sessionStorage.removeItem('spa_pending_payment_card');
+              sessionStorage.removeItem('spa_pending_payment_ref');
+              localStorage.removeItem('spa_pending_payment_card');
+              localStorage.removeItem('spa_pending_payment_ref');
             } catch (e) {}
+            notify('Paystack checkout closed.');
           }
-          notify('Redirecting to GlobalPay Secure Checkout...');
-          window.location.href = result.data.checkoutUrl;
-        } else {
-          btnPaystackPayNow.disabled = false;
-          btnPaystackPayNow.innerHTML = originalBtnHtml;
-          const errMsg = (result && (result.error || result.successMessage)) ? (result.error || result.successMessage) : 'Could not generate payment link.';
-          showModalAlert('GlobalPay Gateway notice: ' + errMsg + '. Please check your connection and try again.', {
-            title: 'Gateway Notice',
-            type: 'warning'
-          });
-        }
+        });
+
+        handler.openIframe();
       } catch (err) {
         btnPaystackPayNow.disabled = false;
         btnPaystackPayNow.innerHTML = originalBtnHtml;
-        console.error('[GlobalPay] Error generating link:', err);
-        showModalAlert('Could not connect to GlobalPay: ' + (err.message || String(err)), {
-          title: 'Connection Error',
+        console.error('[Paystack] Error opening checkout:', err);
+        showModalAlert('Could not launch Paystack checkout: ' + (err.message || String(err)), {
+          title: 'Gateway Error',
           type: 'error'
         });
       }

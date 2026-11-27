@@ -8,8 +8,7 @@
 
   const SUPABASE_URL = 'https://iooacyhvvwqcwvkfxmjt.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlvb2FjeWh2dndxY3d2a2Z4bWp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzMTQ2MzIsImV4cCI6MjEwNjg5MDYzMn0.1vfrl4ZbdPIDlHqdi_PZxy-FGMOItKq91QFyMrbFXEs';
-  const GLOBALPAY_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/globalpay`;
-  const PAYSTACK_PUBLIC_KEY = 'pk_live_732d9b62cd035b8dad96e981d7f6982540342e80';
+  const PAYSTACK_PUBLIC_KEY = 'pk_live_00d128b21cf0dd99c7f68f5e2f63a0319a1613d8';
   const DEFAULT_PAYMENT_EMAIL = 'we.are.danithuga@gmail.com';
   const DEFAULT_PRICE_NGN = 1000;
 
@@ -31,7 +30,7 @@
   // Automated Client Storage & Cache Versioning (Clears obsolete session tokens & caches)
   // NEVER wipes valid member records! Resyncs authoritative data from Supabase Cloud.
   // ---------------------------------------------------------------------------
-  const CURRENT_STORAGE_BUILD = 'SPN_BUILD_2026_11_25_PAYMENT_CLEANUP_V10';
+  const CURRENT_STORAGE_BUILD = 'SPN_BUILD_2026_11_27_PAYSTACK_V11';
   try {
     const activeBuild = localStorage.getItem('spa_build_revision');
     if (activeBuild !== CURRENT_STORAGE_BUILD) {
@@ -51,7 +50,7 @@
       if (typeof window !== 'undefined' && 'caches' in window) {
         caches.keys().then(keys => {
           keys.forEach(k => {
-            if (k !== 'spn-pwa-v10') {
+            if (k !== 'spn-pwa-v11') {
               caches.delete(k);
             }
           });
@@ -167,7 +166,6 @@
   const CloudDB = {
     supabaseUrl: SUPABASE_URL,
     supabaseAnonKey: SUPABASE_ANON_KEY,
-    globalPayFunctionUrl: GLOBALPAY_FUNCTION_URL,
     paystackPublicKey: PAYSTACK_PUBLIC_KEY,
     defaultPaymentEmail: DEFAULT_PAYMENT_EMAIL,
 
@@ -934,50 +932,6 @@
       }
 
       return fullRecord;
-    },
-
-    /**
-     * Generate GlobalPay Checkout Link via Secure Serverless Edge Function
-     * (Zero API keys or credentials exposed to the client or browser)
-     */
-    async generateGlobalPayLink(params) {
-      const res = await fetch(GLOBALPAY_FUNCTION_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          action: 'generate-link',
-          payload: params
-        })
-      });
-      return await res.json();
-    },
-
-    /**
-     * Query GlobalPay transaction status securely via Serverless Edge Function
-     */
-    async queryGlobalPayTransaction(merchantRef, globalPayRef) {
-      try {
-        const res = await fetch(GLOBALPAY_FUNCTION_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            action: 'query-transaction',
-            merchantRef: merchantRef || '',
-            globalPayRef: globalPayRef || ''
-          })
-        });
-        const json = await res.json();
-        if (json && json.isSuccessful && json.data) {
-          return json.data;
-        }
-      } catch (err) {
-        console.warn('[GlobalPay] Secure transaction query deferred:', err);
-      }
-      return null;
     },
 
     /**
