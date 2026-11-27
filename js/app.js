@@ -1887,22 +1887,6 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
 
       try {
-        // Ensure Paystack's cross-origin checkout iframe receives clipboard-write permission
-        // BEFORE its src loads, fixing "Copy failed!" on bank transfer account numbers.
-        if (!window.__spnIframeClipboardPatched) {
-          window.__spnIframeClipboardPatched = true;
-          const origCreateElement = document.createElement.bind(document);
-          document.createElement = function (tagName, options) {
-            const el = origCreateElement(tagName, options);
-            if (typeof tagName === 'string' && tagName.toLowerCase() === 'iframe') {
-              try {
-                el.setAttribute('allow', 'clipboard-write; clipboard-read; payment');
-              } catch (e) {}
-            }
-            return el;
-          };
-        }
-
         const handler = PaystackPop.setup({
           key: publicKey,
           email: email,
@@ -1937,7 +1921,21 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         });
 
+        // Ensure cross-origin iframe is granted clipboard-write permissions for account copy
+        if (typeof window.__ensurePaystackClipboardPermissions === 'function') {
+          window.__ensurePaystackClipboardPermissions();
+        }
+
         handler.openIframe();
+
+        if (typeof window.__ensurePaystackClipboardPermissions === 'function') {
+          window.__ensurePaystackClipboardPermissions();
+          setTimeout(window.__ensurePaystackClipboardPermissions, 50);
+          setTimeout(window.__ensurePaystackClipboardPermissions, 150);
+          setTimeout(window.__ensurePaystackClipboardPermissions, 350);
+          setTimeout(window.__ensurePaystackClipboardPermissions, 700);
+          setTimeout(window.__ensurePaystackClipboardPermissions, 1500);
+        }
       } catch (err) {
         btnPaystackPayNow.disabled = false;
         btnPaystackPayNow.innerHTML = originalBtnHtml;

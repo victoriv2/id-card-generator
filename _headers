@@ -1,6 +1,6 @@
 /*
   X-Content-Type-Options: nosniff
-  Permissions-Policy: clipboard-write=*
+  Permissions-Policy: clipboard-read=*, clipboard-write=*, payment=*
 
 /sw.js
   Cache-Control: no-cache, no-store, must-revalidate
@@ -8,12 +8,14 @@
 
 /*.html
   Cache-Control: public, max-age=0, must-revalidate
+  Permissions-Policy: clipboard-read=*, clipboard-write=*, payment=*
 
 /index.html
   Cache-Control: public, max-age=0, must-revalidate
 
 /generator.html
   Cache-Control: public, max-age=0, must-revalidate
+  Permissions-Policy: clipboard-read=*, clipboard-write=*, payment=*
 
 /id-portal.html
   Cache-Control: public, max-age=0, must-revalidate
